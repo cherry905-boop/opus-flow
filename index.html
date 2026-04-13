@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Opus Flow</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Opus Flow">
+<meta name="theme-color" content="#FAFAF9">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎼</text></svg>">
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body,#root{height:100%;background:#FAFAF9}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
+input,textarea,select,button{font-family:inherit;font-size:inherit}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fi .22s ease-out}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
+.pu{animation:pu 1.5s ease-in-out infinite}
+::selection{background:#DBEAFE;color:#1D4ED8}
+</style>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+/* OPUS FLOW v3 — 배포용 (localStorage) */
+
+const WORK_STATUS = ["idea","sketch","wip","complete","repertoire","concert"];
+const STATUS_LABELS = {idea:"아이디어",sketch:"스케치",wip:"진행중",complete:"완성",repertoire:"레퍼토리",concert:"공연곡"};
+const STATUS_COLORS = {idea:"#94A3B8",sketch:"#D97706",wip:"#2563EB",complete:"#16A34A",repertoire:"#7C3AED",concert:"#DB2777"};
+const SLOTS = {morning:"오전",evening:"오후",free:"자유"};
+const DAYS_KR = ["일","월","화","수","목","금","토"];
+const ICONS = ["🎹","🎼","📖","🎬","💪","🏃","🧘","🎧","🎻","🎺","📝","🎨","🎵","⭐","🔥","💎","🎭","💿","🏆","🎯"];
+const DUR_PRE = [15,30,45,60,90,120];
+
+const ds = d => d.toISOString().split("T")[0];
+const now = () => new Date();
+const today = () => ds(now());
+const wkStart = d => { const t=new Date(d); t.setDate(t.getDate()-t.getDay()); return ds(t); };
+const shift = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return ds(d); };
+const fmtFull = s => { const d=new Date(s); return `${d.getMonth()+1}월 ${d.getDate()}일 ${DAYS_KR[d.getDay()]}`; };
+const wkDates = d => { const s=new Date(wkStart(d)); return Array.from({length:7},(_,i)=>{const x=new Date(s);x.setDate(s.getDate()+i);return ds(x);}); };
+const moDates = d => { const t=new Date(d),y=t.getFullYear(),m=t.getMonth(),f=new Date(y,m,1),l=new Date(y,m+1,0),r=[]; for(let i=0;i<f.getDay();i++){const x=new Date(f);x.setDate(1-f.getDay()+i);r.push(ds(x));} for(let i=1;i<=l.getDate();i++)r.push(ds(new Date(y,m,i))); while(r.length%7){const x=new Date(l);x.setDate(l.getDate()+(r.length-f.getDay()-l.getDate()+1));r.push(ds(x));} return r; };
+const minStr = m => m>=60?`${Math.floor(m/60)}시간${m%60?" "+m%60+"분":""}`:`${m}분`;
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+const KS = {w:"of3-works",s:"of3-sessions",r:"of3-reviews",c:"of3-cats",rt:"of3-routine",g:"of3-goals",h:"of3-horizons",tmr:"of3-timer"};
+
+// localStorage helpers
+const ld = (k,fb) => { try { const v=localStorage.getItem(k); return v?JSON.parse(v):fb; } catch(e){ return fb; } };
+const sv = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} };
+
+const defCats=[{id:"piano",label:"피아노",icon:"🎹"},{id:"composition",label:"작곡",icon:"🎼"},{id:"counterpoint",label:"대위법",icon:"📖"},{id:"av",label:"영상음악",icon:"🎬"},{id:"exercise",label:"운동",icon:"💪"}];
+const defRoutine=[{day:1,slot:"morning",type:"piano"},{day:2,slot:"morning",type:"piano"},{day:3,slot:"morning",type:"piano"},{day:4,slot:"morning",type:"piano"},{day:5,slot:"morning",type:"piano"},{day:1,slot:"evening",type:"composition"},{day:2,slot:"evening",type:"counterpoint"},{day:3,slot:"evening",type:"composition"},{day:4,slot:"evening",type:"counterpoint"},{day:5,slot:"evening",type:"composition"},{day:6,slot:"morning",type:"exercise"},{day:0,slot:"morning",type:"exercise"}];
+const defGoals=[{categoryId:"piano",target:5},{categoryId:"composition",target:3},{categoryId:"counterpoint",target:2},{categoryId:"av",target:2},{categoryId:"exercise",target:3}];
+const defWorks=[{id:"w1",title:"겨울 서곡",status:"sketch",instrumentation:"피아노 솔로",notes:"",horizonIds:[],links:[]},{id:"w2",title:"무제 현악4중주",status:"wip",instrumentation:"현악 4중주",notes:"",horizonIds:[],links:[]}];
+const defHorizons=[{id:"h1",title:"1시간 공연",icon:"🎭",target:12},{id:"h2",title:"자작곡 음반",icon:"💿",target:10}];
+
+const C={bg:"#FAFAF9",bg1:"#FFFFFF",bg2:"#F5F5F4",bd:"#E7E5E4",bdL:"#D6D3D1",tx:"#1C1917",txM:"#78716C",txD:"#A8A29E",ac:"#1D4ED8",acL:"#DBEAFE",acD:"#1E40AF",gn:"#16A34A",gnL:"#DCFCE7",rd:"#DC2626",rdL:"#FEE2E2",am:"#D97706"};
+
+function App(){
+  const[works,setWorks]=useState(()=>ld(KS.w,defWorks));
+  const[sessions,setSessions]=useState(()=>ld(KS.s,[]));
+  const[reviews,setReviews]=useState(()=>ld(KS.r,[]));
+  const[cats,setCats]=useState(()=>ld(KS.c,defCats));
+  const[routine,setRoutine]=useState(()=>ld(KS.rt,defRoutine));
+  const[goals,setGoals]=useState(()=>ld(KS.g,defGoals));
+  const[horizons,setHorizons]=useState(()=>ld(KS.h,defHorizons));
+  const[tab,setTab]=useState("home");
+  const[scr,setScr]=useState(null);
+  const[tmr,setTmr]=useState(()=>ld(KS.tmr,null));
+  const[elapsed,setElapsed]=useState(0);
+
+  // Save on change
+  useEffect(()=>{sv(KS.w,works);},[works]);
+  useEffect(()=>{sv(KS.s,sessions);},[sessions]);
+  useEffect(()=>{sv(KS.r,reviews);},[reviews]);
+  useEffect(()=>{sv(KS.c,cats);},[cats]);
+  useEffect(()=>{sv(KS.rt,routine);},[routine]);
+  useEffect(()=>{sv(KS.g,goals);},[goals]);
+  useEffect(()=>{sv(KS.h,horizons);},[horizons]);
+
+  // Timer backup + tick
+  useEffect(()=>{if(tmr){sv(KS.tmr,tmr);}else{localStorage.removeItem(KS.tmr);}},[tmr]);
+  useEffect(()=>{if(!tmr)return;setElapsed(Math.floor((Date.now()-tmr.startTime)/1000));const iv=setInterval(()=>setElapsed(Math.floor((Date.now()-tmr.startTime)/1000)),1000);return()=>clearInterval(iv);},[tmr]);
+
+  const gc=id=>cats.find(c=>c.id===id)||{id,label:id,icon:"❓"};
+  const gw=id=>works.find(w=>w.id===id);
+  const td=today();
+  const ws=wkStart(td);
+  const tRout=routine.filter(r=>r.day===now().getDay());
+  const tSess=sessions.filter(x=>x.date===td);
+  const wSess=sessions.filter(x=>x.date>=ws);
+  const gp=(cid)=>{const d=wSess.filter(x=>x.type===cid).length;const g=goals.find(x=>x.categoryId===cid);return{done:d,goal:g?g.target:0};};
+  const wt=wid=>sessions.filter(x=>x.linkedWorkId===wid).reduce((a,x)=>a+(x.duration||0),0);
+  const wc=wid=>sessions.filter(x=>x.linkedWorkId===wid).length;
+
+  const nav=(t,d)=>setScr(t?{t,d}:null);
+  const startT=(type,slot,wid)=>{setTmr({type,slot:slot||"free",startTime:Date.now(),wid:wid||null});setElapsed(0);setScr(null);};
+
+  // Styles
+  const P={minHeight:"100vh",paddingBottom:80,background:C.bg,color:C.tx,fontSize:15,lineHeight:1.5};
+  const CT={padding:"20px 20px 28px",maxWidth:480,margin:"0 auto"};
+  const NV={display:"flex",justifyContent:"space-around",padding:"6px 0 calc(10px + env(safe-area-inset-bottom))",borderTop:"1px solid "+C.bd,background:"rgba(250,250,249,.95)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",position:"fixed",bottom:0,left:0,right:0,zIndex:100};
+  const nb=a=>({background:"none",border:"none",color:a?C.ac:C.txD,fontSize:11,padding:"10px 16px",cursor:"pointer",fontWeight:a?700:500});
+  const cd={background:C.bg1,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid "+C.bd,boxShadow:"0 1px 3px rgba(28,25,23,.04)"};
+  const cdH={background:C.acL,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid #BFDBFE"};
+  const H1={fontSize:24,fontWeight:800,letterSpacing:"-0.4px",color:C.tx};
+  const H3={fontSize:12,color:C.txM,fontWeight:600,marginBottom:10,textTransform:"uppercase",letterSpacing:".04em"};
+  const btn={background:C.ac,color:"#fff",border:"none",padding:"13px 28px",borderRadius:12,cursor:"pointer",fontSize:15,fontWeight:700,boxShadow:"0 1px 3px rgba(29,78,216,.15)"};
+  const btnS={background:C.ac,color:"#fff",border:"none",padding:"8px 18px",borderRadius:10,cursor:"pointer",fontSize:13,fontWeight:700};
+  const btnG={background:"transparent",color:C.txM,border:"none",padding:"8px 12px",cursor:"pointer",fontSize:13,fontWeight:500};
+  const btnD={background:C.rdL,color:C.rd,border:"1px solid #FECACA",padding:"11px 20px",borderRadius:12,cursor:"pointer",fontSize:14,fontWeight:600};
+  const inp={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",marginBottom:12,fontSize:15,outline:"none",boxSizing:"border-box"};
+  const ta={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",fontSize:15,outline:"none",resize:"none",lineHeight:1.7,boxSizing:"border-box"};
+  const tg=a=>({display:"inline-flex",alignItems:"center",padding:"7px 16px",borderRadius:10,fontSize:13,fontWeight:600,background:a?C.ac:C.bg2,color:a?"#fff":C.txM,marginRight:6,marginBottom:6,cursor:"pointer",border:a?"none":"1px solid "+C.bd});
+  const pl=c=>({display:"inline-block",padding:"3px 10px",borderRadius:8,fontSize:11,fontWeight:700,background:c+"18",color:c});
+  const pr={background:C.bg2,borderRadius:6,height:7,overflow:"hidden"};
+  const pf=p=>({background:C.ac,height:"100%",width:Math.min(p,100)+"%",borderRadius:6,transition:"width .4s ease"});
+  const bk={background:"none",border:"none",color:C.txM,padding:"8px 0",cursor:"pointer",fontSize:15,marginBottom:14,fontWeight:500};
+  const rb={display:"flex",justifyContent:"space-between",alignItems:"center"};
+  const ck=d=>({width:22,height:22,borderRadius:7,border:"2px solid "+(d?C.ac:C.bdL),background:d?C.ac:C.bg1,cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12,fontWeight:700});
+  const em={color:C.txD,fontSize:14,textAlign:"center",padding:"28px 0"};
+
+  // === TIMER ===
+  if(tmr){
+    const cat=gc(tmr.type);const lw=tmr.wid?gw(tmr.wid):null;
+    const mins=Math.floor(elapsed/60),secs=elapsed%60;
+    return(<div style={P}><div style={{...CT,paddingTop:60}} className="fi">
+      <div style={{textAlign:"center"}}>
+        <div style={{color:C.txM,fontSize:13,marginBottom:10,fontWeight:500}}>{SLOTS[tmr.slot]} 세션</div>
+        <div style={{fontSize:26,fontWeight:800,marginBottom:8,color:C.tx}}>{cat.icon} {cat.label}</div>
+        {lw&&<div style={{color:C.txM,fontSize:14,marginBottom:28}}>→ {lw.title}</div>}
+        <div style={{fontSize:72,fontWeight:200,color:C.ac,fontVariantNumeric:"tabular-nums",marginBottom:8,letterSpacing:"-2px"}}>{String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}</div>
+        <div className="pu" style={{color:C.ac,fontSize:13,marginBottom:56,fontWeight:600}}>● 진행 중</div>
+        <button style={{...btn,width:"100%",padding:16,fontSize:17,borderRadius:14}} onClick={()=>{
+          const dur=Math.max(1,Math.floor((Date.now()-tmr.startTime)/60000));
+          setScr({t:"comp",d:{type:tmr.type,slot:tmr.slot,duration:dur,linkedWorkId:tmr.wid,note:"",checklist:[],date:td}});
+          setTmr(null);
+        }}>세션 완료</button>
+        <button style={{...btnG,marginTop:16,fontSize:14}} onClick={()=>{setTmr(null);setElapsed(0);}}>취소</button>
+      </div>
+    </div></div>);
+  }
+
+  // === OVERLAYS ===
+  if(scr){const{t:st,d:sd}=scr;
+    if(st==="comp"||st==="edS"||st==="addS"){
+      return <SessForm init={sd||{date:td,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]}}
+        cats={cats} works={works} isComp={st==="comp"} canDel={!!(sd&&sd.id)} gc={gc}
+        onSave={s=>{if(s.id){setSessions(p=>p.map(x=>x.id===s.id?s:x));}else{setSessions(p=>[...p,{...s,id:uid()}]);}setScr(null);}}
+        onDel={sd&&sd.id?()=>{setSessions(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null}
+        onClose={()=>setScr(null)} tg={tg} btn={btn} btnS={btnS} btnD={btnD} btnG={btnG} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} ck={ck} P={P} CT={CT} C={C}/>;
+    }
+    if(st==="wD"){
+      const w=gw(sd);if(!w){setScr(null);return null;}
+      const wSes=sessions.filter(x=>x.linkedWorkId===w.id).sort((a,b)=>b.date.localeCompare(a.date));
+      return <WDetail w={w} wSes={wSes} ttm={wt(w.id)} tcnt={wc(w.id)} r30={wSes.filter(x=>(Date.now()-new Date(x.date))/(864e5)<=30).length} horizons={horizons} gc={gc}
+        onUpdate={w2=>setWorks(p=>p.map(x=>x.id===w2.id?w2:x))}
+        onEdit={()=>nav("eW",w)} onDel={()=>{setWorks(p=>p.filter(x=>x.id!==w.id));setSessions(p=>p.map(x=>x.linkedWorkId===w.id?{...x,linkedWorkId:null}:x));setScr(null);}}
+        onAddLink={url=>{if(!url||!url.trim())return;setWorks(p=>p.map(x=>x.id===w.id?{...x,links:[...(x.links||[]),{id:uid(),url,name:url}]}:x));}}
+        onRemLink={lid=>setWorks(p=>p.map(x=>x.id===w.id?{...x,links:(x.links||[]).filter(l=>l.id!==lid)}:x))}
+        onStart={()=>startT(cats[0]&&cats[0].id,"free",w.id)} onClose={()=>setScr(null)}
+        tg={tg} btn={btn} btnS={btnS} btnG={btnG} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} em={em} P={P} CT={CT} C={C}/>;
+    }
+    if(st==="nW"||st==="eW"){
+      return <WForm data={sd} onSave={w=>{if(w.id&&works.find(x=>x.id===w.id)){setWorks(p=>p.map(x=>x.id===w.id?w:x));}else{setWorks(p=>[...p,{...w,id:uid(),horizonIds:[],links:[]}]);}setScr(null);}}
+        onClose={()=>setScr(null)} tg={tg} btn={btn} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} P={P} CT={CT} C={C}/>;
+    }
+    if(st==="dD"){const dt=sd,dss=sessions.filter(x=>x.date===dt);
+      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 뒤로</button>
+        <div style={{...rb,marginBottom:24}}><button style={btnG} onClick={()=>nav("dD",shift(dt,-1))}>←</button><div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:700}}>{fmtFull(dt)}</div>{dt===td&&<div style={{color:C.ac,fontSize:11,marginTop:3,fontWeight:600}}>오늘</div>}</div><button style={btnG} onClick={()=>nav("dD",shift(dt,1))}>→</button></div>
+        <div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>세션 ({dss.length})</span><button style={btnS} onClick={()=>nav("addS",{date:dt,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]})}>+ 추가</button></div>
+        {dss.length===0?<div style={em}>기록 없음</div>:dss.map(ss=>{const cat=gc(ss.type);const lw=ss.linkedWorkId?gw(ss.linkedWorkId):null;
+          return(<div key={ss.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("edS",ss)}><div style={rb}><span style={{fontWeight:700}}>{cat.icon} {cat.label}</span><span style={{color:C.ac,fontWeight:700,fontSize:14}}>{ss.duration}분</span></div>
+            {lw&&<div style={{color:C.txM,fontSize:13,marginTop:5}}>→ {lw.title}</div>}{ss.note&&<div style={{color:C.txD,fontSize:13,marginTop:4}}>{ss.note}</div>}</div>);})}
+      </div></div>);
+    }
+    if(st==="rF"){return <RForm data={sd} cats={cats} gp={gp} onSave={r=>{if(r.id){setReviews(p=>p.map(x=>x.id===r.id?{...r,updatedAt:td}:x));}else{setReviews(p=>[...p,{...r,id:uid(),createdAt:td}]);}setScr(null);}} onDel={sd&&sd.id?()=>{setReviews(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} ta={ta} bk={bk} H1={H1} H3={H3} cd={cd} P={P} CT={CT} C={C}/>;}
+    if(st==="eC"){return <CForm data={sd} onSave={c=>{if(sd&&sd.id)setCats(p=>p.map(x=>x.id===c.id?c:x));else setCats(p=>[...p,{...c,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setCats(p=>p.filter(x=>x.id!==sd.id));setRoutine(p=>p.filter(r=>r.type!==sd.id));setGoals(p=>p.filter(g=>g.categoryId!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
+    if(st==="eH"){return <HForm data={sd} onSave={h=>{if(sd&&sd.id)setHorizons(p=>p.map(x=>x.id===h.id?h:x));else setHorizons(p=>[...p,{...h,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setHorizons(p=>p.filter(x=>x.id!==sd.id));setWorks(p=>p.map(w=>({...w,horizonIds:(w.horizonIds||[]).filter(x=>x!==sd.id)})));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
+    if(st==="eRS"){const day=sd.day,sl=sd.slot;const cur=routine.find(r=>r.day===day&&r.slot===sl);
+      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 취소</button><div style={{...H1,marginBottom:24}}>{DAYS_KR[day]} {SLOTS[sl]}</div>
+        {cats.map(c=>(<div key={c.id} style={{...cd,borderColor:cur&&cur.type===c.id?C.ac:C.bd,cursor:"pointer",background:cur&&cur.type===c.id?C.acL:C.bg1}} onClick={()=>{setRoutine([...routine.filter(r=>!(r.day===day&&r.slot===sl)),{day,slot:sl,type:c.id}]);setScr(null);}}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}
+        <button style={{...btnD,width:"100%",marginTop:10}} onClick={()=>{setRoutine(routine.filter(r=>!(r.day===day&&r.slot===sl)));setScr(null);}}>비우기</button></div></div>);
+    }
+  }
+
+  // === MAIN TABS ===
+  return(<div style={P}><div style={CT}>
+    {tab==="home"&&(<div className="fi">
+      <div style={{marginBottom:24}}><div style={{color:C.txM,fontSize:13,marginBottom:4,fontWeight:500}}>{now().getMonth()+1}월 {now().getDate()}일 {DAYS_KR[now().getDay()]}</div><div style={H1}>작업실</div></div>
+      <div style={{...cd,marginBottom:18}}><div style={{...rb,marginBottom:10}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>오늘 진행률</span><span style={{color:C.ac,fontWeight:800,fontSize:15}}>{tSess.length}/{tRout.length||"−"}</span></div><div style={pr}><div style={pf(tRout.length?Math.round(tSess.length/tRout.length*100):0)}/></div></div>
+      {tRout.length>0?(<div style={{marginBottom:24}}><div style={H3}>오늘 루틴</div>
+        {tRout.map((r,i)=>{const cat=gc(r.type);const done=tSess.some(x=>x.slot===r.slot&&x.type===r.type);
+          return(<div key={i} style={{...(done?cd:cdH),display:"flex",justifyContent:"space-between",alignItems:"center",opacity:done?.55:1}}><div><div style={{color:C.txM,fontSize:11,marginBottom:3,fontWeight:600}}>{SLOTS[r.slot]}</div><div style={{fontWeight:700,fontSize:15}}>{cat.icon} {cat.label}</div></div>
+            {done?<span style={pl(C.gn)}>완료</span>:<button style={btnS} onClick={()=>startT(r.type,r.slot)}>시작</button>}</div>);})}</div>
+      ):(<div style={{...cd,textAlign:"center",padding:"24px 18px",marginBottom:24}}><div style={{fontSize:14,color:C.txM,marginBottom:12,fontWeight:500}}>오늘은 자유 연습일</div>
+        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>{cats.slice(0,4).map(c=>(<button key={c.id} style={{...tg(false),padding:"10px 18px"}} onClick={()=>startT(c.id)}><span style={{marginRight:6}}>{c.icon}</span>{c.label}</button>))}</div></div>)}
+      {works.filter(w=>w.status==="sketch"||w.status==="wip").length>0&&(<div style={{marginBottom:24}}><div style={H3}>진행 중인 곡</div>
+        {works.filter(w=>w.status==="sketch"||w.status==="wip").slice(0,5).map(w=>{const tm=wt(w.id);
+          return(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={rb}><div style={{fontWeight:700}}>{w.title}</div><span style={pl(STATUS_COLORS[w.status])}>{STATUS_LABELS[w.status]}</span></div>
+            <div style={{color:C.txM,fontSize:13,marginTop:6}}>{w.instrumentation||"편성 미정"} · 총 {minStr(tm)}</div></div>);})}</div>)}
+      <div style={cd}><div style={{...H3,marginBottom:14}}>이번 주</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat("+Math.min(cats.length,5)+",1fr)",gap:10}}>{cats.slice(0,5).map(c=>{const p=gp(c.id);const ok=p.goal&&p.done>=p.goal;
+          return(<div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:20,marginBottom:6}}>{c.icon}</div><div style={{fontSize:14,fontWeight:700,color:ok?C.gn:C.tx}}>{p.done}<span style={{color:C.txD,fontWeight:400}}>/{p.goal}</span></div></div>);})}</div></div>
+      <button style={{...btnG,width:"100%",marginTop:14,color:C.txM,fontWeight:600}} onClick={()=>nav("addS",null)}>+ 직접 기록 추가</button>
+    </div>)}
+
+    {tab==="works"&&<WorksTab works={works} horizons={horizons} wt={wt} wc={wc} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} C={C}/>}
+    {tab==="record"&&<RecordTab sessions={sessions} reviews={reviews} cats={cats} td={td} ws={ws} gp={gp} gc={gc} nav={nav} tg={tg} btnS={btnS} btnG={btnG} H1={H1} H3={H3} rb={rb} pl={pl} pr={pr} pf={pf} cd={cd} C={C}/>}
+    {tab==="settings"&&<SetTab cats={cats} routine={routine} goals={goals} horizons={horizons} works={works} gc={gc} gp={gp} setGoals={setGoals} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} cd={cd} C={C}/>}
+  </div>
+  <nav style={NV}>{[["home","작업실"],["works","곡"],["record","기록"],["settings","설정"]].map(x=>(
+    <button key={x[0]} style={nb(tab===x[0])} onClick={()=>{setTab(x[0]);setScr(null);}}>{x[1]}</button>
+  ))}</nav></div>);
+}
+
+// === WORKS TAB ===
+function WorksTab(p){const{works,horizons,wt,wc,nav,tg,btnS,inp,H1,H3,rb,pl,cd,C}=p;
+  const[search,setSearch]=useState("");
+  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>곡</div><button style={btnS} onClick={()=>nav("nW",{title:"",status:"idea",instrumentation:"",notes:""})}>+ 새 곡</button></div>
+    <input style={inp} placeholder="검색..." value={search} onChange={e=>setSearch(e.target.value)}/>
+    {["wip","sketch","idea","complete","repertoire","concert"].map(st=>{const f=works.filter(w=>w.status===st&&(!search||w.title.toLowerCase().indexOf(search.toLowerCase())>=0));if(!f.length)return null;
+      return(<div key={st} style={{marginBottom:20}}><div style={{...H3,display:"flex",alignItems:"center",gap:8}}><span style={pl(STATUS_COLORS[st])}>{STATUS_LABELS[st]}</span><span style={{color:C.txD,fontSize:12}}>{f.length}</span></div>
+        {f.map(w=>(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={{fontWeight:700,marginBottom:4}}>{w.title}</div><div style={{color:C.txM,fontSize:13}}>{w.instrumentation||"−"} · {wc(w.id)}회 · {minStr(wt(w.id))}</div></div>))}</div>);})}</div>);
+}
+
+// === RECORD TAB ===
+function RecordTab(p){const{sessions,reviews,cats,td,ws,gp,gc,nav,tg,btnS,btnG,H1,H3,rb,pl,pr,pf,cd,C}=p;
+  const[mode,setMode]=useState("week");const[calD,setCalD]=useState(td);
+  const calDates=mode==="week"?wkDates(calD):moDates(calD);const wR=reviews.find(r=>r.weekStart===ws);const dt=new Date(calD);
+  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>기록</div><div><button style={tg(mode==="week")} onClick={()=>setMode("week")}>주간</button><button style={tg(mode==="month")} onClick={()=>setMode("month")}>월간</button></div></div>
+    <div style={{...rb,marginBottom:14}}><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?-7:-30))}>←</button><span style={{fontWeight:700,fontSize:15}}>{dt.getFullYear()}년 {dt.getMonth()+1}월</span><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?7:30))}>→</button></div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:5,marginBottom:18}}>
+      {DAYS_KR.map(d=><div key={d} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
+      {calDates.map(dd=>{const isT=dd===td;const count=sessions.filter(x=>x.date===dd).length;const isCur=new Date(dd).getMonth()===dt.getMonth();
+        return(<div key={dd} style={{background:isT?C.acL:C.bg1,borderRadius:10,padding:"9px 2px",textAlign:"center",cursor:"pointer",opacity:isCur?1:.3,border:isT?"1.5px solid "+C.ac:"1px solid "+C.bd}} onClick={()=>nav("dD",dd)}>
+          <div style={{fontSize:13,color:isT?C.ac:C.txM,fontWeight:isT?800:500}}>{new Date(dd).getDate()}</div>{count>0&&<div style={{width:5,height:5,borderRadius:"50%",background:C.ac,margin:"3px auto 0"}}/>}</div>);})}</div>
+    <div style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{weekStart:ws,win:wR?wR.win||wR.text||"":"",focus:wR?wR.focus||"":"",memo:wR?wR.memo||"":"",id:wR?wR.id:null})}><div style={rb}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>주간 리뷰</span><span style={{color:C.ac,fontSize:12,fontWeight:700}}>{wR?"수정":"작성 →"}</span></div>
+      {wR?<div style={{color:C.tx,fontSize:14,marginTop:8}}>✦ {(wR.win||wR.text||"").slice(0,60)}</div>:<div style={{color:C.txD,fontSize:13,marginTop:6}}>이번 주를 돌아보세요</div>}</div>
+    <div style={cd}><div style={H3}>이번 주 진행률</div>{cats.map(c=>{const pp=gp(c.id);if(pp.goal===0&&pp.done===0)return null;const pct=pp.goal?Math.round(pp.done/pp.goal*100):0;
+      return(<div key={c.id} style={{marginBottom:12}}><div style={{...rb,marginBottom:5}}><span style={{fontSize:14,fontWeight:600}}>{c.icon} {c.label}</span><span style={{color:pct>=100?C.gn:C.txM,fontSize:13,fontWeight:700}}>{pp.done}/{pp.goal}</span></div><div style={pr}><div style={pf(pct)}/></div></div>);})}</div>
+    {reviews.length>0&&(<div style={{marginTop:10}}><div style={H3}>지난 리뷰</div>{reviews.slice().sort((a,b)=>(b.weekStart||"").localeCompare(a.weekStart||"")).slice(0,5).map(r=>(
+      <div key={r.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{...r,win:r.win||r.text||"",focus:r.focus||"",memo:r.memo||""})}><span style={{fontSize:13,color:C.txM}}>{r.weekStart?fmtFull(r.weekStart):"−"}</span>{(r.win||r.text)&&<div style={{fontSize:13,marginTop:4}}>✦ {(r.win||r.text||"").slice(0,50)}</div>}</div>))}</div>)}</div>);
+}
+
+// === SETTINGS TAB ===
+function SetTab(p){const{cats,routine,goals,horizons,works,gc,gp,setGoals,nav,tg,btnS,inp,H1,H3,rb,cd,C}=p;
+  const[stab,setStab]=useState("horizon");
+  return(<div className="fi"><div style={{...H1,marginBottom:20}}>설정</div>
+    <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>{[["horizon","장기 목표"],["category","카테고리"],["routine","루틴"],["goals","주간 목표"]].map(x=><button key={x[0]} style={tg(stab===x[0])} onClick={()=>setStab(x[0])}>{x[1]}</button>)}</div>
+    {stab==="horizon"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>장기 목표</span><button style={btnS} onClick={()=>nav("eH",{title:"",icon:"🎯",target:10})}>+ 추가</button></div>
+      {horizons.map(h=>{const linked=works.filter(w=>(w.horizonIds||[]).indexOf(h.id)>=0&&["complete","repertoire","concert"].indexOf(w.status)>=0).length;return(<div key={h.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eH",{...h})}><div style={rb}><span style={{fontWeight:700}}>{h.icon} {h.title}</span><span style={{color:C.ac,fontWeight:700}}>{linked}/{h.target}</span></div></div>);})}</div>}
+    {stab==="category"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>카테고리</span><button style={btnS} onClick={()=>nav("eC",{label:"",icon:"🎵"})}>+ 추가</button></div>
+      {cats.map(c=>(<div key={c.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eC",{...c})}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}</div>}
+    {stab==="routine"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>탭하여 수정</div>
+      <div style={{display:"grid",gridTemplateColumns:"auto repeat(7,1fr)",gap:4}}><div/>{DAYS_KR.map((d,i)=><div key={i} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
+        {["morning","evening"].map(slot=>{const cells=[<div key={slot+"l"} style={{color:C.txM,fontSize:10,padding:"8px 2px",fontWeight:700}}>{SLOTS[slot]}</div>];
+          for(let day=0;day<7;day++){const d=day;const r=routine.find(x=>x.day===d&&x.slot===slot);cells.push(<div key={d} style={{textAlign:"center",padding:"10px 2px",background:C.bg1,borderRadius:8,cursor:"pointer",fontSize:16,border:"1px solid "+C.bd}} onClick={()=>nav("eRS",{day:d,slot})}>{r?gc(r.type).icon:"·"}</div>);}return cells;})}</div></div>}
+    {stab==="goals"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>카테고리별 주간 목표</div>
+      {cats.map(c=>{const g=goals.find(x=>x.categoryId===c.id);return(<div key={c.id} style={{...cd,display:"flex",alignItems:"center",gap:12}}><span style={{flex:1,fontSize:15,fontWeight:600}}>{c.icon} {c.label}</span>
+        <input type="number" style={{...inp,width:64,marginBottom:0,textAlign:"center",padding:8}} value={g?g.target:0} onChange={e=>{const v=parseInt(e.target.value)||0;const ex=goals.find(x=>x.categoryId===c.id);if(ex)setGoals(goals.map(x=>x.categoryId===c.id?{...x,target:v}:x));else setGoals([...goals,{categoryId:c.id,target:v}]);}}/>
+        <span style={{color:C.txD,fontSize:13}}>회</span></div>);})}</div>}</div>);
+}
+
+// === SESSION FORM ===
+function SessForm(p){const{init,cats,works,isComp,canDel,gc,onSave,onDel,onClose,tg,btn,btnS,btnD,btnG,inp,ta,bk,H1,H3,ck,P,CT,C}=p;
+  const[f,setF]=useState({date:init.date||today(),type:init.type,slot:init.slot||"free",linkedWorkId:init.linkedWorkId||null,note:init.note||"",duration:init.duration||30,checklist:init.checklist||[],id:init.id||null});
+  const[nc,setNc]=useState("");const u=patch=>setF(prev=>({...prev,...patch}));
+  const aw=works.filter(w=>["sketch","wip","complete"].indexOf(w.status)>=0);
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button>
+    <div style={{...H1,marginBottom:24}}>{isComp?"세션 기록":f.id?"세션 수정":"세션 추가"}</div>
+    {isComp&&f.duration?(<div style={{textAlign:"center",marginBottom:28}}><div style={{fontSize:52,fontWeight:200,color:C.ac}}>{f.duration}분</div><div style={{color:C.txM,fontSize:14,marginTop:6,fontWeight:500}}>{gc(f.type).icon} {gc(f.type).label} · {SLOTS[f.slot]}</div></div>
+    ):(<div><div style={{marginBottom:16}}><div style={H3}>날짜</div><input type="date" style={inp} value={f.date} onChange={e=>u({date:e.target.value})}/></div>
+      <div style={{marginBottom:16}}><div style={H3}>종류</div><div style={{display:"flex",flexWrap:"wrap"}}>{cats.map(c=><button key={c.id} style={tg(f.type===c.id)} onClick={()=>u({type:c.id})}>{c.icon} {c.label}</button>)}</div></div>
+      <div style={{marginBottom:16}}><div style={H3}>시간</div><div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>{DUR_PRE.map(d=><button key={d} style={tg(f.duration===d)} onClick={()=>u({duration:d})}>{d}분</button>)}</div><input type="number" style={{...inp,width:110}} value={f.duration} onChange={e=>u({duration:parseInt(e.target.value)||0})} placeholder="직접 입력"/></div></div>)}
+    <div style={{marginBottom:16}}><div style={H3}>연결 곡</div><div style={{display:"flex",flexWrap:"wrap"}}><button style={tg(!f.linkedWorkId)} onClick={()=>u({linkedWorkId:null})}>없음</button>{aw.map(w=><button key={w.id} style={tg(f.linkedWorkId===w.id)} onClick={()=>u({linkedWorkId:w.id})}>{w.title}</button>)}</div></div>
+    <div style={{marginBottom:16}}><div style={H3}>체크리스트</div>{(f.checklist||[]).map(c=>(<div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"7px 0"}}><div style={ck(c.done)} onClick={()=>u({checklist:f.checklist.map(x=>x.id===c.id?{...x,done:!x.done}:x)})}>{c.done?"✓":""}</div>
+      <span style={{flex:1,fontSize:14,textDecoration:c.done?"line-through":"none",color:c.done?C.txD:C.tx,fontWeight:500}}>{c.text}</span><button style={{...btnG,color:C.txD,padding:4}} onClick={()=>u({checklist:f.checklist.filter(x=>x.id!==c.id)})}>×</button></div>))}
+      <div style={{display:"flex",gap:8}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="항목 추가" value={nc} onChange={e=>setNc(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}/>
+        <button style={btnS} onClick={()=>{if(nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}>+</button></div></div>
+    <div style={{marginBottom:24}}><div style={H3}>메모</div><textarea style={{...ta,height:80}} value={f.note} onChange={e=>u({note:e.target.value})}/></div>
+    <button style={{...btn,width:"100%"}} onClick={()=>onSave(f)}>저장</button>
+    {canDel&&onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
+}
+
+// === WORK DETAIL ===
+function WDetail(p){const{w,wSes,ttm,tcnt,r30,horizons,gc,onUpdate,onEdit,onDel,onAddLink,onRemLink,onStart,onClose,tg,btn,btnS,btnG,btnD,inp,bk,H1,H3,rb,pl,cd,em,P,CT,C}=p;
+  const[li,setLi]=useState("");
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 뒤로</button>
+    <div style={{...rb,marginBottom:8}}><div style={{...H1,marginBottom:0}}>{w.title}</div><div><button style={btnG} onClick={onEdit}>수정</button><button style={{...btnG,color:C.rd}} onClick={onDel}>삭제</button></div></div>
+    <div style={{color:C.txM,fontSize:14,marginBottom:24,fontWeight:500}}>{w.instrumentation||"편성 미정"}</div>
+    <div style={{...cd,display:"flex",justifyContent:"space-around",textAlign:"center",padding:"20px 18px"}}>
+      <div><div style={{fontSize:22,fontWeight:800,color:C.ac}}>{minStr(ttm)}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>총 투자</div></div><div style={{width:1,background:C.bd}}/>
+      <div><div style={{fontSize:22,fontWeight:800}}>{tcnt}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>세션</div></div><div style={{width:1,background:C.bd}}/>
+      <div><div style={{fontSize:22,fontWeight:800}}>{r30}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>최근30일</div></div></div>
+    <div style={cd}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(w.status===st),background:w.status===st?STATUS_COLORS[st]+"18":"transparent",color:w.status===st?STATUS_COLORS[st]:C.txD,border:w.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>onUpdate({...w,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
+    <div style={cd}><div style={H3}>장기 목표</div><div style={{display:"flex",flexWrap:"wrap"}}>{horizons.map(h=>{const has=(w.horizonIds||[]).indexOf(h.id)>=0;return(<button key={h.id} style={tg(has)} onClick={()=>{const ids=w.horizonIds||[];onUpdate({...w,horizonIds:has?ids.filter(x=>x!==h.id):[...ids,h.id]});}}>{h.icon} {h.title}</button>);})}</div></div>
+    {w.notes&&<div style={cd}><div style={H3}>메모</div><div style={{fontSize:14,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{w.notes}</div></div>}
+    <div style={cd}><div style={H3}>자료 링크 ({(w.links||[]).length})</div>{(w.links||[]).map(l=>(<div key={l.id} style={{...rb,padding:"8px 0",borderBottom:"1px solid "+C.bd}}>
+      <a href={l.url} target="_blank" rel="noopener noreferrer" style={{color:C.ac,textDecoration:"none",fontSize:13,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"80%"}}>{l.name||l.url}</a>
+      <button style={{...btnG,padding:4,color:C.txD}} onClick={()=>onRemLink(l.id)}>×</button></div>))}
+      <div style={{display:"flex",gap:8,marginTop:10}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="URL 추가" value={li} onChange={e=>setLi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){onAddLink(li);setLi("");}}}/>
+        <button style={btnS} onClick={()=>{onAddLink(li);setLi("");}}>+</button></div></div>
+    <div style={cd}><div style={H3}>세션 기록</div>{wSes.length===0?<div style={em}>아직 세션이 없습니다</div>:wSes.slice(0,10).map(ss=>(
+      <div key={ss.id} style={{padding:"10px 0",borderBottom:"1px solid "+C.bd}}><div style={rb}><span style={{color:C.txM,fontSize:12,fontWeight:500}}>{fmtFull(ss.date)}</span><span style={{color:C.ac,fontSize:13,fontWeight:700}}>{ss.duration}분</span></div>
+        <div style={{fontSize:13,marginTop:3,fontWeight:500}}>{gc(ss.type).icon} {gc(ss.type).label}</div>{ss.note&&<div style={{color:C.txD,fontSize:12,marginTop:3}}>{ss.note}</div>}</div>))}
+      {wSes.length>10&&<div style={{color:C.txD,fontSize:12,textAlign:"center",padding:"10px 0"}}>+{wSes.length-10}개 더</div>}</div>
+    <button style={{...btn,width:"100%",marginTop:10}} onClick={onStart}>이 곡으로 세션 시작</button></div></div>);
+}
+
+// === WORK FORM ===
+function WForm(p){const{data,onSave,onClose,tg,btn,inp,ta,bk,H1,H3,P,CT,C}=p;
+  const[f,setF]=useState({title:data&&data.title||"",status:data&&data.status||"idea",instrumentation:data&&data.instrumentation||"",notes:data&&data.notes||"",id:data&&data.id||null,horizonIds:data&&data.horizonIds||[],links:data&&data.links||[]});
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"곡 수정":"새 곡"}</div>
+    <input style={inp} placeholder="제목" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
+    <input style={inp} placeholder="편성 (예: 피아노 솔로)" value={f.instrumentation} onChange={e=>setF({...f,instrumentation:e.target.value})}/>
+    <div style={{marginBottom:16}}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(f.status===st),background:f.status===st?STATUS_COLORS[st]+"18":"transparent",color:f.status===st?STATUS_COLORS[st]:C.txD,border:f.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>setF({...f,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
+    <textarea style={{...ta,height:90,marginBottom:24}} placeholder="메모" value={f.notes} onChange={e=>setF({...f,notes:e.target.value})}/>
+    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button></div></div>);
+}
+
+// === REVIEW FORM ===
+function RForm(p){const{data,cats,gp,onSave,onDel,onClose,tg,btn,btnD,ta,bk,H1,H3,cd,P,CT,C}=p;
+  const[f,setF]=useState({weekStart:data&&data.weekStart||wkStart(today()),win:data&&(data.win||data.text)||"",focus:data&&data.focus||"",memo:data&&data.memo||"",id:data&&data.id||null});
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:20}}>주간 리뷰</div>
+    <div style={{...cd,marginBottom:20}}><div style={{display:"flex",justifyContent:"space-around"}}>{cats.slice(0,5).map(c=>{const pp=gp(c.id);return <div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:18}}>{c.icon}</div><div style={{fontSize:14,color:C.ac,fontWeight:700,marginTop:3}}>{pp.done}/{pp.goal}</div></div>;})}</div></div>
+    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.gn}}>✦</span> 이번 주 가장 잘한 것</div><textarea style={{...ta,height:90}} placeholder="가장 뿌듯했던 순간..." value={f.win} onChange={e=>setF({...f,win:e.target.value})}/></div>
+    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.am}}>◎</span> 다음 주 집중할 것</div><textarea style={{...ta,height:90}} placeholder="다음 주 우선순위..." value={f.focus} onChange={e=>setF({...f,focus:e.target.value})}/></div>
+    <div style={{marginBottom:24}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.txD}}>─</span> 기타 메모</div><textarea style={{...ta,height:70}} placeholder="자유 메모" value={f.memo} onChange={e=>setF({...f,memo:e.target.value})}/></div>
+    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.win||f.focus||f.memo)onSave(f);}}>저장</button>
+    {onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
+}
+
+// === CATEGORY FORM ===
+function CForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
+  const[f,setF]=useState({label:data&&data.label||"",icon:data&&data.icon||"🎵",id:data&&data.id||null});
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"카테고리 수정":"새 카테고리"}</div>
+    <input style={inp} placeholder="이름" value={f.label} onChange={e=>setF({...f,label:e.target.value})}/>
+    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
+    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.label.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
+}
+
+// === HORIZON FORM ===
+function HForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
+  const[f,setF]=useState({title:data&&data.title||"",icon:data&&data.icon||"🎯",target:data&&data.target||10,id:data&&data.id||null});
+  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"목표 수정":"새 목표"}</div>
+    <input style={inp} placeholder="목표 이름" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
+    <input style={inp} type="number" placeholder="목표 곡 수" value={f.target} onChange={e=>setF({...f,target:parseInt(e.target.value)||0})}/>
+    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.slice(0,14).map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
+    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
