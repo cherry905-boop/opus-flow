@@ -5,22 +5,333 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Opus Flow</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Opus Flow">
-<meta name="theme-color" content="#FAFAF9">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎼</text></svg>">
+<meta name="application-name" content="Opus Flow">
+<meta name="description" content="피아노 연습 기록과 체크를 위한 Opus Flow">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>">
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css');
-*{margin:0;padding:0;box-sizing:border-box}
-html,body,#root{height:100%;background:#FAFAF9}
-body{font-family:'Pretendard Variable','Pretendard',-apple-system,'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
-input,textarea,select,button{font-family:inherit;font-size:inherit}
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f7f6f3;
+  --bg-muted:#f1f1ef;
+  --text:#37352f;
+  --muted:#787774;
+  --subtle:#9b9a97;
+  --border:rgba(55,53,47,.09);
+  --border-soft:rgba(55,53,47,.06);
+  --blue-bg:#ddebf1;
+  --blue-text:#183347;
+  --green-bg:#ddedea;
+  --green-text:#1b5147;
+  --yellow-bg:#fbf3db;
+  --yellow-text:#614a19;
+  --red-bg:#fbe4e4;
+  --red-text:#5c1f1f;
+  --gray-bg:rgba(55,53,47,.06);
+  --gray-text:#787774;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{min-height:100%;background:var(--bg)}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+button{touch-action:manipulation}
+input,textarea,select{outline:none}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fi .22s ease-out}
-@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
-.pu{animation:pu 1.5s ease-in-out infinite}
-::selection{background:#DBEAFE;color:#1D4ED8}
+::selection{background:var(--blue-bg);color:var(--blue-text)}
+.app{min-height:100vh;background:var(--bg);color:var(--text)}
+.layout{max-width:390px;margin:0 auto;min-height:100vh}
+.main{padding:28px 20px 92px;max-width:390px;margin:0 auto}
+.mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;border-top:1px solid var(--border);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 0 calc(8px + env(safe-area-inset-bottom))}
+.mobile-nav-inner{max-width:390px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.nav-button{border:0;background:transparent;color:var(--subtle);font-size:12px;font-weight:400;padding:10px 4px;cursor:pointer}
+.nav-button.active{color:var(--text);font-weight:650}
+.sidebar{display:none}
+.page-header{margin-bottom:24px}
+.page-icon{font-size:28px;line-height:1;margin-bottom:10px}
+.page-title{font-size:32px;font-weight:750;letter-spacing:-.4px;line-height:1.15;color:var(--text)}
+.page-subtitle{font-size:14px;font-weight:400;color:var(--muted);margin-top:6px}
+.grid{display:grid;gap:16px}
+.desktop-grid{display:grid;gap:16px}
+.properties{display:grid;grid-template-columns:88px 1fr;row-gap:8px;column-gap:16px;margin:0 0 26px}
+.property-label{font-size:14px;color:var(--muted);font-weight:400}
+.property-value{font-size:14px;color:var(--text);min-width:0}
+.section{margin-top:26px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.section-title{font-size:14px;font-weight:650;color:var(--text)}
+.section-action{border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.row{display:flex;align-items:center;gap:10px;min-height:66px;padding:12px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .12s ease}
+.row:first-child{border-top:1px solid var(--border-soft)}
+.row:hover{background:var(--bg-soft)}
+.row:active{background:var(--bg-muted)}
+.marker{width:20px;flex:0 0 20px;color:var(--muted);font-size:14px;text-align:center}
+.row-main{flex:1;min-width:0}
+.row-title{font-size:14px;font-weight:600;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-right{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;min-height:18px;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:550;line-height:1.25;white-space:nowrap;background:var(--gray-bg);color:var(--gray-text)}
+.pill.blue{background:var(--blue-bg);color:var(--blue-text)}
+.pill.green{background:var(--green-bg);color:var(--green-text)}
+.pill.yellow{background:var(--yellow-bg);color:var(--yellow-text)}
+.pill.red{background:var(--red-bg);color:var(--red-text)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--border-soft);margin:0 -20px 12px;padding:0 20px}
+.tab{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:400;padding:8px 8px 9px;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+.tab.active{color:var(--text);font-weight:650;border-bottom-color:var(--text)}
+.period-nav{display:grid;grid-template-columns:34px 1fr 34px;align-items:center;margin:0 0 18px}
+.period-nav .button{min-height:34px;padding:0}
+.period-title{font-size:14px;font-weight:650;text-align:center;color:var(--text)}
+.button{border:0;background:var(--text);color:#fff;border-radius:6px;min-height:42px;padding:9px 13px;font-size:13px;font-weight:650;cursor:pointer}
+.button.secondary{background:var(--bg-muted);color:var(--text)}
+.button.ghost{background:transparent;color:var(--muted)}
+.button.danger{background:var(--red-bg);color:var(--red-text)}
+.button.full{width:100%}
+.button-row{display:flex;gap:8px;margin-top:18px}
+.button-row .button{flex:1}
+.field{display:block;margin-bottom:14px}
+.label{font-size:14px;color:var(--muted);font-weight:400;margin-bottom:6px}
+.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:14px;padding:9px 10px;line-height:1.4}
+.textarea{min-height:94px;resize:vertical;line-height:1.5}
+.inline-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.progress{height:4px;border-radius:99px;background:var(--bg-muted);overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:99px;background:var(--text)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border-soft);border-left:1px solid var(--border-soft);margin-bottom:26px}
+.calendar-head,.calendar-day{border-right:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);text-align:center}
+.calendar-head{font-size:12px;color:var(--muted);padding:7px 0}
+.calendar-day{border-top:0;border-left:0;background:var(--bg);min-height:46px;padding:7px 0;color:var(--text);cursor:pointer}
+.calendar-day.muted{color:var(--subtle)}
+.calendar-day.today{box-shadow:inset 0 0 0 1.4px var(--text)}
+.dot{width:5px;height:5px;border-radius:99px;background:var(--text);margin:4px auto 0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.stat{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:13px 0}
+.stat-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;font-weight:650;color:var(--text)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+.overlay{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto}
+.overlay-inner{max-width:390px;margin:0 auto;min-height:100%;padding:28px 20px 124px}
+.back{border:0;background:transparent;color:var(--muted);font-size:14px;padding:8px 0 16px;cursor:pointer}
+.empty{color:var(--subtle);font-size:14px;font-weight:400}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;font-weight:550}
+.muted{color:var(--muted)}
+.score-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.checkline{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);margin:0 0 14px}
+.choice-field{margin-bottom:14px}
+.choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px}
+.choice-grid.compact{grid-template-columns:repeat(5,1fr)}
+.choice-button{border:1px solid var(--border);background:var(--bg);color:var(--muted);border-radius:6px;min-height:38px;padding:8px 7px;font-size:13px;cursor:pointer}
+.choice-button.active{background:var(--text);border-color:var(--text);color:#fff;font-weight:650}
+.choice-button.warning.active{background:var(--yellow-bg);border-color:var(--yellow-bg);color:var(--yellow-text)}
+.quick-checks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.rule-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:8px}
+.timer-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:22px 0;margin:0 0 26px}
+.timer-time{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:36px;font-weight:650;letter-spacing:0;line-height:1.1;margin-bottom:12px}
+.metronome-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:16px 0;margin:-2px 0 26px}
+.metronome-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.metronome-title{font-size:14px;font-weight:650;color:var(--text)}
+.metronome-state{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.metronome-dot{width:8px;height:8px;border-radius:99px;background:var(--border);transition:transform .08s ease,background .08s ease}
+.metronome-dot.on{background:var(--text);transform:scale(1.35)}
+.metronome-beats{display:flex;align-items:center;gap:5px;margin-left:2px}
+.metronome-beat{width:6px;height:6px;border-radius:99px;background:var(--border);transition:background .08s ease,transform .08s ease}
+.metronome-beat.accent{width:7px;height:7px}
+.metronome-beat.active{background:var(--text);transform:scale(1.35)}
+.metronome-controls{display:grid;grid-template-columns:38px minmax(0,1fr) 38px 84px;gap:8px;align-items:center}
+.metronome-controls .button{min-height:42px;padding:0}
+.metronome-bpm{display:grid;grid-template-columns:1fr 42px;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
+.metronome-bpm input{border:0;border-radius:0;text-align:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;font-weight:650;padding:8px 6px}
+.metronome-bpm span{font-size:11px;color:var(--muted);border-left:1px solid var(--border);padding:0 8px}
+.metronome-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.metronome-mini{display:grid;grid-template-columns:42px 1fr;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
+.metronome-mini span{font-size:11px;color:var(--muted);padding:0 8px;border-right:1px solid var(--border)}
+.metronome-mini select{border:0;border-radius:0;background:var(--bg);padding:8px 8px;color:var(--text)}
+.metronome-advanced{margin-top:8px}
+.metronome-advanced summary{list-style:none;cursor:pointer;font-size:12px;color:var(--muted);padding:5px 0}
+.metronome-advanced summary::-webkit-details-marker{display:none}
+.metronome-volume{display:grid;grid-template-columns:44px 1fr 50px;gap:10px;align-items:center;margin-top:12px;font-size:12px;color:var(--muted)}
+.metronome-volume input{width:100%;height:24px;accent-color:var(--text);cursor:pointer}
+.metronome-volume input::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--bg-muted)}
+.metronome-volume input::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:99px;background:var(--text);margin-top:-7px}
+.metronome-volume input::-moz-range-track{height:8px;border-radius:99px;background:var(--bg-muted)}
+.metronome-volume input::-moz-range-thumb{width:22px;height:22px;border:0;border-radius:99px;background:var(--text)}
+.metronome-volume-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;text-align:right;color:var(--text)}
+.check-marker input{width:17px;height:17px;accent-color:var(--text)}
+.practice-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px;max-width:260px}
+.practice-mini-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.practice-mini-input{padding:6px 8px}
+.bpm-entry{display:grid;grid-template-columns:82px minmax(116px,1fr) 32px;gap:8px;align-items:end;margin-top:8px;max-width:360px}
+.bpm-entry-remove{border:0;background:var(--bg-soft);color:var(--muted);border-radius:6px;height:36px;cursor:pointer}
+.bpm-add{border:0;background:transparent;color:var(--muted);font-size:12px;margin-top:8px;cursor:pointer}
+.count-stepper{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;min-height:36px;background:var(--bg)}
+.count-button{border:0;background:var(--bg-soft);color:var(--text);font-size:13px;font-weight:650;height:100%;cursor:pointer}
+.count-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;text-align:center;font-size:14px;font-weight:650}
+.practice-sticky{position:fixed;left:50%;bottom:0;z-index:60;width:min(390px,100vw);transform:translateX(-50%);padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border-soft);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.practice-step-note{font-size:13px;color:var(--muted);line-height:1.5;margin:-10px 0 20px}
+.review-back{border:0;background:transparent;color:var(--muted);font-size:13px;padding:0 0 16px;cursor:pointer}
+@media (hover:none){.row:hover{background:transparent}.row:active{background:var(--bg-soft)}}
+@media (min-width:900px){
+  .layout{display:block;max-width:390px}
+  .sidebar{display:none}
+  .brand{font-size:16px;font-weight:720;margin-bottom:24px}
+  .side-nav{display:flex;flex-direction:column;gap:2px}
+  .side-button{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:9px 10px;text-align:left;font-size:14px;cursor:pointer}
+  .side-button.active{background:var(--bg-soft);color:var(--text);font-weight:650}
+  .mobile-nav{display:block}
+  .main{max-width:390px;margin:0;padding:28px 20px 92px}
+  .desktop-grid{grid-template-columns:1fr;align-items:start}
+  .overlay{background:var(--bg);backdrop-filter:none}
+  .overlay-inner{min-height:100%;margin:0 auto;background:var(--bg);border:0;border-radius:0;box-shadow:none}
+}
+
+/* Photo reference pass: iOS-like piano practice app */
+html,body,#root{background:#f3f1ed}
+body{color:#1f1f1d}
+.app{background:#fff;min-height:100vh}
+.layout{max-width:390px;background:#fff}
+.main{max-width:390px;margin:0 auto;padding:0 24px 116px;background:#fff;overflow-x:hidden}
+.page-header{margin:12px 0 16px}
+.page-head-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.page-head-left{display:flex;align-items:center;min-width:0;gap:12px}
+.page-icon{width:34px;height:34px;display:grid;place-items:center;margin:0;font-size:28px;line-height:1;color:#111}
+.page-icon:empty{display:none}
+.page-title{font-size:28px;font-weight:800;letter-spacing:0;line-height:1.12;color:#151512;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-subtitle{margin-top:7px;font-size:12px;line-height:1.35;color:#83807a}
+.page-action{flex:0 0 auto}
+.icon-button{width:34px;height:34px;border:0;background:transparent;border-radius:99px;color:#191916;font-size:22px;display:grid;place-items:center;cursor:pointer}
+.action-stack{display:grid;gap:12px;margin:16px 0 14px}
+.action-card{width:100%;max-width:100%;overflow:hidden;min-height:56px;border:1px solid #e7e2dc;background:#fff;border-radius:10px;display:grid;grid-template-columns:34px minmax(0,1fr) 18px;align-items:center;gap:10px;padding:12px 14px;text-align:left;color:#161613;box-shadow:0 1px 0 rgba(20,18,15,.02);cursor:pointer}
+.action-card:active{background:#f7f5f1}
+.action-icon{font-size:25px;line-height:1;text-align:center}
+.action-copy{display:grid;gap:2px;min-width:0}
+.action-title{font-size:16px;font-weight:760;line-height:1.25}
+.action-subtitle{font-size:11px;color:#8b8781;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chevron{font-size:24px;line-height:1;color:#111}
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;margin:12px 0 20px;padding:3px;border:1px solid #e7e2dc;border-radius:999px;background:#f5f3ef;overflow:hidden}
+.tab{border:0;border-radius:999px;background:transparent;color:#5f5b55;font-size:13px;font-weight:500;padding:7px 10px;line-height:1.15}
+.tab.active{background:#fff;color:#111;font-weight:800;border-bottom:0;box-shadow:0 1px 8px rgba(26,24,20,.08)}
+.section{margin-top:24px}
+.section-head{margin-bottom:9px}
+.section-title{font-size:13px;font-weight:800;color:#1d1c19}
+.section-action.plus{font-size:24px;line-height:1;color:#1a1916}
+.row{width:100%;max-width:100%;overflow:hidden;min-height:58px;padding:11px 12px;margin-bottom:8px;border:1px solid #e8e3dc;border-radius:9px;background:#fff;gap:10px;box-shadow:0 1px 0 rgba(20,18,15,.02)}
+.row:first-child{border-top:1px solid #e8e3dc}
+.row:hover{background:#fff}
+.row:active{background:#f7f5f1}
+.marker{width:24px;flex-basis:24px;color:#111;font-size:20px}
+.row-title{font-size:13px;font-weight:760;color:#1f1f1d;letter-spacing:0}
+.row-sub{font-size:11px;color:#85817b;margin-top:3px}
+.row-right{gap:6px;font-size:11px;color:#635f59;flex:0 0 auto;max-width:96px;min-width:0;justify-content:flex-end;overflow:hidden}
+.row-stack{display:grid;gap:3px;text-align:right;color:#77736d}
+.row-stack .mono{color:#222;font-size:12px}
+.pill{border-radius:7px;padding:4px 8px;min-height:22px;font-size:11px;font-weight:700}
+.button{background:#1f211e;border-radius:12px;min-height:44px}
+.button.secondary{background:#f2f0ec;color:#222}
+.button.ghost{background:#f6f4f0;color:#555}
+.button.danger{background:#fbe4e4;color:#5c1f1f}
+.mobile-nav{border-top:1px solid #e7e2dc;background:rgba(255,255,255,.94);padding:6px 0 calc(7px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(35,31,25,.06)}
+.mobile-nav-inner{max-width:390px;grid-template-columns:repeat(5,1fr);align-items:end}
+.nav-button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-height:58px;padding:4px 2px 5px;color:#7b7771;font-size:11px}
+.nav-button.active{color:#171715;font-weight:800}
+.nav-icon{height:22px;display:grid;place-items:center;font-size:20px;line-height:1}
+.nav-button.center{transform:translateY(-16px);color:#8a857f}
+.nav-button.center .nav-icon{width:54px;height:54px;border-radius:999px;background:linear-gradient(#b6b1a9,#979188);color:#fff;font-size:28px;box-shadow:0 8px 18px rgba(57,53,48,.24);border:3px solid rgba(255,255,255,.9)}
+.nav-button.center span:last-child{margin-top:-2px}
+.overlay{background:#fff}
+.overlay-inner{max-width:390px;padding:0 24px 128px;background:#fff}
+.back{padding:10px 0 12px;color:#111;font-size:24px;line-height:1;width:44px;text-align:left}
+.back{font-size:0}
+.back:before{content:"←";font-size:24px}
+.properties{border:1px solid #e8e3dc;border-radius:12px;padding:13px 14px;margin-bottom:18px;background:#fff}
+.field{margin-bottom:13px}
+.input,.select,.textarea{border:1px solid #e8e3dc;border-radius:9px;background:#fff;padding:11px 12px}
+.textarea{min-height:90px}
+.week-card,.bar-card,.distribution-card{border:1px solid #e8e3dc;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 1px 0 rgba(20,18,15,.02)}
+.period-nav{display:grid;grid-template-columns:32px 1fr 32px;align-items:center;margin:0;padding:8px 4px 6px}
+.period-title{font-size:14px;font-weight:760;color:#1d1c19;text-align:center}
+.period-arrow{border:0;background:transparent;font-size:28px;line-height:1;color:#151512;cursor:pointer}
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);padding:7px 8px 12px;gap:2px}
+.week-day{border:0;background:transparent;display:grid;place-items:center;gap:6px;min-height:58px;border-radius:999px;color:#5f5b55;cursor:pointer}
+.week-day span{font-size:11px;color:#8a857f}
+.week-day strong{width:30px;height:30px;border-radius:99px;display:grid;place-items:center;font-size:14px;font-weight:650}
+.week-day.today strong{background:#1d1d1a;color:#fff}
+.week-day i{width:5px;height:5px;border-radius:99px;background:#48a064}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 22px}
+.metric-card{border:1px solid #e8e3dc;border-radius:9px;background:#fff;padding:13px 12px;min-height:88px}
+.metric-value{font-size:18px;font-weight:820;color:#1b1b18;line-height:1.15}
+.metric-label{font-size:12px;font-weight:760;color:#2a2926;margin-top:10px}
+.metric-caption{font-size:11px;color:#8a857f;margin-top:4px}
+.bar-card{height:176px;padding:18px 14px 10px}
+.bar-chart{height:100%;display:grid;grid-template-columns:repeat(7,1fr);align-items:end;gap:11px}
+.bar-column{height:100%;display:grid;grid-template-rows:1fr 18px;align-items:end;text-align:center;gap:8px}
+.bar-track{height:100%;display:flex;align-items:end;justify-content:center;border-top:1px solid #f0ece6}
+.bar-fill{width:14px;border-radius:8px 8px 2px 2px;background:#35332f;min-height:4px}
+.bar-column span{font-size:11px;color:#817c75}
+.distribution-card{padding:14px 13px}
+.dist-row{display:grid;grid-template-columns:54px 1fr 52px;align-items:center;gap:12px;min-height:28px;font-size:12px;color:#262522}
+.dist-row div{height:4px;border-radius:99px;background:#eeeae4;overflow:hidden}
+.dist-row i{display:block;height:100%;border-radius:99px;background:#9b9993}
+.dist-row em{font-style:normal;text-align:right;color:#6f6b65}
+.practice-timer-card{border:1px solid #e8e3dc;border-radius:12px;padding:14px 16px;margin:4px 0 18px;display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center;background:#fff}
+.timer-label{font-size:11px;color:#6f6b65;margin-bottom:4px}
+.timer-time{font-size:36px;color:#050505;letter-spacing:0;margin:0}
+.timer-goal{border-left:1px solid #e8e3dc;padding-left:18px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px}
+.timer-goal .timer-label{grid-column:1 / 3}
+.timer-goal strong{font-size:18px}
+.timer-goal span{font-size:26px;color:#111}
+.timer-buttons{grid-column:1 / 3;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metronome-card{border:1px solid #1f1f1d;border-radius:13px;background:#fff;padding:14px 16px 16px;margin:0 0 20px;box-shadow:0 12px 22px rgba(22,20,17,.16)}
+.metronome-top{margin:0 0 18px}
+.metronome-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:760}
+.metronome-icons{display:flex;gap:14px;font-size:20px;color:#191916}
+.metronome-dot{background:#4ca260}
+.metronome-display{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;font-size:40px;font-weight:820;color:#050505}
+.metronome-display input{width:92px;border:0;background:transparent;text-align:left;font:inherit;color:#050505;line-height:1}
+.metronome-beats{justify-content:center;margin:0 0 14px}
+.metronome-settings-row{display:grid;grid-template-columns:74px 82px 1fr;border-top:1px solid #ebe6df;border-bottom:1px solid #ebe6df;margin:0 -16px 15px}
+.metronome-settings-row label{min-height:58px;padding:9px 10px;border-right:1px solid #ebe6df;display:grid;align-content:center;gap:4px;font-size:11px;color:#6e6a64}
+.metronome-settings-row label:last-child{border-right:0;grid-template-columns:1fr 38px;align-items:center}
+.metronome-settings-row label:last-child span{grid-column:1 / 3}
+.metronome-settings-row select{border:0;background:transparent;color:#111;font-size:13px;min-width:0}
+.metronome-settings-row input[type=range]{width:100%;accent-color:#111}
+.metronome-settings-row em{font-style:normal;color:#111;text-align:right}
+.metronome-control-row{display:grid;grid-template-columns:58px 78px 72px;justify-content:center;align-items:center;gap:26px}
+.metro-stop,.metro-tap{border:0;background:#f1efeb;color:#111;border-radius:12px;min-height:44px;font-weight:800;cursor:pointer}
+.metro-play{border:0;width:78px;height:78px;border-radius:999px;background:#1f1f1d;color:#fff;font-size:32px;display:grid;place-items:center;box-shadow:0 8px 15px rgba(20,18,15,.2);cursor:pointer}
+.metro-tap{border-radius:999px}
+.metronome-state{margin-top:10px;justify-content:center;font-size:11px;color:#7c7771}
+.quick-checks{grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 18px}
+.quick-card{border:1px solid #e8e3dc;border-radius:10px;min-height:102px;background:#fff;display:grid;place-items:center;text-align:center;padding:12px;color:#171714;cursor:pointer}
+.quick-card strong{font-size:28px;line-height:1}
+.quick-card span{font-size:15px;font-weight:820;margin-top:4px}
+.quick-card em{font-style:normal;font-size:11px;color:#77736d}
+.quick-card.stable{background:#f4faf5;border-color:#dceadf}
+.quick-card.caution{background:#fff3f1;border-color:#f1d9d4;color:#8c1d13}
+.eval-list{display:grid;gap:8px}
+.eval-row{border:1px solid #e8e3dc;border-radius:10px;background:#fff;display:grid;grid-template-columns:40px 1fr;gap:10px;padding:10px}
+.eval-icon{width:34px;height:34px;border-radius:8px;background:#f2f0ec;display:grid;place-items:center;font-size:20px;color:#222}
+.eval-row.warning .eval-icon{background:#fff0ee;color:#9d2a1d}
+.eval-copy{min-width:0}
+.eval-title{font-size:13px;font-weight:820;color:#1c1b18}
+.eval-subtitle{font-size:10px;color:#8a857f;margin-top:2px;line-height:1.25}
+.eval-options{grid-column:1 / 3;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.eval-button{border:1px solid #ebe6df;background:#faf9f7;border-radius:7px;min-height:35px;font-size:12px;color:#4f4b45;cursor:pointer}
+.eval-button.active{background:#1f1f1d;color:#fff;border-color:#1f1f1d;font-weight:800}
+.practice-sticky{width:min(390px,100vw);padding:0 0 env(safe-area-inset-bottom);border:0;background:transparent;backdrop-filter:none}
+.dark-cta{border-radius:16px 16px 0 0;background:linear-gradient(135deg,#2d2f2b,#171914);min-height:90px;font-size:16px;box-shadow:0 -10px 24px rgba(24,22,18,.18)}
+.dark-cta span{display:inline-grid;place-items:center;margin-left:14px;width:24px;height:24px;border-radius:99px;background:#efede8;color:#222;font-size:12px}
+.calendar{border:0;margin:0}
+.calendar-head{border:0;color:#8a857f}
+.calendar-day{border:0;border-radius:9px}
+@media (min-width:900px){
+  .layout{max-width:390px;background:#fff;box-shadow:0 12px 36px rgba(33,30,24,.10)}
+  .main{max-width:390px;padding:0 24px 116px}
+  .mobile-nav{display:block}
+  .mobile-nav-inner{grid-template-columns:repeat(5,1fr)}
+}
 </style>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -29,368 +340,2277 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useMemo, useState, useEffect, useRef } = React;
 
-/* OPUS FLOW v3 — 배포용 (localStorage) */
+const LEGACY_KEYS = [
+  "of3-works",
+  "of3-sessions",
+  "of3-reviews",
+  "of3-cats",
+  "of3-routine",
+  "of3-goals",
+  "of3-horizons",
+  "of3-timer",
+];
+const KEYS = {
+  timer: "of3-timer",
+  reviews: "of3-reviews",
+  pieces: "of3-piano-pieces",
+  techniques: "of3-piano-techniques",
+  pianoSessions: "of3-piano-sessions",
+  techniquePlans: "of3-technique-plans",
+  techniquePlanSessions: "of3-technique-sessions",
+  techniquePractices: "of3-technique-practices",
+  settings: "of3-settings",
+};
+const NEW_KEYS = [KEYS.pieces, KEYS.techniques, KEYS.pianoSessions, KEYS.techniquePlans, KEYS.techniquePlanSessions, KEYS.techniquePractices, KEYS.settings];
+const ALL_BACKUP_KEYS = [...LEGACY_KEYS, ...NEW_KEYS];
 
-const WORK_STATUS = ["idea","sketch","wip","complete","repertoire","concert"];
-const STATUS_LABELS = {idea:"아이디어",sketch:"스케치",wip:"진행중",complete:"완성",repertoire:"레퍼토리",concert:"공연곡"};
-const STATUS_COLORS = {idea:"#94A3B8",sketch:"#D97706",wip:"#2563EB",complete:"#16A34A",repertoire:"#7C3AED",concert:"#DB2777"};
-const SLOTS = {morning:"오전",evening:"오후",free:"자유"};
-const DAYS_KR = ["일","월","화","수","목","금","토"];
-const ICONS = ["🎹","🎼","📖","🎬","💪","🏃","🧘","🎧","🎻","🎺","📝","🎨","🎵","⭐","🔥","💎","🎭","💿","🏆","🎯"];
-const DUR_PRE = [15,30,45,60,90,120];
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const DAYS_FULL = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+const PIANO_STATUS = { active: "활성", paused: "일시중지", archived: "보관" };
+const TECH_CATEGORIES = ["하농", "피쉬나", "체르니", "스케일", "아르페지오", "기타"];
+const TECHNIQUE_TYPES = { hanon: "하농", pischna: "피쉬나", scale: "스케일", arpeggio: "아르페지오" };
+const TECHNIQUE_MODES = { "key-number": "키+번호", "bpm-number": "번호+BPM", "bpm-complete": "전체 세트+BPM" };
+const TECHNIQUE_KEY_ORDER = ["C", "F", "Bb", "Eb", "Ab", "Db", "Gb", "B", "E", "A", "D", "G"];
+const METRONOME_SIGNATURES = ["2/4", "3/4", "4/4", "6/8"];
+const METRONOME_VOLUME_KEY = "of3-metronome-volume";
+const DIFFICULTY_LABELS = { easy: "쉬움", good: "적당", hard: "어려움", tooHard: "무리" };
+const DROP_LABELS = { none: "없음", mild: "조금 있음", clear: "뚜렷함" };
+const COLLAPSE_LABELS = { none: "없음", mild: "조금 무너짐", clear: "무너짐" };
+const PAIN_LABELS = { none: "없음", discomfort: "불편함", pain: "통증" };
+const TECHNIQUE_PASS_RULE = {
+  minPassingSessions: 2,
+  minDistinctDays: 2,
+  minScore: 4,
+  maxTension: 2,
+  passDifficulties: ["easy", "good"],
+};
+const defPieces = [
+  { id: "piece-1", title: "발라드 1번", composer: "쇼팽", opus: "Op. 23", currentSection: "1~80마디", status: "active", notes: "큰 구조와 호흡을 먼저 잡기", createdAt: "2026-05-01" },
+  { id: "piece-2", title: "평균율 1권 C장조 프렐류드", composer: "바흐", opus: "BWV 846", currentSection: "전곡", status: "paused", notes: "", createdAt: "2026-05-01" },
+];
+const defTechniques = [
+  { id: "tech-1", title: "5번", category: "하농", targetBPM: 110, currentBPM: 100, status: "active", notes: "손목 힘 빼고 균일하게", createdAt: "2026-05-01" },
+  { id: "tech-2", title: "C장조", category: "스케일", targetBPM: 88, currentBPM: 76, status: "active", notes: "", createdAt: "2026-05-01" },
+];
+const defTechniquePlans = [
+  {
+    id: "plan-hanon-21-30",
+    title: "하농 21~30",
+    type: "hanon",
+    mode: "key-number",
+    status: "active",
+    keyOrder: TECHNIQUE_KEY_ORDER,
+    currentKey: "C",
+    numberGroups: [[21, 22], [23, 24], [25, 26], [27, 28], [29, 30]],
+    currentGroupIndex: 0,
+    startBPM: 110,
+    currentBPM: 130,
+    targetBPM: 130,
+    bpmStep: 4,
+    notes: "한 주에 두 번호씩. C키 21·22번부터 시작하고, 모든 묶음 통과 후 F키로 이동.",
+    createdAt: "2026-05-01",
+  },
+  {
+    id: "plan-pischna-core",
+    title: "피쉬나 기본 묶음",
+    type: "pischna",
+    mode: "bpm-number",
+    status: "active",
+    numberGroups: [[1, 2], [3, 4], [5, 6]],
+    currentGroupIndex: 0,
+    startBPM: 60,
+    currentBPM: 60,
+    targetBPM: 84,
+    bpmStep: 4,
+    notes: "피쉬나는 번호 안에 조성이 포함되어 있으므로 키 이동 없이 BPM 기준으로 진행.",
+    createdAt: "2026-05-01",
+  },
+  {
+    id: "plan-scale-complete",
+    title: "스케일 전체 세트",
+    type: "scale",
+    mode: "bpm-complete",
+    status: "active",
+    numberGroups: [],
+    currentGroupIndex: 0,
+    startBPM: 72,
+    currentBPM: 72,
+    targetBPM: 108,
+    bpmStep: 4,
+    notes: "스케일을 조별로 쪼개지 않고 한 번에 치는 전체 세트.",
+    createdAt: "2026-05-01",
+  },
+  {
+    id: "plan-arpeggio-complete",
+    title: "아르페지오 전체 세트",
+    type: "arpeggio",
+    mode: "bpm-complete",
+    status: "active",
+    numberGroups: [],
+    currentGroupIndex: 0,
+    startBPM: 66,
+    currentBPM: 66,
+    targetBPM: 96,
+    bpmStep: 4,
+    notes: "아르페지오를 조별로 쪼개지 않고 한 번에 치는 전체 세트.",
+    createdAt: "2026-05-01",
+  },
+];
+const defTechniquePlanSessions = [];
+const defTechniquePractices = [];
+const defPianoSessions = [
+  { id: "ps-1", date: "2026-05-01", type: "piece", targetId: "piece-1", duration: 45, section: "1~40마디", bpm: "", repetitions: "", note: "", feeling: "큰 흐름 확인" },
+  { id: "ps-2", date: "2026-05-02", type: "piece", targetId: "piece-1", duration: 60, section: "1~80마디", bpm: "", repetitions: "", note: "", feeling: "중간부 연결 개선" },
+  { id: "ps-3", date: "2026-05-03", type: "technique", targetId: "tech-1", duration: 20, section: "", bpm: 100, repetitions: 5, note: "", feeling: "균일함 개선" },
+];
+const defSettings = {
+  goals: { weeklyPianoMinutes: 240, pieceSessionGoalMinutes: 45, techniqueSessionGoalMinutes: 30 },
+  monthlyFocus: {
+    "2026-05": {
+      intent: "발라드 1번의 큰 구조를 잡고, 하농 5번과 C장조 스케일을 짧게 자주 유지한다.",
+      pieceIds: ["piece-1"],
+      techniqueIds: ["tech-1", "tech-2"],
+    },
+  },
+  pianoRoutine: [
+    { id: "pr-1", day: 1, kind: "piece", targetId: "piece-1", duration: 45 },
+    { id: "pr-2", day: 3, kind: "technique", targetId: "tech-1", duration: 20 },
+    { id: "pr-3", day: 5, kind: "piece", targetId: "piece-1", duration: 45 },
+  ],
+};
 
-const ds = d => d.toISOString().split("T")[0];
-const now = () => new Date();
-const today = () => ds(now());
-const wkStart = d => { const t=new Date(d); t.setDate(t.getDate()-t.getDay()); return ds(t); };
-const shift = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return ds(d); };
-const fmtFull = s => { const d=new Date(s); return `${d.getMonth()+1}월 ${d.getDate()}일 ${DAYS_KR[d.getDay()]}`; };
-const wkDates = d => { const s=new Date(wkStart(d)); return Array.from({length:7},(_,i)=>{const x=new Date(s);x.setDate(s.getDate()+i);return ds(x);}); };
-const moDates = d => { const t=new Date(d),y=t.getFullYear(),m=t.getMonth(),f=new Date(y,m,1),l=new Date(y,m+1,0),r=[]; for(let i=0;i<f.getDay();i++){const x=new Date(f);x.setDate(1-f.getDay()+i);r.push(ds(x));} for(let i=1;i<=l.getDate();i++)r.push(ds(new Date(y,m,i))); while(r.length%7){const x=new Date(l);x.setDate(l.getDate()+(r.length-f.getDay()-l.getDate()+1));r.push(ds(x));} return r; };
-const minStr = m => m>=60?`${Math.floor(m/60)}시간${m%60?" "+m%60+"분":""}`:`${m}분`;
-const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const readJSON = (key, fallback) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw == null ? fallback : JSON.parse(raw);
+  } catch (error) {
+    return fallback;
+  }
+};
+const writeJSON = (key, value) => {
+  try {
+    if (value === undefined || value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+};
+const legacyId = (prefix, item, index) => item.id || `${prefix}-${index}-${String(item.title || item.date || "item").replace(/[^\w가-힣-]+/g, "-")}`;
+const mergeById = (current, incoming) => {
+  const map = new Map();
+  [...(Array.isArray(current) ? current : []), ...(Array.isArray(incoming) ? incoming : [])].forEach((item) => {
+    if (!item || !item.id) return;
+    map.set(item.id, { ...(map.get(item.id) || {}), ...item });
+  });
+  return Array.from(map.values());
+};
+const migrateLegacyPianoStorage = () => {
+  const legacyPieces = readJSON("of3-pieces", null);
+  const legacyTechniques = readJSON("of3-techniques", null);
+  const legacyPieceSessions = readJSON("of3-piece-sessions", null);
+  const legacyTechniqueSessions = readJSON("of3-technique-sessions", null);
+  const legacyMonthlyGoals = readJSON("of3-monthly-goals", null);
 
-const KS = {w:"of3-works",s:"of3-sessions",r:"of3-reviews",c:"of3-cats",rt:"of3-routine",g:"of3-goals",h:"of3-horizons",tmr:"of3-timer"};
+  if (Array.isArray(legacyPieces) && legacyPieces.length) {
+    const incoming = legacyPieces.map((piece, index) => ({ ...piece, id: legacyId("legacy-piece", piece, index) }));
+    writeJSON(KEYS.pieces, mergeById(readJSON(KEYS.pieces, []), incoming));
+  }
+  if (Array.isArray(legacyTechniques) && legacyTechniques.length) {
+    const incoming = legacyTechniques.map((technique, index) => ({ ...technique, id: legacyId("legacy-technique", technique, index) }));
+    writeJSON(KEYS.techniques, mergeById(readJSON(KEYS.techniques, []), incoming));
+  }
 
-// localStorage helpers
-const ld = (k,fb) => { try { const v=localStorage.getItem(k); return v?JSON.parse(v):fb; } catch(e){ return fb; } };
-const sv = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} };
+  const migratedSessions = [
+    ...(Array.isArray(legacyPieceSessions) ? legacyPieceSessions.map((session, index) => ({
+      id: session.id || `legacy-piece-session-${index}-${session.date || "date"}-${session.pieceId || session.targetId || "piece"}`,
+      date: session.date,
+      type: "piece",
+      targetId: session.pieceId || session.targetId,
+      duration: Number(session.duration) || 0,
+      section: session.section || "",
+      bpm: session.bpm === undefined ? "" : session.bpm,
+      repetitions: session.repetitions === undefined ? "" : session.repetitions,
+      note: session.note || "",
+      feeling: session.feeling || "",
+      createdAt: session.createdAt,
+    })) : []),
+    ...(Array.isArray(legacyTechniqueSessions) ? legacyTechniqueSessions.filter((session) => session && !session.planId && (session.techniqueId || session.targetId)).map((session, index) => ({
+      id: session.id || `legacy-technique-session-${index}-${session.date || "date"}-${session.techniqueId || session.targetId || "technique"}`,
+      date: session.date,
+      type: "technique",
+      targetId: session.techniqueId || session.targetId,
+      duration: Number(session.duration) || 0,
+      section: session.section || "",
+      bpm: session.bpm === undefined ? "" : session.bpm,
+      repetitions: session.repetitions === undefined ? "" : session.repetitions,
+      note: session.note || "",
+      feeling: session.feeling || "",
+      createdAt: session.createdAt,
+    })) : []),
+  ].filter((session) => session.date && session.targetId);
+  if (migratedSessions.length) {
+    writeJSON(KEYS.pianoSessions, mergeById(readJSON(KEYS.pianoSessions, []), migratedSessions));
+  }
 
-const defCats=[{id:"piano",label:"피아노",icon:"🎹"},{id:"composition",label:"작곡",icon:"🎼"},{id:"counterpoint",label:"대위법",icon:"📖"},{id:"av",label:"영상음악",icon:"🎬"},{id:"exercise",label:"운동",icon:"💪"}];
-const defRoutine=[{day:1,slot:"morning",type:"piano"},{day:2,slot:"morning",type:"piano"},{day:3,slot:"morning",type:"piano"},{day:4,slot:"morning",type:"piano"},{day:5,slot:"morning",type:"piano"},{day:1,slot:"evening",type:"composition"},{day:2,slot:"evening",type:"counterpoint"},{day:3,slot:"evening",type:"composition"},{day:4,slot:"evening",type:"counterpoint"},{day:5,slot:"evening",type:"composition"},{day:6,slot:"morning",type:"exercise"},{day:0,slot:"morning",type:"exercise"}];
-const defGoals=[{categoryId:"piano",target:5},{categoryId:"composition",target:3},{categoryId:"counterpoint",target:2},{categoryId:"av",target:2},{categoryId:"exercise",target:3}];
-const defWorks=[{id:"w1",title:"겨울 서곡",status:"sketch",instrumentation:"피아노 솔로",notes:"",horizonIds:[],links:[]},{id:"w2",title:"무제 현악4중주",status:"wip",instrumentation:"현악 4중주",notes:"",horizonIds:[],links:[]}];
-const defHorizons=[{id:"h1",title:"1시간 공연",icon:"🎭",target:12},{id:"h2",title:"자작곡 음반",icon:"💿",target:10}];
+  if (Array.isArray(legacyTechniqueSessions)) {
+    const planSessions = legacyTechniqueSessions.filter((session) => session && session.planId);
+    if (planSessions.length !== legacyTechniqueSessions.length) writeJSON(KEYS.techniquePlanSessions, planSessions);
+  }
 
-const C={bg:"#FAFAF9",bg1:"#FFFFFF",bg2:"#F5F5F4",bd:"#E7E5E4",bdL:"#D6D3D1",tx:"#1C1917",txM:"#78716C",txD:"#A8A29E",ac:"#1D4ED8",acL:"#DBEAFE",acD:"#1E40AF",gn:"#16A34A",gnL:"#DCFCE7",rd:"#DC2626",rdL:"#FEE2E2",am:"#D97706"};
+  if (Array.isArray(legacyMonthlyGoals) && legacyMonthlyGoals.length) {
+    const settings = normalizeSettings(readJSON(KEYS.settings, defSettings));
+    const monthlyFocus = { ...settings.monthlyFocus };
+    legacyMonthlyGoals.forEach((goal) => {
+      if (!goal || !goal.yearMonth) return;
+      monthlyFocus[goal.yearMonth] = {
+        ...(monthlyFocus[goal.yearMonth] || {}),
+        pieceIds: Array.isArray(goal.pieceIds) ? goal.pieceIds : (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].pieceIds) || [],
+        techniqueIds: Array.isArray(goal.techniqueIds) ? goal.techniqueIds : (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].techniqueIds) || [],
+        intent: goal.intent || (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].intent) || "",
+      };
+    });
+    writeJSON(KEYS.settings, normalizeSettings({ ...settings, monthlyFocus }));
+  }
+};
+function useStored(key, fallback) {
+  const [value, setValue] = useState(() => readJSON(key, fallback));
+  useEffect(() => writeJSON(key, value), [key, value]);
+  return [value, setValue];
+}
+const dateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+const today = () => dateKey(new Date());
+const parseDate = (value) => new Date(`${value}T00:00:00`);
+const shiftDate = (value, amount) => {
+  const d = parseDate(value);
+  d.setDate(d.getDate() + amount);
+  return dateKey(d);
+};
+const weekStart = (value) => {
+  const d = parseDate(value);
+  d.setDate(d.getDate() - d.getDay());
+  return dateKey(d);
+};
+const weekDates = (value) => Array.from({ length: 7 }, (_, index) => shiftDate(weekStart(value), index));
+const monthKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+const shiftMonth = (ym, amount) => {
+  const [year, month] = ym.split("-").map(Number);
+  return monthKey(new Date(year, month - 1 + amount, 1));
+};
+const monthTitle = (ym) => {
+  const [year, month] = ym.split("-").map(Number);
+  return `${year}년 ${month}월`;
+};
+const monthDates = (ym) => {
+  const [year, month] = ym.split("-").map(Number);
+  const first = new Date(year, month - 1, 1);
+  const last = new Date(year, month, 0);
+  const dates = [];
+  for (let i = 0; i < first.getDay(); i++) dates.push(shiftDate(dateKey(first), i - first.getDay()));
+  for (let d = 1; d <= last.getDate(); d++) dates.push(dateKey(new Date(year, month - 1, d)));
+  while (dates.length % 7) dates.push(shiftDate(dateKey(last), dates.length - first.getDay() - last.getDate() + 1));
+  return dates;
+};
+const fullDate = (value) => {
+  const d = parseDate(value);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${DAYS_FULL[d.getDay()]}`;
+};
+const shortDate = (value) => {
+  const d = parseDate(value);
+  return `${d.getMonth() + 1}.${d.getDate()}`;
+};
+const minText = (minutes) => {
+  const value = Number(minutes) || 0;
+  if (value < 60) {
+    const rounded = Math.round(value * 10) / 10;
+    return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}m`;
+  }
+  const h = Math.floor(value / 60);
+  const m = Math.round(value % 60);
+  return m ? `${h}h ${m}m` : `${h}h`;
+};
+const clockText = (ms) => {
+  const total = Math.max(0, Math.floor((Number(ms) || 0) / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = (n) => String(n).padStart(2, "0");
+  return h ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+};
+const targetGoalText = (minutes) => {
+  const total = Math.max(0, Math.round((Number(minutes) || 0) * 60));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
+const sum = (items, getValue) => items.reduce((total, item) => total + (Number(getValue(item)) || 0), 0);
+const statusClass = (status) => status === "active" ? "blue" : status === "archived" ? "red" : "";
+const byDateDesc = (a, b) => (b.date || "").localeCompare(a.date || "");
+const normalizeSettings = (settings) => {
+  const goals = (settings && settings.goals) || {};
+  return {
+    goals: {
+      weeklyPianoMinutes: Number(goals.weeklyPianoMinutes ?? defSettings.goals.weeklyPianoMinutes) || 0,
+      pieceSessionGoalMinutes: Number(goals.pieceSessionGoalMinutes ?? defSettings.goals.pieceSessionGoalMinutes) || 0,
+      techniqueSessionGoalMinutes: Number(goals.techniqueSessionGoalMinutes ?? defSettings.goals.techniqueSessionGoalMinutes) || 0,
+    },
+    monthlyFocus: { ...defSettings.monthlyFocus, ...((settings && settings.monthlyFocus) || {}) },
+    pianoRoutine: Array.isArray(settings && settings.pianoRoutine) ? settings.pianoRoutine : defSettings.pianoRoutine,
+  };
+};
+migrateLegacyPianoStorage();
+const techniqueModeForType = (type) => type === "hanon" ? "key-number" : type === "pischna" ? "bpm-number" : "bpm-complete";
+const techniqueGroup = (plan) => {
+  const groups = Array.isArray(plan && plan.numberGroups) ? plan.numberGroups : [];
+  return groups[Number(plan.currentGroupIndex) || 0] || [];
+};
+const groupText = (group) => Array.isArray(group) && group.length ? group.join("·") : "전체";
+const techniqueStageId = (plan) => {
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const key = mode === "key-number" ? (plan.currentKey || "C") : "";
+  const group = groupText(techniqueGroup(plan));
+  return `${mode}|${key}|${group}|${Number(plan.currentBPM) || 0}`;
+};
+const techniqueStageTitle = (plan) => {
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const bpm = `${Number(plan.currentBPM) || 0}/${Number(plan.targetBPM) || 0} BPM`;
+  if (mode === "key-number") return `${plan.currentKey || "C"}키 · ${groupText(techniqueGroup(plan))}번 · ${bpm}`;
+  if (mode === "bpm-number") return `${groupText(techniqueGroup(plan))}번 · ${bpm}`;
+  return `전체 세트 · ${bpm}`;
+};
+const techniquePlanSubtitle = (plan) => `${TECHNIQUE_TYPES[plan.type] || plan.type || "테크닉"} · ${TECHNIQUE_MODES[plan.mode || techniqueModeForType(plan.type)] || "진행"} · ${techniqueStageTitle(plan)}`;
+const techniqueTaskTitle = (plan) => {
+  const type = TECHNIQUE_TYPES[plan.type] || "테크닉";
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  if (mode === "key-number") return `${type} ${groupText(techniqueGroup(plan))}번 / ${plan.currentKey || "C"}키`;
+  if (mode === "bpm-number") return `${type} ${groupText(techniqueGroup(plan))}번`;
+  return `${type} 전체 세트`;
+};
+const techniqueTaskMeta = (plan) => {
+  const current = Number(plan.currentBPM) || 0;
+  const target = Number(plan.targetBPM) || 0;
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  if (mode === "key-number") return `목표 ${target}BPM · 이 묶음을 통과하면 다음 번호`;
+  if (mode === "bpm-number") return `현재 ${current}BPM · 목표 ${target}BPM · 키 이동 없음`;
+  return `현재 ${current}BPM · 목표 ${target}BPM · 전체 세트를 한 번에`;
+};
+const techniqueNextText = (plan) => {
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const groups = Array.isArray(plan.numberGroups) && plan.numberGroups.length ? plan.numberGroups : [[]];
+  const groupIndex = Number(plan.currentGroupIndex) || 0;
+  if (mode === "key-number") {
+    if (groupIndex < groups.length - 1) return `${groupText(groups[groupIndex + 1])}번으로 이동`;
+    const keyOrder = Array.isArray(plan.keyOrder) && plan.keyOrder.length ? plan.keyOrder : TECHNIQUE_KEY_ORDER;
+    const keyIndex = keyOrder.indexOf(plan.currentKey || keyOrder[0]);
+    return keyIndex >= 0 && keyIndex < keyOrder.length - 1 ? `${keyOrder[keyIndex + 1]}키 21·22번으로 이동` : "플랜 완료";
+  }
+  if (mode === "bpm-number") {
+    const current = Number(plan.currentBPM) || 0;
+    const target = Number(plan.targetBPM) || 0;
+    if (current < target) return `${Math.min(target, current + (Number(plan.bpmStep) || 4))}BPM으로 이동`;
+    return groupIndex < groups.length - 1 ? `${groupText(groups[groupIndex + 1])}번으로 이동` : "플랜 완료";
+  }
+  const current = Number(plan.currentBPM) || 0;
+  const target = Number(plan.targetBPM) || 0;
+  return current < target ? `${Math.min(target, current + (Number(plan.bpmStep) || 4))}BPM으로 이동` : "플랜 완료";
+};
+const techniquePassText = (assessment) => `통과 ${assessment.passingSessions.length}/${TECHNIQUE_PASS_RULE.minPassingSessions}회 · 날짜 ${assessment.passedDates.size}/${TECHNIQUE_PASS_RULE.minDistinctDays}일`;
+const techniqueHoldText = (assessment) => assessment.eligible ? "다음 단계로 넘어갈 준비 완료" : techniquePassText(assessment);
+const bpmEntriesText = (entries) => (entries || [])
+  .filter((entry) => Number(entry.bpm) || Number(entry.repetitions))
+  .map((entry) => `${Number(entry.bpm) || 0}BPM${Number(entry.repetitions) ? ` ${Number(entry.repetitions)}회` : ""}`)
+  .join(", ");
+const practiceItemsText = (items) => (items || []).map((item) => {
+  const bpmText = bpmEntriesText(item.bpmEntries);
+  if (bpmText) return `${item.label} ${bpmText}`;
+  return `${item.label}${item.bpm ? ` ${item.bpm}BPM` : ""}${item.repetitions ? ` ${item.repetitions}회` : ""}`;
+}).join(" · ") || "체크 항목 없음";
+const metronomeSessionText = (session) => [session.timeSignature || session.metronomeSignature, session.bpm || session.metronomeBPM ? `${session.bpm || session.metronomeBPM}BPM` : ""].filter(Boolean).join(" ");
+const pieceSessionText = (session) => [minText(session.duration), session.section, metronomeSessionText(session), session.repetitions ? `${session.repetitions}회` : "", session.feeling || session.note || "메모 없음"].filter(Boolean).join(" · ");
+const sessionMaxBpm = (session) => Math.max(Number(session.bpm) || 0, ...((session.bpmEntries || []).map((entry) => Number(entry.bpm) || 0)));
+const techniquePlanCompactText = (plan) => {
+  const type = TECHNIQUE_TYPES[plan.type] || plan.title || "테크닉";
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const bpm = Number(plan.currentBPM) || 0;
+  if (plan.completed) return `${type} 완료`;
+  if (mode === "key-number") return `${type} ${groupText(techniqueGroup(plan))}번, ${plan.currentKey || "C"}키 ${bpm}BPM`;
+  if (mode === "bpm-number") return `${type} ${groupText(techniqueGroup(plan))}번, ${bpm}BPM`;
+  return `${type} 전체 세트, ${bpm}BPM`;
+};
+const techniquePlanProgress = (plan) => {
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const groups = Array.isArray(plan.numberGroups) && plan.numberGroups.length ? plan.numberGroups : [[]];
+  if (mode === "key-number") {
+    const keyOrder = Array.isArray(plan.keyOrder) && plan.keyOrder.length ? plan.keyOrder : TECHNIQUE_KEY_ORDER;
+    const keyIndex = Math.max(0, keyOrder.indexOf(plan.currentKey || keyOrder[0]));
+    const current = keyIndex * groups.length + (Number(plan.currentGroupIndex) || 0) + 1;
+    return Math.round(current / (keyOrder.length * groups.length) * 100);
+  }
+  const current = Number(plan.currentBPM) || 0;
+  const target = Number(plan.targetBPM) || 0;
+  return target ? Math.round(current / target * 100) : 0;
+};
+function techniqueSessionPasses(session, plan) {
+  const scoreOk = ["evenness", "soundConsistency", "fingerIndependence"].every((key) => Number(session[key]) >= TECHNIQUE_PASS_RULE.minScore);
+  const bpmOk = !plan || !Number(plan.currentBPM) || sessionMaxBpm(session) >= Number(plan.currentBPM);
+  return Boolean(session.completedAll)
+    && bpmOk
+    && scoreOk
+    && session.weakFingerDrop === "none"
+    && session.collapse === "none"
+    && Number(session.tension) <= TECHNIQUE_PASS_RULE.maxTension
+    && session.pain === "none"
+    && TECHNIQUE_PASS_RULE.passDifficulties.includes(session.difficulty);
+}
+function assessTechniquePlan(plan, sessions) {
+  const stageId = techniqueStageId(plan);
+  const stageSessions = sessions.filter((session) => session.planId === plan.id && (!session.stageId || session.stageId === stageId));
+  const passingSessions = stageSessions.filter((session) => techniqueSessionPasses(session, plan));
+  const passedDates = new Set(passingSessions.map((session) => session.date).filter(Boolean));
+  const reasons = [];
+  if (passingSessions.length < TECHNIQUE_PASS_RULE.minPassingSessions) reasons.push(`통과 기록 ${TECHNIQUE_PASS_RULE.minPassingSessions}회 필요`);
+  if (passedDates.size < TECHNIQUE_PASS_RULE.minDistinctDays) reasons.push(`서로 다른 날짜 ${TECHNIQUE_PASS_RULE.minDistinctDays}일 필요`);
+  if (plan.completed) reasons.push("이미 완료된 플랜");
+  if (plan.status && plan.status !== "active") reasons.push("활성 상태가 아님");
+  return { stageId, stageSessions, passingSessions, passedDates, eligible: reasons.length === 0, reasons };
+}
+function advanceTechniquePlan(plan) {
+  const mode = plan.mode || techniqueModeForType(plan.type);
+  const groups = Array.isArray(plan.numberGroups) && plan.numberGroups.length ? plan.numberGroups : [[]];
+  const groupIndex = Number(plan.currentGroupIndex) || 0;
+  const currentBPM = Number(plan.currentBPM) || 0;
+  const targetBPM = Number(plan.targetBPM) || 0;
+  const bpmStep = Number(plan.bpmStep) || 4;
+  const stamp = today();
+  if (mode === "key-number") {
+    if (groupIndex < groups.length - 1) return { ...plan, currentGroupIndex: groupIndex + 1, updatedAt: stamp };
+    const keyOrder = Array.isArray(plan.keyOrder) && plan.keyOrder.length ? plan.keyOrder : TECHNIQUE_KEY_ORDER;
+    const keyIndex = keyOrder.indexOf(plan.currentKey || keyOrder[0]);
+    if (keyIndex >= 0 && keyIndex < keyOrder.length - 1) return { ...plan, currentKey: keyOrder[keyIndex + 1], currentGroupIndex: 0, updatedAt: stamp };
+    return { ...plan, completed: true, status: "paused", updatedAt: stamp };
+  }
+  if (mode === "bpm-number") {
+    if (currentBPM < targetBPM) return { ...plan, currentBPM: Math.min(targetBPM, currentBPM + bpmStep), updatedAt: stamp };
+    if (groupIndex < groups.length - 1) return { ...plan, currentGroupIndex: groupIndex + 1, currentBPM: Number(plan.startBPM) || currentBPM, updatedAt: stamp };
+    return { ...plan, completed: true, status: "paused", updatedAt: stamp };
+  }
+  if (currentBPM < targetBPM) return { ...plan, currentBPM: Math.min(targetBPM, currentBPM + bpmStep), updatedAt: stamp };
+  return { ...plan, completed: true, status: "paused", updatedAt: stamp };
+}
+const formatGroups = (groups) => (Array.isArray(groups) ? groups.map((group) => Array.isArray(group) ? group.join(",") : String(group)).join(" / ") : "");
+const parseGroups = (value) => String(value || "")
+  .split("/")
+  .map((part) => part.split(",").map((number) => Number(number.trim())).filter(Boolean))
+  .filter((group) => group.length);
 
-function App(){
-  const[works,setWorks]=useState(()=>ld(KS.w,defWorks));
-  const[sessions,setSessions]=useState(()=>ld(KS.s,[]));
-  const[reviews,setReviews]=useState(()=>ld(KS.r,[]));
-  const[cats,setCats]=useState(()=>ld(KS.c,defCats));
-  const[routine,setRoutine]=useState(()=>ld(KS.rt,defRoutine));
-  const[goals,setGoals]=useState(()=>ld(KS.g,defGoals));
-  const[horizons,setHorizons]=useState(()=>ld(KS.h,defHorizons));
-  const[tab,setTab]=useState("home");
-  const[scr,setScr]=useState(null);
-  const[tmr,setTmr]=useState(()=>ld(KS.tmr,null));
-  const[elapsed,setElapsed]=useState(0);
-
-  // Save on change
-  useEffect(()=>{sv(KS.w,works);},[works]);
-  useEffect(()=>{sv(KS.s,sessions);},[sessions]);
-  useEffect(()=>{sv(KS.r,reviews);},[reviews]);
-  useEffect(()=>{sv(KS.c,cats);},[cats]);
-  useEffect(()=>{sv(KS.rt,routine);},[routine]);
-  useEffect(()=>{sv(KS.g,goals);},[goals]);
-  useEffect(()=>{sv(KS.h,horizons);},[horizons]);
-
-  // Timer backup + tick
-  useEffect(()=>{if(tmr){sv(KS.tmr,tmr);}else{localStorage.removeItem(KS.tmr);}},[tmr]);
-  useEffect(()=>{if(!tmr)return;setElapsed(Math.floor((Date.now()-tmr.startTime)/1000));const iv=setInterval(()=>setElapsed(Math.floor((Date.now()-tmr.startTime)/1000)),1000);return()=>clearInterval(iv);},[tmr]);
-
-  const gc=id=>cats.find(c=>c.id===id)||{id,label:id,icon:"❓"};
-  const gw=id=>works.find(w=>w.id===id);
-  const td=today();
-  const ws=wkStart(td);
-  const tRout=routine.filter(r=>r.day===now().getDay());
-  const tSess=sessions.filter(x=>x.date===td);
-  const wSess=sessions.filter(x=>x.date>=ws);
-  const gp=(cid)=>{const d=wSess.filter(x=>x.type===cid).length;const g=goals.find(x=>x.categoryId===cid);return{done:d,goal:g?g.target:0};};
-  const wt=wid=>sessions.filter(x=>x.linkedWorkId===wid).reduce((a,x)=>a+(x.duration||0),0);
-  const wc=wid=>sessions.filter(x=>x.linkedWorkId===wid).length;
-
-  const nav=(t,d)=>setScr(t?{t,d}:null);
-  const startT=(type,slot,wid)=>{setTmr({type,slot:slot||"free",startTime:Date.now(),wid:wid||null});setElapsed(0);setScr(null);};
-
-  // Styles
-  const P={minHeight:"100vh",paddingBottom:80,background:C.bg,color:C.tx,fontSize:15,lineHeight:1.5};
-  const CT={padding:"20px 20px 28px",maxWidth:480,margin:"0 auto"};
-  const NV={display:"flex",justifyContent:"space-around",padding:"6px 0 calc(10px + env(safe-area-inset-bottom))",borderTop:"1px solid "+C.bd,background:"rgba(250,250,249,.95)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",position:"fixed",bottom:0,left:0,right:0,zIndex:100};
-  const nb=a=>({background:"none",border:"none",color:a?C.ac:C.txD,fontSize:11,padding:"10px 16px",cursor:"pointer",fontWeight:a?700:500});
-  const cd={background:C.bg1,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid "+C.bd,boxShadow:"0 1px 3px rgba(28,25,23,.04)"};
-  const cdH={background:C.acL,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid #BFDBFE"};
-  const H1={fontSize:24,fontWeight:800,letterSpacing:"-0.4px",color:C.tx};
-  const H3={fontSize:12,color:C.txM,fontWeight:600,marginBottom:10,textTransform:"uppercase",letterSpacing:".04em"};
-  const btn={background:C.ac,color:"#fff",border:"none",padding:"13px 28px",borderRadius:12,cursor:"pointer",fontSize:15,fontWeight:700,boxShadow:"0 1px 3px rgba(29,78,216,.15)"};
-  const btnS={background:C.ac,color:"#fff",border:"none",padding:"8px 18px",borderRadius:10,cursor:"pointer",fontSize:13,fontWeight:700};
-  const btnG={background:"transparent",color:C.txM,border:"none",padding:"8px 12px",cursor:"pointer",fontSize:13,fontWeight:500};
-  const btnD={background:C.rdL,color:C.rd,border:"1px solid #FECACA",padding:"11px 20px",borderRadius:12,cursor:"pointer",fontSize:14,fontWeight:600};
-  const inp={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",marginBottom:12,fontSize:15,outline:"none",boxSizing:"border-box"};
-  const ta={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",fontSize:15,outline:"none",resize:"none",lineHeight:1.7,boxSizing:"border-box"};
-  const tg=a=>({display:"inline-flex",alignItems:"center",padding:"7px 16px",borderRadius:10,fontSize:13,fontWeight:600,background:a?C.ac:C.bg2,color:a?"#fff":C.txM,marginRight:6,marginBottom:6,cursor:"pointer",border:a?"none":"1px solid "+C.bd});
-  const pl=c=>({display:"inline-block",padding:"3px 10px",borderRadius:8,fontSize:11,fontWeight:700,background:c+"18",color:c});
-  const pr={background:C.bg2,borderRadius:6,height:7,overflow:"hidden"};
-  const pf=p=>({background:C.ac,height:"100%",width:Math.min(p,100)+"%",borderRadius:6,transition:"width .4s ease"});
-  const bk={background:"none",border:"none",color:C.txM,padding:"8px 0",cursor:"pointer",fontSize:15,marginBottom:14,fontWeight:500};
-  const rb={display:"flex",justifyContent:"space-between",alignItems:"center"};
-  const ck=d=>({width:22,height:22,borderRadius:7,border:"2px solid "+(d?C.ac:C.bdL),background:d?C.ac:C.bg1,cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12,fontWeight:700});
-  const em={color:C.txD,fontSize:14,textAlign:"center",padding:"28px 0"};
-
-  // === TIMER ===
-  if(tmr){
-    const cat=gc(tmr.type);const lw=tmr.wid?gw(tmr.wid):null;
-    const mins=Math.floor(elapsed/60),secs=elapsed%60;
-    return(<div style={P}><div style={{...CT,paddingTop:60}} className="fi">
-      <div style={{textAlign:"center"}}>
-        <div style={{color:C.txM,fontSize:13,marginBottom:10,fontWeight:500}}>{SLOTS[tmr.slot]} 세션</div>
-        <div style={{fontSize:26,fontWeight:800,marginBottom:8,color:C.tx}}>{cat.icon} {cat.label}</div>
-        {lw&&<div style={{color:C.txM,fontSize:14,marginBottom:28}}>→ {lw.title}</div>}
-        <div style={{fontSize:72,fontWeight:200,color:C.ac,fontVariantNumeric:"tabular-nums",marginBottom:8,letterSpacing:"-2px"}}>{String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}</div>
-        <div className="pu" style={{color:C.ac,fontSize:13,marginBottom:56,fontWeight:600}}>● 진행 중</div>
-        <button style={{...btn,width:"100%",padding:16,fontSize:17,borderRadius:14}} onClick={()=>{
-          const dur=Math.max(1,Math.floor((Date.now()-tmr.startTime)/60000));
-          setScr({t:"comp",d:{type:tmr.type,slot:tmr.slot,duration:dur,linkedWorkId:tmr.wid,note:"",checklist:[],date:td}});
-          setTmr(null);
-        }}>세션 완료</button>
-        <button style={{...btnG,marginTop:16,fontSize:14}} onClick={()=>{setTmr(null);setElapsed(0);}}>취소</button>
+function PageHeader({ icon, title, subtitle, action }) {
+  return (
+    <header className="page-header">
+      <div className="page-head-row">
+        <div className="page-head-left">
+          <div className="page-icon">{icon}</div>
+          <h1 className="page-title">{title}</h1>
+        </div>
+        {action && <div className="page-action">{action}</div>}
       </div>
-    </div></div>);
+      {subtitle && <div className="page-subtitle">{subtitle}</div>}
+    </header>
+  );
+}
+function ActionCard({ icon, title, subtitle, onClick }) {
+  return (
+    <button className="action-card" type="button" onClick={onClick}>
+      <span className="action-icon">{icon}</span>
+      <span className="action-copy">
+        <span className="action-title">{title}</span>
+        {subtitle && <span className="action-subtitle">{subtitle}</span>}
+      </span>
+      <span className="chevron">›</span>
+    </button>
+  );
+}
+function Properties({ rows }) {
+  return (
+    <div className="properties">
+      {rows.map((row) => (
+        <React.Fragment key={row.label}>
+          <div className="property-label">{row.label}</div>
+          <div className="property-value">{row.value || "-"}</div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+function Section({ title, action, children }) {
+  return (
+    <section className="section">
+      <div className="section-head">
+        <div className="section-title">{title}</div>
+        {action}
+      </div>
+      <div>{React.Children.toArray(children).filter(Boolean)}</div>
+    </section>
+  );
+}
+function Row({ marker, title, subtitle, right, onClick, children }) {
+  return (
+    <div className="row" onClick={onClick}>
+      <div className="marker">{marker}</div>
+      <div className="row-main">
+        <div className="row-title">{title}</div>
+        {subtitle && <div className="row-sub">{subtitle}</div>}
+        {children}
+      </div>
+      {right && <div className="row-right">{right}</div>}
+    </div>
+  );
+}
+function Pill({ children, tone = "" }) {
+  return <span className={`pill ${tone}`}>{children}</span>;
+}
+function Tabs({ value, onChange, items }) {
+  return (
+    <div className="tabs">
+      {items.map((item) => <button key={item.value} className={`tab ${value === item.value ? "active" : ""}`} onClick={() => onChange(item.value)}>{item.label}</button>)}
+    </div>
+  );
+}
+function Progress({ value }) {
+  return <div className="progress"><div className="progress-fill" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>;
+}
+function Field({ label, children }) {
+  return <label className="field"><div className="label">{label}</div>{children}</label>;
+}
+function Empty({ text = "항목 없음" }) {
+  return <Row marker="·" title={<span className="empty">{text}</span>} />;
+}
+function ChoiceGroup({ label, value, onChange, options, compact = false, warningValues = [] }) {
+  return (
+    <div className="choice-field">
+      <div className="label">{label}</div>
+      <div className={`choice-grid ${compact ? "compact" : ""}`}>
+        {options.map((option) => {
+          const active = String(value) === String(option.value);
+          const warning = warningValues.map(String).includes(String(option.value));
+          return (
+            <button
+              key={String(option.value)}
+              type="button"
+              className={`choice-button ${active ? "active" : ""} ${warning ? "warning" : ""}`}
+              onClick={() => onChange(option.value)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+function MetricCard({ label, value, caption }) {
+  return (
+    <div className="metric-card">
+      <div className="metric-value">{value}</div>
+      <div className="metric-label">{label}</div>
+      {caption && <div className="metric-caption">{caption}</div>}
+    </div>
+  );
+}
+function EvalRow({ icon, title, subtitle, value, onChange, warning = false }) {
+  const options = [
+    { value: "good", label: "좋음" },
+    { value: "normal", label: "보통" },
+    { value: "hard", label: "어려움" },
+  ];
+  return (
+    <div className={`eval-row ${warning ? "warning" : ""}`}>
+      <div className="eval-icon">{icon}</div>
+      <div className="eval-copy">
+        <div className="eval-title">{title}</div>
+        <div className="eval-subtitle">{subtitle}</div>
+      </div>
+      <div className="eval-options">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={`eval-button ${value === option.value ? "active" : ""}`}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+function Metronome({ value = 80, signature = "4/4", onChange, onSignatureChange }) {
+  const [bpm, setBpm] = useState(Number(value) || 80);
+  const [bpmInput, setBpmInput] = useState(String(Number(value) || 80));
+  const [timeSignature, setTimeSignature] = useState(METRONOME_SIGNATURES.includes(signature) ? signature : "4/4");
+  const [volume, setVolume] = useState(() => Math.max(0, Math.min(150, Number(localStorage.getItem(METRONOME_VOLUME_KEY)) || 70)));
+  const [running, setRunning] = useState(false);
+  const [beat, setBeat] = useState(0);
+  const audioRef = useRef(null);
+  const beatRef = useRef(0);
+  const tickRef = useRef(null);
+  const beatsPerMeasure = Number(timeSignature.split("/")[0]) || 4;
+
+  useEffect(() => {
+    const next = Number(value) || bpm;
+    if (next !== bpm) {
+      setBpm(next);
+      setBpmInput(String(next));
+    }
+  }, [value]);
+  useEffect(() => {
+    const next = METRONOME_SIGNATURES.includes(signature) ? signature : "4/4";
+    if (next !== timeSignature) {
+      setTimeSignature(next);
+      beatRef.current = 0;
+      setBeat(0);
+    }
+  }, [signature]);
+  useEffect(() => () => {
+    if (tickRef.current) clearInterval(tickRef.current);
+    if (audioRef.current && audioRef.current.state !== "closed") audioRef.current.close();
+  }, []);
+  useEffect(() => {
+    if (!running) return;
+    if (tickRef.current) clearInterval(tickRef.current);
+    const interval = Math.max(120, 60000 / Math.max(30, Math.min(240, Number(bpm) || 80)));
+    tickRef.current = setInterval(() => {
+      beatRef.current = beatRef.current % beatsPerMeasure + 1;
+      setBeat(beatRef.current);
+      playClick(beatRef.current === 1 ? "accent" : timeSignature === "6/8" && beatRef.current === 4 ? "secondary" : "normal");
+    }, interval);
+    return () => {
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
+  }, [running, bpm, timeSignature, volume]);
+
+  const normalizeBpm = (nextValue, fallback = bpm) => Math.max(30, Math.min(240, Number(nextValue) || fallback || 80));
+  const commitBpm = (nextValue = bpmInput) => {
+    const next = normalizeBpm(nextValue);
+    setBpm(next);
+    setBpmInput(String(next));
+    if (onChange) onChange(next);
+  };
+  const setBpmValue = (nextValue) => commitBpm(nextValue);
+  const setSignatureValue = (nextValue) => {
+    const next = METRONOME_SIGNATURES.includes(nextValue) ? nextValue : "4/4";
+    setTimeSignature(next);
+    beatRef.current = 0;
+    setBeat(0);
+    if (onSignatureChange) onSignatureChange(next);
+  };
+  const setVolumeValue = (nextValue) => {
+    const next = Math.max(0, Math.min(150, Number(nextValue) || 0));
+    setVolume(next);
+    localStorage.setItem(METRONOME_VOLUME_KEY, String(next));
+  };
+  const getAudio = () => {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+    if (!audioRef.current || audioRef.current.state === "closed") audioRef.current = new AudioContext();
+    if (audioRef.current.state === "suspended") audioRef.current.resume().catch(() => {});
+    return audioRef.current;
+  };
+  const playClick = (kind = "normal") => {
+    const audio = getAudio();
+    if (!audio) return;
+    const now = audio.currentTime;
+    const oscillator = audio.createOscillator();
+    const filter = audio.createBiquadFilter();
+    const gain = audio.createGain();
+    const accent = kind === "accent";
+    const secondary = kind === "secondary";
+    const volumeRatio = Math.max(0, Math.min(1.5, Number(volume) / 100));
+    const peak = (accent ? 0.22 : secondary ? 0.14 : 0.09) * volumeRatio;
+    if (peak <= 0) return;
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(accent ? 1560 : secondary ? 1180 : 940, now);
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(accent ? 1800 : 1300, now);
+    filter.Q.setValueAtTime(8, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, peak), now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+    oscillator.connect(filter);
+    filter.connect(gain);
+    gain.connect(audio.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.055);
+  };
+  const start = () => {
+    const next = normalizeBpm(bpmInput);
+    setBpm(next);
+    setBpmInput(String(next));
+    if (onChange) onChange(next);
+    getAudio();
+    beatRef.current = 1;
+    setBeat(1);
+    playClick("accent");
+    setRunning(true);
+  };
+  const stop = () => {
+    if (tickRef.current) clearInterval(tickRef.current);
+    tickRef.current = null;
+    beatRef.current = 0;
+    setBeat(0);
+    setRunning(false);
+  };
+  return (
+    <div className="metronome-card">
+      <div className="metronome-top">
+        <div className="metronome-title"><span className={`metronome-dot ${running && beat ? "on" : ""}`} />메트로놈</div>
+        <div className="metronome-icons"><span>♩</span><span>⋮</span></div>
+      </div>
+      <div className="metronome-display">
+        <span>♩ =</span>
+        <input
+          type="number"
+          min="30"
+          max="240"
+          value={bpmInput}
+          onChange={(e) => setBpmInput(e.target.value)}
+          onBlur={(e) => commitBpm(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              commitBpm(e.currentTarget.value);
+              e.currentTarget.blur();
+            }
+          }}
+        />
+      </div>
+      <div className="metronome-beats">
+        {Array.from({ length: beatsPerMeasure }).map((_, index) => (
+          <span key={index} className={`metronome-beat ${index === 0 ? "accent" : ""} ${running && beat === index + 1 ? "active" : ""}`} />
+        ))}
+      </div>
+      <div className="metronome-settings-row">
+        <label>
+          <span>박자</span>
+          <select value={timeSignature} onChange={(e) => setSignatureValue(e.target.value)}>
+            {METRONOME_SIGNATURES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>음색</span>
+          <select defaultValue="click">
+            <option value="click">클릭</option>
+            <option value="soft">소프트</option>
+          </select>
+        </label>
+        <label>
+          <span>볼륨</span>
+          <input
+            type="range"
+            min="0"
+            max="150"
+            step="5"
+            value={volume}
+            onInput={(e) => setVolumeValue(e.currentTarget.value)}
+            onChange={(e) => setVolumeValue(e.currentTarget.value)}
+          />
+          <em>{volume}</em>
+        </label>
+      </div>
+      <div className="metronome-control-row">
+        <button className="metro-stop" type="button" onClick={stop}>■</button>
+        {running ? <button className="metro-play" type="button" onClick={stop}>Ⅱ</button> : <button className="metro-play" type="button" onClick={start}>▶</button>}
+        <button className="metro-tap" type="button" onClick={() => setBpmValue(bpm)}>TAP</button>
+      </div>
+      <div className="metronome-state">
+        {running ? `${beat || 1}/${beatsPerMeasure}` : "대기"} · {timeSignature}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [pieces, setPieces] = useStored(KEYS.pieces, defPieces);
+  const [techniques, setTechniques] = useStored(KEYS.techniques, defTechniques);
+  const [pianoSessions, setPianoSessions] = useStored(KEYS.pianoSessions, defPianoSessions);
+  const [techniquePlans, setTechniquePlans] = useStored(KEYS.techniquePlans, defTechniquePlans);
+  const [techniquePlanSessions, setTechniquePlanSessions] = useStored(KEYS.techniquePlanSessions, defTechniquePlanSessions);
+  const [techniquePractices, setTechniquePractices] = useStored(KEYS.techniquePractices, defTechniquePractices);
+  const [reviews, setReviews] = useStored(KEYS.reviews, []);
+  const [timer, setTimer] = useStored(KEYS.timer, null);
+  const [settingsRaw, setSettingsRaw] = useStored(KEYS.settings, defSettings);
+  const settings = normalizeSettings(settingsRaw);
+  const updateSettings = (patch) => setSettingsRaw((prev) => normalizeSettings({ ...normalizeSettings(prev), ...patch }));
+
+  const [tab, setTab] = useState("piano");
+  const [screen, setScreen] = useState(null);
+  const [pianoView, setPianoView] = useState("pieces");
+  const [settingsView, setSettingsView] = useState("libraries");
+  const [calendarMode, setCalendarMode] = useState("week");
+  const [calendarAnchor, setCalendarAnchor] = useState(today());
+  const [selectedMonth, setSelectedMonth] = useState(monthKey(new Date()));
+
+  const td = today();
+  const ws = weekStart(td);
+  const we = shiftDate(ws, 7);
+  const pieceMap = useMemo(() => Object.fromEntries(pieces.map((item) => [item.id, item])), [pieces]);
+  const techniqueMap = useMemo(() => Object.fromEntries(techniques.map((item) => [item.id, item])), [techniques]);
+  const techniquePlanMap = useMemo(() => Object.fromEntries(techniquePlans.map((item) => [item.id, item])), [techniquePlans]);
+  const pianoItemName = (session) => session.type === "piece" ? (pieceMap[session.targetId] && pieceMap[session.targetId].title) : (techniqueMap[session.targetId] && techniqueMap[session.targetId].title);
+  const techniquePlanName = (session) => techniquePlanMap[session.planId] && techniquePlanMap[session.planId].title;
+  const weekPianoSessions = pianoSessions.filter((session) => session.date >= ws && session.date < we);
+  const weekTechniquePractices = techniquePractices.filter((session) => session.date >= ws && session.date < we);
+  const weekPianoMinutes = sum(weekPianoSessions, (session) => session.duration) + sum(weekTechniquePractices, (session) => session.duration);
+  const activityDates = [...pianoSessions.map((s) => s.date), ...techniquePractices.map((s) => s.date)].filter(Boolean);
+  const lastActivity = activityDates.slice().sort().slice(-1)[0] || null;
+  const streak = getStreak(activityDates, td);
+  const monthFocus = settings.monthlyFocus[selectedMonth] || { intent: "", pieceIds: [], techniqueIds: [] };
+  const setMonthFocus = (patch) => updateSettings({ monthlyFocus: { ...settings.monthlyFocus, [selectedMonth]: { ...monthFocus, ...patch } } });
+  const openTab = (id) => { setTab(id); setScreen(null); };
+  const common = {
+    pieces, setPieces, techniques, setTechniques, pianoSessions, setPianoSessions,
+    techniquePlans, setTechniquePlans, techniquePlanSessions, setTechniquePlanSessions,
+    techniquePractices, setTechniquePractices, timer, setTimer,
+    reviews, setReviews, settings, updateSettings,
+    td, ws, we, pieceMap, techniqueMap, techniquePlanMap, pianoItemName, techniquePlanName,
+    weekPianoMinutes, weekPianoSessions, weekTechniquePractices, streak, lastActivity,
+    selectedMonth, setSelectedMonth, monthFocus, setMonthFocus,
+    screen, setScreen, pianoView, setPianoView,
+    settingsView, setSettingsView, calendarMode, setCalendarMode, calendarAnchor, setCalendarAnchor,
+    openTab,
+  };
+
+  const navItems = [
+    { id: "piano", label: "홈", icon: "⌂" },
+    { id: "record", label: "기록", icon: "◴" },
+    { id: "practice", label: "연습", icon: "◷", center: true },
+    { id: "library", label: "라이브러리", icon: "▦" },
+    { id: "settings", label: "설정", icon: "⚙" },
+  ];
+  const handleNav = (item) => {
+    if (item.center) {
+      setScreen({ type: "technique-practice" });
+      return;
+    }
+    openTab(item.id);
+  };
+  return (
+    <div className="app">
+      <div className="layout">
+        <aside className="sidebar">
+          <div className="brand">Opus Flow</div>
+          <nav className="side-nav">
+            {navItems.map((item) => <button key={item.id} className={`side-button ${tab === item.id ? "active" : ""}`} onClick={() => openTab(item.id)}>{item.label}</button>)}
+          </nav>
+        </aside>
+        <main className="main">
+          {tab === "piano" && <PianoView {...common} />}
+          {tab === "record" && <RecordView {...common} />}
+          {tab === "library" && <LibraryView {...common} />}
+          {tab === "settings" && <SettingsView {...common} />}
+        </main>
+      </div>
+      <nav className="mobile-nav"><div className="mobile-nav-inner">
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            className={`nav-button ${tab === item.id ? "active" : ""} ${item.center ? "center" : ""}`}
+            onClick={() => handleNav(item)}
+          >
+            <span className="nav-icon">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
+      </div></nav>
+      {screen && <Overlay screen={screen} onClose={() => setScreen(null)} {...common} />}
+    </div>
+  );
+}
+
+function getStreak(dates, todayValue) {
+  const set = new Set(dates);
+  let count = 0;
+  let cursor = todayValue;
+  while (set.has(cursor)) {
+    count += 1;
+    cursor = shiftDate(cursor, -1);
   }
+  return count;
+}
+function lastText(date) {
+  if (!date) return "없음";
+  const diff = Math.floor((parseDate(today()) - parseDate(date)) / 864e5);
+  if (diff === 0) return "오늘";
+  if (diff === 1) return "어제";
+  return `${diff}일 전`;
+}
+function PianoView(p) {
+  return (
+    <>
+      <PageHeader
+        icon="🎹"
+        title="피아노"
+        subtitle="오늘도 꾸준한 연습, 내일의 나를 만듭니다."
+        action={<button className="icon-button" type="button" aria-label="알림">♧</button>}
+      />
+      <div className="action-stack">
+        <ActionCard icon="♫" title="곡 연습 시작" subtitle="타이머와 구간 반복 카운트" onClick={() => p.setScreen({ type: "piece-practice" })} />
+        <ActionCard icon="♬" title="테크닉 연습 시작" subtitle="메트로놈, BPM별 반복, 연습 후 체크" onClick={() => p.setScreen({ type: "technique-practice" })} />
+      </div>
+      <Tabs value={p.pianoView} onChange={p.setPianoView} items={[
+        { value: "pieces", label: "곡" },
+        { value: "techniques", label: "테크닉" },
+        { value: "sessions", label: "세션" },
+      ]} />
+      {p.pianoView === "pieces" && <PianoHomePieces {...p} />}
+      {p.pianoView === "techniques" && <PianoHomeTechniques {...p} />}
+      {p.pianoView === "sessions" && <PianoSessionList {...p} />}
+    </>
+  );
+}
+function PianoHomePieces(p) {
+  const activePieces = p.pieces.filter((piece) => piece.status === "active").slice(0, 4);
+  const recentTechniqueRows = [
+    ...p.techniquePlanSessions.map((session) => ({
+      id: session.id,
+      date: session.date,
+      title: session.stageLabel || "테크닉 연습",
+      subtitle: [bpmEntriesText(session.bpmEntries) || (session.bpm ? `BPM ${session.bpm}` : ""), session.planType ? TECHNIQUE_TYPES[session.planType] : ""].filter(Boolean).join(" · "),
+      duration: session.practiceDuration || session.duration || 0,
+    })),
+    ...p.pianoSessions.filter((session) => session.type === "technique").map((session) => ({
+      id: session.id,
+      date: session.date,
+      title: p.pianoItemName(session) || "보조 테크닉",
+      subtitle: session.bpm ? `BPM ${session.bpm}` : "기록",
+      duration: session.duration || 0,
+    })),
+  ].sort(byDateDesc).slice(0, 3);
+  return (
+    <>
+      <Section title="집중 곡" action={<button className="section-action plus" type="button" onClick={() => p.setScreen({ type: "piece-form" })}>+</button>}>
+        {activePieces.map((piece) => {
+          const sessions = p.pianoSessions.filter((session) => session.type === "piece" && session.targetId === piece.id && session.date >= p.ws && session.date < p.we);
+          const minutes = sum(sessions, (session) => session.duration);
+          return (
+            <Row
+              key={piece.id}
+              marker="♪"
+              title={piece.title}
+              subtitle={piece.currentSection || piece.composer || "진행 구간 없음"}
+              right={<span className="row-stack"><span className="mono">{minutes ? minText(minutes) : "-"}</span><span>이번 주</span></span>}
+              onClick={() => p.setScreen({ type: "piece-practice", data: { pieceId: piece.id } })}
+            />
+          );
+        })}
+        {!activePieces.length && <Empty text="집중 곡 없음" />}
+      </Section>
+      <Section title="최근 테크닉 기록">
+        {recentTechniqueRows.map((row) => (
+          <Row
+            key={row.id}
+            marker="♪"
+            title={row.title}
+            subtitle={row.subtitle || "테크닉"}
+            right={<span className="row-stack"><span className="mono">{minText(row.duration)}</span><span>{lastText(row.date)}</span></span>}
+          />
+        ))}
+        {!recentTechniqueRows.length && <Empty text="최근 테크닉 기록 없음" />}
+      </Section>
+    </>
+  );
+}
+function PianoHomeTechniques(p) {
+  const activePlans = p.techniquePlans.filter((plan) => plan.status === "active" && !plan.completed);
+  return (
+    <Section title="현재 테크닉" action={<button className="section-action plus" type="button" onClick={() => p.setScreen({ type: "technique-plan-form" })}>+</button>}>
+      {activePlans.map((plan) => (
+        <Row
+          key={plan.id}
+          marker="●"
+          title={techniquePlanCompactText(plan)}
+          subtitle={techniqueNextText(plan)}
+          right={<Pill tone="blue">진행 중</Pill>}
+          onClick={() => p.setScreen({ type: "technique-plan-detail", item: plan })}
+        />
+      ))}
+      {!activePlans.length && <Empty text="진행 중인 테크닉 없음" />}
+    </Section>
+  );
+}
+function TechniquePlanRow({ plan, sessions, onOpen }) {
+  const allSessions = sessions || [];
+  const assessment = assessTechniquePlan(plan, allSessions);
+  const tone = plan.completed ? "green" : assessment.eligible ? "green" : statusClass(plan.status);
+  const label = plan.completed ? "완료" : assessment.eligible ? "넘어가기" : `${assessment.passingSessions.length}/2`;
+  return (
+    <Row
+      marker={assessment.eligible ? "✓" : "♪"}
+      title={techniqueTaskTitle(plan)}
+      subtitle={techniqueTaskMeta(plan)}
+      right={<Pill tone={tone}>{label}</Pill>}
+      onClick={onOpen}
+    >
+      <Progress value={techniquePlanProgress(plan)} />
+      <div className="rule-note">{techniqueHoldText(assessment)} · 다음: {techniqueNextText(plan)}</div>
+    </Row>
+  );
+}
+function PianoPieceLibrary(p) {
+  return (
+    <>
+      <Section title="곡 라이브러리" action={<button className="section-action" onClick={() => p.setScreen({ type: "piece-form" })}>+ 새 곡</button>}>
+        {p.pieces.map((piece) => <Row key={piece.id} marker="♪" title={piece.title} subtitle={`${piece.composer || "작곡가 미정"} · ${piece.opus || "-"} · ${piece.currentSection || "구간 없음"}`} right={<><button className="button ghost" onClick={(e) => { e.stopPropagation(); p.setScreen({ type: "piece-practice", data: { pieceId: piece.id } }); }}>연습</button><Pill tone={statusClass(piece.status)}>{PIANO_STATUS[piece.status] || piece.status}</Pill></>} onClick={() => p.setScreen({ type: "piece-form", item: piece })} />)}
+      </Section>
+    </>
+  );
+}
+function TechniqueLibrary(p) {
+  return (
+    <>
+      <Section title="테크닉 항목" action={<button className="section-action" onClick={() => p.setScreen({ type: "technique-plan-form" })}>+ 새 항목</button>}>
+        {p.techniquePlans.map((plan) => <TechniquePlanRow key={plan.id} plan={plan} sessions={p.techniquePlanSessions.filter((session) => session.planId === plan.id)} onOpen={() => p.setScreen({ type: "technique-plan-detail", item: plan })} />)}
+        {!p.techniquePlans.length && <Empty text="체크할 테크닉 항목 없음" />}
+      </Section>
+      <Section title="간단 기록용 테크닉" action={<button className="section-action" onClick={() => p.setScreen({ type: "technique-form" })}>+ 새 테크닉</button>}>
+        {p.techniques.map((technique) => <Row key={technique.id} marker="♪" title={technique.title} subtitle={`${technique.category} · ${technique.currentBPM || 0}/${technique.targetBPM || 0} BPM`} right={<Pill tone={statusClass(technique.status)}>{PIANO_STATUS[technique.status] || technique.status}</Pill>} onClick={() => p.setScreen({ type: "technique-form", item: technique })} />)}
+      </Section>
+    </>
+  );
+}
+function PianoSessionList(p) {
+  const pieceSessions = p.pianoSessions.filter((session) => session.type === "piece").slice().sort(byDateDesc);
+  const simpleTechniqueSessions = p.pianoSessions.filter((session) => session.type === "technique").slice().sort(byDateDesc);
+  const removePianoSession = (session) => {
+    if (!confirm("이 피아노 세션 기록을 삭제할까요?")) return;
+    p.setPianoSessions((prev) => prev.filter((item) => item.id !== session.id));
+  };
+  const removeTechniquePractice = (session) => {
+    if (!confirm("이 테크닉 연습 기록을 삭제할까요?")) return;
+    p.setTechniquePractices((prev) => prev.filter((item) => item.id !== session.id));
+    p.setTechniquePlanSessions((prev) => prev.filter((item) => item.practiceId !== session.id));
+  };
+  return (
+    <>
+      <Section title="곡 연습 기록" action={<button className="section-action" onClick={() => p.setScreen({ type: "piece-practice" })}>+ 시작</button>}>
+        {pieceSessions.slice(0, 30).map((session) => (
+          <Row
+            key={session.id}
+            marker="♪"
+            title={p.pianoItemName(session) || "곡 연습"}
+            subtitle={`${shortDate(session.date)} · ${pieceSessionText(session)}`}
+            right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); removePianoSession(session); }}>삭제</button>}
+          />
+        ))}
+        {!pieceSessions.length && <Empty text="곡 연습 기록 없음" />}
+      </Section>
+      <Section title="보조 테크닉 기록" action={<button className="section-action" onClick={() => p.setScreen({ type: "piano-session", data: { type: "technique" } })}>+ 기록</button>}>
+        {simpleTechniqueSessions.slice(0, 20).map((session) => (
+          <Row
+            key={session.id}
+            marker="♪"
+            title={p.pianoItemName(session) || "보조 테크닉"}
+            subtitle={`${shortDate(session.date)} · ${minText(session.duration)}${session.bpm ? ` · ${session.bpm}BPM` : ""}${session.repetitions ? ` · ${session.repetitions}회` : ""} · ${session.feeling || session.note || "메모 없음"}`}
+            right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); removePianoSession(session); }}>삭제</button>}
+          />
+        ))}
+        {!simpleTechniqueSessions.length && <Empty text="보조 테크닉 기록 없음" />}
+      </Section>
+      <Section title="테크닉 연습 기록" action={<button className="section-action" onClick={() => p.setScreen({ type: "technique-practice" })}>+ 시작</button>}>
+        {p.techniquePractices.slice().sort(byDateDesc).slice(0, 30).map((session) => <Row key={session.id} marker="✓" title="테크닉 연습" subtitle={[shortDate(session.date), minText(session.duration), metronomeSessionText(session), practiceItemsText(session.items)].filter(Boolean).join(" · ")} right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); removeTechniquePractice(session); }}>삭제</button>} />)}
+        {!p.techniquePractices.length && <Empty text="테크닉 연습 기록 없음" />}
+      </Section>
+    </>
+  );
+}
 
-  // === OVERLAYS ===
-  if(scr){const{t:st,d:sd}=scr;
-    if(st==="comp"||st==="edS"||st==="addS"){
-      return <SessForm init={sd||{date:td,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]}}
-        cats={cats} works={works} isComp={st==="comp"} canDel={!!(sd&&sd.id)} gc={gc}
-        onSave={s=>{if(s.id){setSessions(p=>p.map(x=>x.id===s.id?s:x));}else{setSessions(p=>[...p,{...s,id:uid()}]);}setScr(null);}}
-        onDel={sd&&sd.id?()=>{setSessions(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null}
-        onClose={()=>setScr(null)} tg={tg} btn={btn} btnS={btnS} btnD={btnD} btnG={btnG} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} ck={ck} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="wD"){
-      const w=gw(sd);if(!w){setScr(null);return null;}
-      const wSes=sessions.filter(x=>x.linkedWorkId===w.id).sort((a,b)=>b.date.localeCompare(a.date));
-      return <WDetail w={w} wSes={wSes} ttm={wt(w.id)} tcnt={wc(w.id)} r30={wSes.filter(x=>(Date.now()-new Date(x.date))/(864e5)<=30).length} horizons={horizons} gc={gc}
-        onUpdate={w2=>setWorks(p=>p.map(x=>x.id===w2.id?w2:x))}
-        onEdit={()=>nav("eW",w)} onDel={()=>{setWorks(p=>p.filter(x=>x.id!==w.id));setSessions(p=>p.map(x=>x.linkedWorkId===w.id?{...x,linkedWorkId:null}:x));setScr(null);}}
-        onAddLink={url=>{if(!url||!url.trim())return;setWorks(p=>p.map(x=>x.id===w.id?{...x,links:[...(x.links||[]),{id:uid(),url,name:url}]}:x));}}
-        onRemLink={lid=>setWorks(p=>p.map(x=>x.id===w.id?{...x,links:(x.links||[]).filter(l=>l.id!==lid)}:x))}
-        onStart={()=>startT(cats[0]&&cats[0].id,"free",w.id)} onClose={()=>setScr(null)}
-        tg={tg} btn={btn} btnS={btnS} btnG={btnG} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} em={em} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="nW"||st==="eW"){
-      return <WForm data={sd} onSave={w=>{if(w.id&&works.find(x=>x.id===w.id)){setWorks(p=>p.map(x=>x.id===w.id?w:x));}else{setWorks(p=>[...p,{...w,id:uid(),horizonIds:[],links:[]}]);}setScr(null);}}
-        onClose={()=>setScr(null)} tg={tg} btn={btn} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="dD"){const dt=sd,dss=sessions.filter(x=>x.date===dt);
-      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 뒤로</button>
-        <div style={{...rb,marginBottom:24}}><button style={btnG} onClick={()=>nav("dD",shift(dt,-1))}>←</button><div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:700}}>{fmtFull(dt)}</div>{dt===td&&<div style={{color:C.ac,fontSize:11,marginTop:3,fontWeight:600}}>오늘</div>}</div><button style={btnG} onClick={()=>nav("dD",shift(dt,1))}>→</button></div>
-        <div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>세션 ({dss.length})</span><button style={btnS} onClick={()=>nav("addS",{date:dt,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]})}>+ 추가</button></div>
-        {dss.length===0?<div style={em}>기록 없음</div>:dss.map(ss=>{const cat=gc(ss.type);const lw=ss.linkedWorkId?gw(ss.linkedWorkId):null;
-          return(<div key={ss.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("edS",ss)}><div style={rb}><span style={{fontWeight:700}}>{cat.icon} {cat.label}</span><span style={{color:C.ac,fontWeight:700,fontSize:14}}>{ss.duration}분</span></div>
-            {lw&&<div style={{color:C.txM,fontSize:13,marginTop:5}}>→ {lw.title}</div>}{ss.note&&<div style={{color:C.txD,fontSize:13,marginTop:4}}>{ss.note}</div>}</div>);})}
-      </div></div>);
-    }
-    if(st==="rF"){return <RForm data={sd} cats={cats} gp={gp} onSave={r=>{if(r.id){setReviews(p=>p.map(x=>x.id===r.id?{...r,updatedAt:td}:x));}else{setReviews(p=>[...p,{...r,id:uid(),createdAt:td}]);}setScr(null);}} onDel={sd&&sd.id?()=>{setReviews(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} ta={ta} bk={bk} H1={H1} H3={H3} cd={cd} P={P} CT={CT} C={C}/>;}
-    if(st==="eC"){return <CForm data={sd} onSave={c=>{if(sd&&sd.id)setCats(p=>p.map(x=>x.id===c.id?c:x));else setCats(p=>[...p,{...c,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setCats(p=>p.filter(x=>x.id!==sd.id));setRoutine(p=>p.filter(r=>r.type!==sd.id));setGoals(p=>p.filter(g=>g.categoryId!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
-    if(st==="eH"){return <HForm data={sd} onSave={h=>{if(sd&&sd.id)setHorizons(p=>p.map(x=>x.id===h.id?h:x));else setHorizons(p=>[...p,{...h,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setHorizons(p=>p.filter(x=>x.id!==sd.id));setWorks(p=>p.map(w=>({...w,horizonIds:(w.horizonIds||[]).filter(x=>x!==sd.id)})));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
-    if(st==="eRS"){const day=sd.day,sl=sd.slot;const cur=routine.find(r=>r.day===day&&r.slot===sl);
-      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 취소</button><div style={{...H1,marginBottom:24}}>{DAYS_KR[day]} {SLOTS[sl]}</div>
-        {cats.map(c=>(<div key={c.id} style={{...cd,borderColor:cur&&cur.type===c.id?C.ac:C.bd,cursor:"pointer",background:cur&&cur.type===c.id?C.acL:C.bg1}} onClick={()=>{setRoutine([...routine.filter(r=>!(r.day===day&&r.slot===sl)),{day,slot:sl,type:c.id}]);setScr(null);}}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}
-        <button style={{...btnD,width:"100%",marginTop:10}} onClick={()=>{setRoutine(routine.filter(r=>!(r.day===day&&r.slot===sl)));setScr(null);}}>비우기</button></div></div>);
-    }
+function RecordView(p) {
+  const ym = monthKey(parseDate(p.calendarAnchor));
+  const dates = p.calendarMode === "week" ? weekDates(p.calendarAnchor) : monthDates(ym);
+  const periodStart = p.calendarMode === "week" ? dates[0] : `${ym}-01`;
+  const periodEnd = p.calendarMode === "week" ? shiftDate(periodStart, 7) : `${shiftMonth(ym, 1)}-01`;
+  const periodPianoSessions = p.pianoSessions.filter((session) => session.date >= periodStart && session.date < periodEnd);
+  const periodTechniquePractices = p.techniquePractices.filter((session) => session.date >= periodStart && session.date < periodEnd);
+  const periodTechniquePlanSessions = p.techniquePlanSessions.filter((session) => session.date >= periodStart && session.date < periodEnd);
+  const periodSimpleTechniqueSessions = periodPianoSessions.filter((session) => session.type === "technique");
+  const periodTotalMinutes = sum(periodPianoSessions, (session) => session.duration) + sum(periodTechniquePractices, (session) => session.duration);
+  const reviewWeekStart = p.calendarMode === "week" ? periodStart : p.ws;
+  const weekReview = p.reviews.find((review) => review.weekStart === reviewWeekStart);
+  const countForDate = (date) => p.pianoSessions.filter((s) => s.date === date).length + p.techniquePractices.filter((s) => s.date === date).length;
+  const moveCalendar = (amount) => p.setCalendarAnchor(p.calendarMode === "week" ? shiftDate(p.calendarAnchor, amount * 7) : `${shiftMonth(ym, amount)}-01`);
+  const cumulativeMinutes = sum(p.pianoSessions, (session) => session.duration) + sum(p.techniquePractices, (session) => session.duration);
+  const sessionCount = periodPianoSessions.length + periodTechniquePractices.length;
+  const avgDenominator = p.calendarMode === "week" ? 7 : parseDate(shiftDate(periodEnd, -1)).getDate();
+  const avgMinutes = Math.round(periodTotalMinutes / Math.max(1, avgDenominator));
+  const dayMinutes = (date) => sum(p.pianoSessions.filter((session) => session.date === date), (session) => session.duration) + sum(p.techniquePractices.filter((session) => session.date === date), (session) => session.duration);
+  const monthChartDates = dates.filter((date) => date.startsWith(ym));
+  const monthChartRows = [];
+  for (let index = 0; index < monthChartDates.length; index += 7) {
+    const bucket = monthChartDates.slice(index, index + 7);
+    monthChartRows.push({
+      date: `${ym}-week-${monthChartRows.length + 1}`,
+      label: `${monthChartRows.length + 1}주`,
+      minutes: sum(bucket, (date) => dayMinutes(date)),
+    });
   }
-
-  // === MAIN TABS ===
-  return(<div style={P}><div style={CT}>
-    {tab==="home"&&(<div className="fi">
-      <div style={{marginBottom:24}}><div style={{color:C.txM,fontSize:13,marginBottom:4,fontWeight:500}}>{now().getMonth()+1}월 {now().getDate()}일 {DAYS_KR[now().getDay()]}</div><div style={H1}>작업실</div></div>
-      <div style={{...cd,marginBottom:18}}><div style={{...rb,marginBottom:10}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>오늘 진행률</span><span style={{color:C.ac,fontWeight:800,fontSize:15}}>{tSess.length}/{tRout.length||"−"}</span></div><div style={pr}><div style={pf(tRout.length?Math.round(tSess.length/tRout.length*100):0)}/></div></div>
-      {tRout.length>0?(<div style={{marginBottom:24}}><div style={H3}>오늘 루틴</div>
-        {tRout.map((r,i)=>{const cat=gc(r.type);const done=tSess.some(x=>x.slot===r.slot&&x.type===r.type);
-          return(<div key={i} style={{...(done?cd:cdH),display:"flex",justifyContent:"space-between",alignItems:"center",opacity:done?.55:1}}><div><div style={{color:C.txM,fontSize:11,marginBottom:3,fontWeight:600}}>{SLOTS[r.slot]}</div><div style={{fontWeight:700,fontSize:15}}>{cat.icon} {cat.label}</div></div>
-            {done?<span style={pl(C.gn)}>완료</span>:<button style={btnS} onClick={()=>startT(r.type,r.slot)}>시작</button>}</div>);})}</div>
-      ):(<div style={{...cd,textAlign:"center",padding:"24px 18px",marginBottom:24}}><div style={{fontSize:14,color:C.txM,marginBottom:12,fontWeight:500}}>오늘은 자유 연습일</div>
-        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>{cats.slice(0,4).map(c=>(<button key={c.id} style={{...tg(false),padding:"10px 18px"}} onClick={()=>startT(c.id)}><span style={{marginRight:6}}>{c.icon}</span>{c.label}</button>))}</div></div>)}
-      {works.filter(w=>w.status==="sketch"||w.status==="wip").length>0&&(<div style={{marginBottom:24}}><div style={H3}>진행 중인 곡</div>
-        {works.filter(w=>w.status==="sketch"||w.status==="wip").slice(0,5).map(w=>{const tm=wt(w.id);
-          return(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={rb}><div style={{fontWeight:700}}>{w.title}</div><span style={pl(STATUS_COLORS[w.status])}>{STATUS_LABELS[w.status]}</span></div>
-            <div style={{color:C.txM,fontSize:13,marginTop:6}}>{w.instrumentation||"편성 미정"} · 총 {minStr(tm)}</div></div>);})}</div>)}
-      <div style={cd}><div style={{...H3,marginBottom:14}}>이번 주</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat("+Math.min(cats.length,5)+",1fr)",gap:10}}>{cats.slice(0,5).map(c=>{const p=gp(c.id);const ok=p.goal&&p.done>=p.goal;
-          return(<div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:20,marginBottom:6}}>{c.icon}</div><div style={{fontSize:14,fontWeight:700,color:ok?C.gn:C.tx}}>{p.done}<span style={{color:C.txD,fontWeight:400}}>/{p.goal}</span></div></div>);})}</div></div>
-      <button style={{...btnG,width:"100%",marginTop:14,color:C.txM,fontWeight:600}} onClick={()=>nav("addS",null)}>+ 직접 기록 추가</button>
-    </div>)}
-
-    {tab==="works"&&<WorksTab works={works} horizons={horizons} wt={wt} wc={wc} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} C={C}/>}
-    {tab==="record"&&<RecordTab sessions={sessions} reviews={reviews} cats={cats} td={td} ws={ws} gp={gp} gc={gc} nav={nav} tg={tg} btnS={btnS} btnG={btnG} H1={H1} H3={H3} rb={rb} pl={pl} pr={pr} pf={pf} cd={cd} C={C}/>}
-    {tab==="settings"&&<SetTab cats={cats} routine={routine} goals={goals} horizons={horizons} works={works} sessions={sessions} reviews={reviews} gc={gc} gp={gp} setGoals={setGoals} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} cd={cd} C={C}/>}
-  </div>
-  <nav style={NV}>{[["home","작업실"],["works","곡"],["record","기록"],["settings","설정"]].map(x=>(
-    <button key={x[0]} style={nb(tab===x[0])} onClick={()=>{setTab(x[0]);setScr(null);}}>{x[1]}</button>
-  ))}</nav></div>);
+  const chartRows = p.calendarMode === "week"
+    ? dates.map((date) => ({ date, label: DAYS[parseDate(date).getDay()], minutes: dayMinutes(date) }))
+    : monthChartRows;
+  const maxChartMinutes = Math.max(1, ...chartRows.map((row) => row.minutes));
+  const techniqueRows = Object.entries(TECHNIQUE_TYPES).map(([type, label]) => {
+    const planMinutes = sum(periodTechniquePlanSessions.filter((session) => session.planType === type), (session) => session.practiceDuration || session.duration);
+    const simpleMinutes = sum(periodSimpleTechniqueSessions.filter((session) => {
+      const target = p.techniqueMap[session.targetId];
+      return target && target.category === label;
+    }), (session) => session.duration);
+    return { type, label, minutes: planMinutes + simpleMinutes };
+  }).filter((row) => row.minutes > 0 || p.calendarMode === "week").slice(0, 4);
+  const maxTechniqueMinutes = Math.max(1, ...techniqueRows.map((row) => row.minutes));
+  return (
+    <>
+      <PageHeader
+        icon="▣"
+        title="기록"
+        subtitle={`누적 ${minText(cumulativeMinutes)} · ${p.calendarMode === "week" ? "이번 주" : "이번 달"} ${minText(periodTotalMinutes)}`}
+        action={<button className="icon-button" type="button" aria-label="필터">≡</button>}
+      />
+      <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
+      <div className="week-card">
+        <div className="period-nav">
+          <button className="period-arrow" onClick={() => moveCalendar(-1)}>‹</button>
+          <div className="period-title">{p.calendarMode === "week" ? `${fullDate(dates[0]).replace(` ${DAYS_FULL[parseDate(dates[0]).getDay()]}`, "")} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
+          <button className="period-arrow" onClick={() => moveCalendar(1)}>›</button>
+        </div>
+        <div className="week-strip">
+          {(p.calendarMode === "week" ? dates : dates.filter((date) => date.startsWith(ym)).slice(0, 7)).map((date) => {
+            const count = countForDate(date);
+            const isToday = date === p.td;
+            return (
+              <button key={date} className={`week-day ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
+                <span>{DAYS[parseDate(date).getDay()]}</span>
+                <strong>{parseDate(date).getDate()}</strong>
+                {count > 0 && <i />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <div className="metric-grid">
+        <MetricCard label="세션" value={`${sessionCount}회`} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+        <MetricCard label="연습 시간" value={minText(periodTotalMinutes)} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+        <MetricCard label="일 평균" value={minText(avgMinutes)} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+      </div>
+      <Section title={`${p.calendarMode === "week" ? "주간" : "월간"} 시간 분포`}>
+        <div className="bar-card">
+          <div className="bar-chart">
+            {chartRows.map((row) => (
+              <div className="bar-column" key={row.date}>
+                <div className="bar-track"><div className="bar-fill" style={{ height: `${Math.max(4, row.minutes / maxChartMinutes * 100)}%` }} /></div>
+                <span>{row.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+      <Section title="테크닉별 시간">
+        <div className="distribution-card">
+          {techniqueRows.map((row) => (
+            <div className="dist-row" key={row.type}>
+              <span>{row.label}</span>
+              <div><i style={{ width: `${Math.max(6, row.minutes / maxTechniqueMinutes * 100)}%` }} /></div>
+              <em>{minText(row.minutes)}</em>
+            </div>
+          ))}
+        </div>
+      </Section>
+      <Section title="주간 리뷰">
+        <Row marker="□" title={weekReview ? "이번 주 리뷰" : "작성하기"} subtitle={weekReview ? (weekReview.win || weekReview.text || weekReview.focus || "작성된 리뷰") : "아직 작성된 리뷰 없음"} right={<Pill>{weekReview ? "수정" : "작성"}</Pill>} onClick={() => p.setScreen({ type: "review-form", item: weekReview || { weekStart: reviewWeekStart, win: "", focus: "", memo: "" } })} />
+      </Section>
+      <Section title="지난 리뷰">
+        {p.reviews.slice().sort((a, b) => (b.weekStart || "").localeCompare(a.weekStart || "")).slice(0, 5).map((review) => <Row key={review.id} marker="□" title={review.weekStart ? fullDate(review.weekStart) : "날짜 없음"} subtitle={(review.win || review.text || review.focus || review.memo || "").slice(0, 70) || "내용 없음"} onClick={() => p.setScreen({ type: "review-form", item: { ...review, win: review.win || review.text || "" } })} />)}
+        {!p.reviews.length && <Empty text="지난 리뷰 없음" />}
+      </Section>
+    </>
+  );
 }
 
-// === WORKS TAB ===
-function WorksTab(p){const{works,horizons,wt,wc,nav,tg,btnS,inp,H1,H3,rb,pl,cd,C}=p;
-  const[search,setSearch]=useState("");
-  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>곡</div><button style={btnS} onClick={()=>nav("nW",{title:"",status:"idea",instrumentation:"",notes:""})}>+ 새 곡</button></div>
-    <input style={inp} placeholder="검색..." value={search} onChange={e=>setSearch(e.target.value)}/>
-    {["wip","sketch","idea","complete","repertoire","concert"].map(st=>{const f=works.filter(w=>w.status===st&&(!search||w.title.toLowerCase().indexOf(search.toLowerCase())>=0));if(!f.length)return null;
-      return(<div key={st} style={{marginBottom:20}}><div style={{...H3,display:"flex",alignItems:"center",gap:8}}><span style={pl(STATUS_COLORS[st])}>{STATUS_LABELS[st]}</span><span style={{color:C.txD,fontSize:12}}>{f.length}</span></div>
-        {f.map(w=>(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={{fontWeight:700,marginBottom:4}}>{w.title}</div><div style={{color:C.txM,fontSize:13}}>{w.instrumentation||"−"} · {wc(w.id)}회 · {minStr(wt(w.id))}</div></div>))}</div>);})}</div>);
+function LibraryView(p) {
+  const [view, setView] = useState("pieces");
+  return (
+    <>
+      <PageHeader icon="▦" title="라이브러리" subtitle={`곡 ${p.pieces.length}개 · 테크닉 ${p.techniquePlans.length}개`} />
+      <Tabs value={view} onChange={setView} items={[
+        { value: "pieces", label: "곡" },
+        { value: "techniques", label: "테크닉" },
+      ]} />
+      {view === "pieces" && <PianoPieceLibrary {...p} />}
+      {view === "techniques" && <TechniqueLibrary {...p} />}
+    </>
+  );
 }
 
-// === RECORD TAB ===
-function RecordTab(p){const{sessions,reviews,cats,td,ws,gp,gc,nav,tg,btnS,btnG,H1,H3,rb,pl,pr,pf,cd,C}=p;
-  const[mode,setMode]=useState("week");const[calD,setCalD]=useState(td);
-  const calDates=mode==="week"?wkDates(calD):moDates(calD);const wR=reviews.find(r=>r.weekStart===ws);const dt=new Date(calD);
-  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>기록</div><div><button style={tg(mode==="week")} onClick={()=>setMode("week")}>주간</button><button style={tg(mode==="month")} onClick={()=>setMode("month")}>월간</button></div></div>
-    <div style={{...rb,marginBottom:14}}><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?-7:-30))}>←</button><span style={{fontWeight:700,fontSize:15}}>{dt.getFullYear()}년 {dt.getMonth()+1}월</span><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?7:30))}>→</button></div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:5,marginBottom:18}}>
-      {DAYS_KR.map(d=><div key={d} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
-      {calDates.map(dd=>{const isT=dd===td;const count=sessions.filter(x=>x.date===dd).length;const isCur=new Date(dd).getMonth()===dt.getMonth();
-        return(<div key={dd} style={{background:isT?C.acL:C.bg1,borderRadius:10,padding:"9px 2px",textAlign:"center",cursor:"pointer",opacity:isCur?1:.3,border:isT?"1.5px solid "+C.ac:"1px solid "+C.bd}} onClick={()=>nav("dD",dd)}>
-          <div style={{fontSize:13,color:isT?C.ac:C.txM,fontWeight:isT?800:500}}>{new Date(dd).getDate()}</div>{count>0&&<div style={{width:5,height:5,borderRadius:"50%",background:C.ac,margin:"3px auto 0"}}/>}</div>);})}</div>
-    <div style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{weekStart:ws,win:wR?wR.win||wR.text||"":"",focus:wR?wR.focus||"":"",memo:wR?wR.memo||"":"",id:wR?wR.id:null})}><div style={rb}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>주간 리뷰</span><span style={{color:C.ac,fontSize:12,fontWeight:700}}>{wR?"수정":"작성 →"}</span></div>
-      {wR?<div style={{color:C.tx,fontSize:14,marginTop:8}}>✦ {(wR.win||wR.text||"").slice(0,60)}</div>:<div style={{color:C.txD,fontSize:13,marginTop:6}}>이번 주를 돌아보세요</div>}</div>
-    <div style={cd}><div style={H3}>이번 주 진행률</div>{cats.map(c=>{const pp=gp(c.id);if(pp.goal===0&&pp.done===0)return null;const pct=pp.goal?Math.round(pp.done/pp.goal*100):0;
-      return(<div key={c.id} style={{marginBottom:12}}><div style={{...rb,marginBottom:5}}><span style={{fontSize:14,fontWeight:600}}>{c.icon} {c.label}</span><span style={{color:pct>=100?C.gn:C.txM,fontSize:13,fontWeight:700}}>{pp.done}/{pp.goal}</span></div><div style={pr}><div style={pf(pct)}/></div></div>);})}</div>
-    {reviews.length>0&&(<div style={{marginTop:10}}><div style={H3}>지난 리뷰</div>{reviews.slice().sort((a,b)=>(b.weekStart||"").localeCompare(a.weekStart||"")).slice(0,5).map(r=>(
-      <div key={r.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{...r,win:r.win||r.text||"",focus:r.focus||"",memo:r.memo||""})}><span style={{fontSize:13,color:C.txM}}>{r.weekStart?fmtFull(r.weekStart):"−"}</span>{(r.win||r.text)&&<div style={{fontSize:13,marginTop:4}}>✦ {(r.win||r.text||"").slice(0,50)}</div>}</div>))}</div>)}</div>);
+function SettingsView(p) {
+  return (
+    <>
+      <PageHeader icon="⚙️" title="설정" subtitle="라이브러리, 루틴, 목표, 데이터" />
+      <Tabs value={p.settingsView} onChange={p.setSettingsView} items={[
+        { value: "libraries", label: "라이브러리" },
+        { value: "routine", label: "루틴" },
+        { value: "goals", label: "목표" },
+        { value: "data", label: "데이터" },
+      ]} />
+      {p.settingsView === "libraries" && (
+        <div className="grid">
+          <Section title="피아노 라이브러리 관리">
+            <Row marker="♪" title={`곡 ${p.pieces.length}개`} subtitle="피아노 탭에서 추가/수정" onClick={() => { p.setPianoView("pieces"); p.openTab("piano"); }} />
+            <Row marker="♪" title={`테크닉 훈련 ${p.techniquePlans.length}개`} subtitle="하농·피쉬나·스케일·아르페지오 진행 규칙" onClick={() => { p.setPianoView("techniques"); p.openTab("piano"); }} />
+            <Row marker="♪" title={`보조 테크닉 ${p.techniques.length}개`} subtitle="기존 BPM 라이브러리 호환" onClick={() => { p.setPianoView("techniques"); p.openTab("piano"); }} />
+          </Section>
+        </div>
+      )}
+      {p.settingsView === "routine" && <RoutineSettings {...p} />}
+      {p.settingsView === "goals" && <GoalSettings {...p} />}
+      {p.settingsView === "data" && <DataSettings {...p} />}
+    </>
+  );
 }
-
-// === SETTINGS TAB ===
-function SetTab(p){const{cats,routine,goals,horizons,works,sessions,reviews,gc,gp,setGoals,nav,tg,btnS,inp,H1,H3,rb,cd,C}=p;
-  const[stab,setStab]=useState("horizon");
-  const KS_ALL=["of3-works","of3-sessions","of3-reviews","of3-cats","of3-routine","of3-goals","of3-horizons","of3-timer"];
-  const expData=()=>{
-    const data={};KS_ALL.forEach(k=>{const v=localStorage.getItem(k);data[k]=v?JSON.parse(v):null;});
-    const obj={schemaVersion:1,exportedAt:new Date().toISOString(),appVersion:"v3",data};
-    const dt=new Date(),pad=n=>String(n).padStart(2,"0");
-    const fn=`opus-flow-backup-${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}-${pad(dt.getHours())}${pad(dt.getMinutes())}.json`;
-    const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");a.href=url;a.download=fn;a.click();
+function RoutineSettings(p) {
+  const setPianoRoutine = (items) => p.updateSettings({ pianoRoutine: items });
+  return (
+    <div className="grid">
+      <Section title="피아노 루틴" action={<button className="section-action" onClick={() => p.setScreen({ type: "piano-routine-form" })}>+ 추가</button>}>
+        {p.settings.pianoRoutine.map((item) => <Row key={item.id} marker="♪" title={item.kind === "piece" ? (p.pieceMap[item.targetId] && p.pieceMap[item.targetId].title) || "삭제된 곡" : (p.techniqueMap[item.targetId] && p.techniqueMap[item.targetId].title) || "삭제된 테크닉"} subtitle={`${DAYS[item.day]}요일 · ${item.duration || 30}분`} right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); setPianoRoutine(p.settings.pianoRoutine.filter((x) => x.id !== item.id)); }}>삭제</button>} />)}
+        {!p.settings.pianoRoutine.length && <Empty text="피아노 루틴 없음" />}
+      </Section>
+    </div>
+  );
+}
+function GoalSettings(p) {
+  const goals = p.settings.goals;
+  const updateGoal = (key, value) => p.updateSettings({ goals: { ...goals, [key]: Number(value) || 0 } });
+  return (
+    <Section title="목표 설정">
+      <div className="row" style={{ cursor: "default" }}>
+        <div className="marker">♪</div>
+        <div className="row-main"><div className="row-title">주간 피아노 시간</div><div className="row-sub">분 단위</div></div>
+        <input className="input" style={{ width: 92 }} type="number" value={goals.weeklyPianoMinutes} onChange={(e) => updateGoal("weeklyPianoMinutes", e.target.value)} />
+      </div>
+      <div className="row" style={{ cursor: "default" }}>
+        <div className="marker">♫</div>
+        <div className="row-main"><div className="row-title">곡 세션 목표</div><div className="row-sub">곡 연습 시작 화면의 기본 목표</div></div>
+        <input className="input" style={{ width: 92 }} type="number" value={goals.pieceSessionGoalMinutes} onChange={(e) => updateGoal("pieceSessionGoalMinutes", e.target.value)} />
+      </div>
+      <div className="row" style={{ cursor: "default" }}>
+        <div className="marker">♬</div>
+        <div className="row-main"><div className="row-title">테크닉 세션 목표</div><div className="row-sub">테크닉 연습 시작 화면의 기본 목표</div></div>
+        <input className="input" style={{ width: 92 }} type="number" value={goals.techniqueSessionGoalMinutes} onChange={(e) => updateGoal("techniqueSessionGoalMinutes", e.target.value)} />
+      </div>
+    </Section>
+  );
+}
+function DataSettings(p) {
+  const pieceSessionCount = p.pianoSessions.filter((session) => session.type === "piece").length;
+  const simpleTechniqueSessionCount = p.pianoSessions.filter((session) => session.type === "technique").length;
+  const exportBackup = () => {
+    const data = {};
+    ALL_BACKUP_KEYS.forEach((key) => { data[key] = readJSON(key, null); });
+    data[KEYS.settings] = normalizeSettings(data[KEYS.settings] || defSettings);
+    const backup = { schemaVersion: 9, exportedAt: new Date().toISOString(), appVersion: "piano-redesign", data };
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const filename = `opus-flow-backup-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}.json`;
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
     URL.revokeObjectURL(url);
   };
-  const impData=e=>{
-    const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      let obj;try{obj=JSON.parse(ev.target.result);}catch(err){alert("파일을 읽을 수 없습니다");return;}
-      if(!obj||obj.schemaVersion!==1||!obj.data||typeof obj.data!=="object"){alert("지원하지 않는 백업 파일입니다");return;}
-      if(!confirm("현재 데이터가 모두 교체됩니다. 계속하시겠어요?"))return;
-      Object.entries(obj.data).forEach(([k,v])=>{if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));});
+  const importBackup = (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      let backup;
+      try { backup = JSON.parse(ev.target.result); } catch (error) { alert("파일을 읽을 수 없습니다"); return; }
+      const version = Number(backup && backup.schemaVersion);
+      if (!backup || !backup.data || typeof backup.data !== "object" || ![1,2,3,4,5,6,7,8,9].includes(version)) {
+        alert("지원하지 않는 백업 파일입니다");
+        return;
+      }
+      if (!confirm("현재 데이터가 백업 파일 내용으로 교체됩니다. 계속하시겠어요?")) return;
+      LEGACY_KEYS.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(backup.data, key)) writeJSON(key, backup.data[key]);
+      });
+      writeJSON(KEYS.pieces, backup.data[KEYS.pieces] || backup.data["of3-pieces"] || defPieces);
+      writeJSON(KEYS.techniques, backup.data[KEYS.techniques] || backup.data["of3-techniques"] || defTechniques);
+      writeJSON(KEYS.pianoSessions, backup.data[KEYS.pianoSessions] || (version < 4 ? migrateOldPianoSessions(backup.data) : null) || []);
+      writeJSON(KEYS.techniquePlans, backup.data[KEYS.techniquePlans] || defTechniquePlans);
+      writeJSON(KEYS.techniquePlanSessions, version >= 4 && Array.isArray(backup.data[KEYS.techniquePlanSessions]) ? backup.data[KEYS.techniquePlanSessions] : defTechniquePlanSessions);
+      writeJSON(KEYS.techniquePractices, version >= 5 && Array.isArray(backup.data[KEYS.techniquePractices]) ? backup.data[KEYS.techniquePractices] : defTechniquePractices);
+      writeJSON(KEYS.settings, normalizeSettings(backup.data[KEYS.settings] || defSettings));
       location.reload();
     };
-    r.readAsText(f);e.target.value="";
+    reader.readAsText(file);
+    event.target.value = "";
   };
-  const lastSes=sessions.length?sessions.map(x=>x.date).sort().slice(-1)[0]:null;
-  return(<div className="fi"><div style={{...H1,marginBottom:20}}>설정</div>
-    <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>{[["horizon","장기 목표"],["category","카테고리"],["routine","루틴"],["goals","주간 목표"],["data","데이터"]].map(x=><button key={x[0]} style={tg(stab===x[0])} onClick={()=>setStab(x[0])}>{x[1]}</button>)}</div>
-    {stab==="horizon"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>장기 목표</span><button style={btnS} onClick={()=>nav("eH",{title:"",icon:"🎯",target:10})}>+ 추가</button></div>
-      {horizons.map(h=>{const linked=works.filter(w=>(w.horizonIds||[]).indexOf(h.id)>=0&&["complete","repertoire","concert"].indexOf(w.status)>=0).length;return(<div key={h.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eH",{...h})}><div style={rb}><span style={{fontWeight:700}}>{h.icon} {h.title}</span><span style={{color:C.ac,fontWeight:700}}>{linked}/{h.target}</span></div></div>);})}</div>}
-    {stab==="category"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>카테고리</span><button style={btnS} onClick={()=>nav("eC",{label:"",icon:"🎵"})}>+ 추가</button></div>
-      {cats.map(c=>(<div key={c.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eC",{...c})}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}</div>}
-    {stab==="routine"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>탭하여 수정</div>
-      <div style={{display:"grid",gridTemplateColumns:"auto repeat(7,1fr)",gap:4}}><div/>{DAYS_KR.map((d,i)=><div key={i} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
-        {["morning","evening"].map(slot=>{const cells=[<div key={slot+"l"} style={{color:C.txM,fontSize:10,padding:"8px 2px",fontWeight:700}}>{SLOTS[slot]}</div>];
-          for(let day=0;day<7;day++){const d=day;const r=routine.find(x=>x.day===d&&x.slot===slot);cells.push(<div key={d} style={{textAlign:"center",padding:"10px 2px",background:C.bg1,borderRadius:8,cursor:"pointer",fontSize:16,border:"1px solid "+C.bd}} onClick={()=>nav("eRS",{day:d,slot})}>{r?gc(r.type).icon:"·"}</div>);}return cells;})}</div></div>}
-    {stab==="goals"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>카테고리별 주간 목표</div>
-      {cats.map(c=>{const g=goals.find(x=>x.categoryId===c.id);return(<div key={c.id} style={{...cd,display:"flex",alignItems:"center",gap:12}}><span style={{flex:1,fontSize:15,fontWeight:600}}>{c.icon} {c.label}</span>
-        <input type="number" style={{...inp,width:64,marginBottom:0,textAlign:"center",padding:8}} value={g?g.target:0} onChange={e=>{const v=parseInt(e.target.value)||0;const ex=goals.find(x=>x.categoryId===c.id);if(ex)setGoals(goals.map(x=>x.categoryId===c.id?{...x,target:v}:x));else setGoals([...goals,{categoryId:c.id,target:v}]);}}/>
-        <span style={{color:C.txD,fontSize:13}}>회</span></div>);})}</div>}
-    {stab==="data"&&<div>
-      <div style={cd}><div style={H3}>현재 저장된 데이터</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>{[["곡",works.length],["세션",sessions.length],["리뷰",reviews.length],["카테고리",cats.length]].map(x=>(<div key={x[0]} style={{textAlign:"center"}}><div style={{fontSize:20,fontWeight:800}}>{x[1]}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>{x[0]}</div></div>))}</div>
-        <div style={{color:C.txM,fontSize:13,fontWeight:500}}>마지막 활동 <span style={{color:C.tx,fontWeight:600,marginLeft:6}}>{lastSes?fmtFull(lastSes):"없음"}</span></div></div>
-      <div style={cd}><div style={H3}>백업 내보내기</div><button style={btnS} onClick={expData}>JSON 파일로 저장</button></div>
-      <div style={cd}><div style={H3}>백업 불러오기</div><label style={{...btnS,display:"inline-block"}}>JSON 파일 선택<input type="file" accept="application/json,.json" style={{display:"none"}} onChange={impData}/></label></div></div>}</div>);
+  return (
+    <>
+      <Section title="데이터 요약">
+        <Row marker="♪" title={`피아노 곡 ${p.pieces.length}개 · 테크닉 항목 ${p.techniquePlans.length}개`} subtitle={`곡 세션 ${pieceSessionCount}개 · 보조 테크닉 ${simpleTechniqueSessionCount}개 · 테크닉 연습 ${p.techniquePractices.length}개`} />
+        <Row marker="📅" title={`리뷰 ${p.reviews.length}개`} subtitle={`마지막 활동 ${p.lastActivity ? fullDate(p.lastActivity) : "없음"}`} />
+      </Section>
+      <Section title="백업/복원">
+        <Row marker="↓" title="백업 내보내기" subtitle="schemaVersion 9 JSON" onClick={exportBackup} />
+        <div className="row" style={{ cursor: "default" }}>
+          <div className="marker">↑</div>
+          <div className="row-main"><div className="row-title">백업 불러오기</div><div className="row-sub">기존 v1~v8 백업 호환</div></div>
+          <label className="button">선택<input type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importBackup} /></label>
+        </div>
+      </Section>
+    </>
+  );
+}
+function migrateOldPianoSessions(data) {
+  const pieceSessions = data["of3-piece-sessions"];
+  const techniqueSessions = data["of3-technique-sessions"];
+  if (!Array.isArray(pieceSessions) && !Array.isArray(techniqueSessions)) return null;
+  return [
+    ...(Array.isArray(pieceSessions) ? pieceSessions.map((s) => ({ id: s.id || uid(), date: s.date, type: "piece", targetId: s.pieceId, duration: s.duration, section: s.section || "", bpm: "", repetitions: "", note: s.note || "", feeling: s.feeling || "" })) : []),
+    ...(Array.isArray(techniqueSessions) ? techniqueSessions.map((s) => ({ id: s.id || uid(), date: s.date, type: "technique", targetId: s.techniqueId, duration: s.duration, section: "", bpm: s.bpm || "", repetitions: s.repetitions || "", note: s.note || "", feeling: s.feeling || "" })) : []),
+  ];
 }
 
-// === SESSION FORM ===
-function SessForm(p){const{init,cats,works,isComp,canDel,gc,onSave,onDel,onClose,tg,btn,btnS,btnD,btnG,inp,ta,bk,H1,H3,ck,P,CT,C}=p;
-  const[f,setF]=useState({date:init.date||today(),type:init.type,slot:init.slot||"free",linkedWorkId:init.linkedWorkId||null,note:init.note||"",duration:init.duration||30,checklist:init.checklist||[],id:init.id||null});
-  const[nc,setNc]=useState("");const u=patch=>setF(prev=>({...prev,...patch}));
-  const aw=works.filter(w=>["sketch","wip","complete"].indexOf(w.status)>=0);
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button>
-    <div style={{...H1,marginBottom:24}}>{isComp?"세션 기록":f.id?"세션 수정":"세션 추가"}</div>
-    {isComp&&f.duration?(<div style={{textAlign:"center",marginBottom:28}}><div style={{fontSize:52,fontWeight:200,color:C.ac}}>{f.duration}분</div><div style={{color:C.txM,fontSize:14,marginTop:6,fontWeight:500}}>{gc(f.type).icon} {gc(f.type).label} · {SLOTS[f.slot]}</div></div>
-    ):(<div><div style={{marginBottom:16}}><div style={H3}>날짜</div><input type="date" style={inp} value={f.date} onChange={e=>u({date:e.target.value})}/></div>
-      <div style={{marginBottom:16}}><div style={H3}>종류</div><div style={{display:"flex",flexWrap:"wrap"}}>{cats.map(c=><button key={c.id} style={tg(f.type===c.id)} onClick={()=>u({type:c.id})}>{c.icon} {c.label}</button>)}</div></div>
-      <div style={{marginBottom:16}}><div style={H3}>시간</div><div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>{DUR_PRE.map(d=><button key={d} style={tg(f.duration===d)} onClick={()=>u({duration:d})}>{d}분</button>)}</div><input type="number" style={{...inp,width:110}} value={f.duration} onChange={e=>u({duration:parseInt(e.target.value)||0})} placeholder="직접 입력"/></div></div>)}
-    <div style={{marginBottom:16}}><div style={H3}>연결 곡</div><div style={{display:"flex",flexWrap:"wrap"}}><button style={tg(!f.linkedWorkId)} onClick={()=>u({linkedWorkId:null})}>없음</button>{aw.map(w=><button key={w.id} style={tg(f.linkedWorkId===w.id)} onClick={()=>u({linkedWorkId:w.id})}>{w.title}</button>)}</div></div>
-    <div style={{marginBottom:16}}><div style={H3}>체크리스트</div>{(f.checklist||[]).map(c=>(<div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"7px 0"}}><div style={ck(c.done)} onClick={()=>u({checklist:f.checklist.map(x=>x.id===c.id?{...x,done:!x.done}:x)})}>{c.done?"✓":""}</div>
-      <span style={{flex:1,fontSize:14,textDecoration:c.done?"line-through":"none",color:c.done?C.txD:C.tx,fontWeight:500}}>{c.text}</span><button style={{...btnG,color:C.txD,padding:4}} onClick={()=>u({checklist:f.checklist.filter(x=>x.id!==c.id)})}>×</button></div>))}
-      <div style={{display:"flex",gap:8}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="항목 추가" value={nc} onChange={e=>setNc(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}/>
-        <button style={btnS} onClick={()=>{if(nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}>+</button></div></div>
-    <div style={{marginBottom:24}}><div style={H3}>메모</div><textarea style={{...ta,height:80}} value={f.note} onChange={e=>u({note:e.target.value})}/></div>
-    <button style={{...btn,width:"100%"}} onClick={()=>onSave(f)}>저장</button>
-    {canDel&&onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
+function Overlay({ screen, onClose, ...p }) {
+  return (
+    <div className="overlay">
+      <div className="overlay-inner">
+        <button className="back" onClick={onClose}>← 닫기</button>
+        {screen.type === "piece-form" && <PieceForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "technique-form" && <TechniqueForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "technique-plan-detail" && <TechniquePlanDetail item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "technique-plan-form" && <TechniquePlanForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "technique-practice" && <TechniquePracticeForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "technique-plan-session" && <TechniquePlanSessionForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "piece-practice" && <PiecePracticeForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "piano-session" && <PianoSessionForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "review-form" && <ReviewForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "day-detail" && <DayDetail date={screen.date} {...p} />}
+        {screen.type === "focus-picker" && <FocusPicker onClose={onClose} {...p} />}
+        {screen.type === "piano-routine-form" && <PianoRoutineForm onClose={onClose} {...p} />}
+      </div>
+    </div>
+  );
+}
+function PieceForm({ item, pieces, setPieces, setMonthFocus, monthFocus, onClose }) {
+  const [form, setForm] = useState(item || { title: "", composer: "", opus: "", currentSection: "", status: "active", notes: "" });
+  const save = () => {
+    if (!form.title.trim()) return;
+    if (form.id) setPieces(pieces.map((piece) => piece.id === form.id ? form : piece));
+    else setPieces([...pieces, { ...form, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("곡을 삭제하시겠어요?")) return;
+    setPieces(pieces.filter((piece) => piece.id !== form.id));
+    setMonthFocus({ pieceIds: (monthFocus.pieceIds || []).filter((id) => id !== form.id) });
+    onClose();
+  };
+  return <ItemFormFrame icon="🎹" title={form.id ? "곡 수정" : "새 곡"} form={form} setForm={setForm} save={save} remove={form.id && remove} fields="piece" />;
+}
+function PiecePracticeForm({ data, pieces, setPieces, setPianoSessions, timer, setTimer, settings, onClose }) {
+  const initialPieceId = data && data.pieceId || pieces[0] && pieces[0].id || "";
+  const initialPiece = pieces.find((piece) => piece.id === initialPieceId) || pieces[0];
+  const goals = settings && settings.goals || defSettings.goals;
+  const targetMinutes = Number(goals.pieceSessionGoalMinutes ?? defSettings.goals.pieceSessionGoalMinutes) || 0;
+  const [form, setForm] = useState({
+    date: today(),
+    pieceId: initialPieceId,
+    section: initialPiece && initialPiece.currentSection || "",
+    bpm: data && data.bpm || 80,
+    timeSignature: data && data.timeSignature || "4/4",
+    repetitions: 0,
+    connectedFlow: "good",
+    rhythm: "good",
+    sectionSecurity: "good",
+    tone: "good",
+    tension: "good",
+    difficulty: "good",
+    recordingId: "",
+    feeling: "",
+    note: "",
+  });
+  const [step, setStep] = useState("practice");
+  const [now, setNow] = useState(Date.now());
+  const activeTimer = timer && timer.kind === "piece" ? timer : null;
+  useEffect(() => {
+    if (!activeTimer || !activeTimer.running) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [activeTimer && activeTimer.running, activeTimer && activeTimer.startedAt]);
+  const selectedPiece = pieces.find((piece) => piece.id === form.pieceId);
+  const elapsedMs = activeTimer
+    ? (Number(activeTimer.accumulatedMs) || 0) + (activeTimer.running && activeTimer.startedAt ? Math.max(0, now - Date.parse(activeTimer.startedAt)) : 0)
+    : 0;
+  const startTimer = () => {
+    const stamp = new Date().toISOString();
+    setTimer({ kind: "piece", targetId: form.pieceId, running: true, startedAt: stamp, firstStartedAt: activeTimer && activeTimer.firstStartedAt || stamp, accumulatedMs: activeTimer ? Math.round(elapsedMs) : 0 });
+  };
+  const pauseTimer = () => setTimer(activeTimer ? { ...activeTimer, running: false, startedAt: null, accumulatedMs: Math.round(elapsedMs) } : null);
+  const resetTimer = () => setTimer(null);
+  const changePiece = (pieceId) => {
+    const nextPiece = pieces.find((piece) => piece.id === pieceId);
+    setForm((prev) => ({ ...prev, pieceId, section: prev.section || nextPiece && nextPiece.currentSection || "" }));
+  };
+  const incrementReps = () => setForm((prev) => ({ ...prev, repetitions: (Number(prev.repetitions) || 0) + 1 }));
+  const decrementReps = () => setForm((prev) => ({ ...prev, repetitions: Math.max(0, (Number(prev.repetitions) || 0) - 1) }));
+  const goToCheck = () => {
+    if (!form.pieceId) return;
+    if (elapsedMs < 1000) {
+      alert("먼저 연습 시작을 눌러 실제 시간을 기록해주세요.");
+      return;
+    }
+    if (activeTimer && activeTimer.running) pauseTimer();
+    setStep("check");
+  };
+  const markPieceStable = () => setForm((prev) => ({
+    ...prev,
+    connectedFlow: "good",
+    rhythm: "good",
+    sectionSecurity: "good",
+    tone: "good",
+    tension: "good",
+    difficulty: "good",
+  }));
+  const markPieceCaution = () => setForm((prev) => ({
+    ...prev,
+    connectedFlow: prev.connectedFlow === "good" ? "normal" : prev.connectedFlow,
+    rhythm: prev.rhythm === "good" ? "normal" : prev.rhythm,
+    sectionSecurity: prev.sectionSecurity === "good" ? "normal" : prev.sectionSecurity,
+    tension: "hard",
+    difficulty: ["good", "normal"].includes(prev.difficulty) ? "hard" : prev.difficulty,
+  }));
+  const save = () => {
+    if (!form.pieceId) return;
+    if (elapsedMs < 1000) {
+      alert("먼저 연습 시작을 눌러 실제 시간을 기록해주세요.");
+      return;
+    }
+    const endedAt = new Date().toISOString();
+    const duration = Math.max(1, Math.round(elapsedMs / 60000));
+    setPianoSessions((prev) => [...prev, {
+      id: uid(),
+      date: form.date,
+      type: "piece",
+      targetId: form.pieceId,
+      duration,
+      targetDuration: targetMinutes,
+      section: form.section,
+      bpm: Number(form.bpm) || "",
+      timeSignature: form.timeSignature,
+      repetitions: Number(form.repetitions) || 0,
+      recordingId: form.recordingId,
+      pieceCheck: {
+        connectedFlow: form.connectedFlow,
+        rhythm: form.rhythm,
+        sectionSecurity: form.sectionSecurity,
+        tone: form.tone,
+        tension: form.tension,
+        difficulty: form.difficulty,
+      },
+      note: form.note,
+      feeling: form.feeling,
+      startedAt: activeTimer && activeTimer.firstStartedAt || endedAt,
+      endedAt,
+      createdAt: endedAt,
+    }]);
+    if (form.section.trim()) {
+      setPieces((prev) => prev.map((piece) => piece.id === form.pieceId ? { ...piece, currentSection: form.section } : piece));
+    }
+    setTimer(null);
+    onClose();
+  };
+  if (!pieces.length) {
+    return (
+      <>
+        <PageHeader icon="🎹" title="곡 연습" subtitle="먼저 곡을 추가해주세요" />
+        <Empty text="연습할 곡 없음" />
+      </>
+    );
+  }
+  if (step === "check") {
+    return (
+      <>
+        <PageHeader icon="🎹" title="곡 연습 후 체크" subtitle={`${selectedPiece ? selectedPiece.title : "곡"} · ${minText(Math.max(1, Math.round(elapsedMs / 60000)))}`} />
+        <button className="review-back" type="button" onClick={() => setStep("practice")}>← 연습으로 돌아가기</button>
+        <Section title="오늘 한 곡">
+          <Row
+            marker="♪"
+            title={selectedPiece ? selectedPiece.title : "곡 연습"}
+            subtitle={[form.section, metronomeSessionText(form), Number(form.repetitions) ? `${Number(form.repetitions)}회` : ""].filter(Boolean).join(" · ") || "구간 기록 없음"}
+            right={<Pill>{minText(Math.max(1, Math.round(elapsedMs / 60000)))}</Pill>}
+          />
+        </Section>
+        <Section title="연습 상태 평가">
+          <div className="quick-checks">
+            <button className="quick-card stable" type="button" onClick={markPieceStable}>
+              <strong>☺</strong>
+              <span>오늘 안정적</span>
+              <em>흐름과 몸 상태 양호</em>
+            </button>
+            <button className="quick-card caution" type="button" onClick={markPieceCaution}>
+              <strong>☹</strong>
+              <span>무리감 표시</span>
+              <em>다음 연습에서 유지</em>
+            </button>
+          </div>
+          <div className="eval-list">
+            <EvalRow icon="↔" title="흐름 연결" subtitle="구간과 구간이 끊기지 않고 이어졌나요?" value={form.connectedFlow} onChange={(value) => setForm({ ...form, connectedFlow: value })} />
+            <EvalRow icon="♩" title="박자 안정" subtitle="메트로놈 없이도 템포가 크게 흔들리지 않았나요?" value={form.rhythm} onChange={(value) => setForm({ ...form, rhythm: value })} />
+            <EvalRow icon="⌗" title="구간 정확도" subtitle="오늘 정한 마디와 손 이동이 안정적이었나요?" value={form.sectionSecurity} onChange={(value) => setForm({ ...form, sectionSecurity: value })} />
+            <EvalRow icon="◇" title="표현 / 음색" subtitle="소리의 방향과 다이내믹이 의도대로 나왔나요?" value={form.tone} onChange={(value) => setForm({ ...form, tone: value })} />
+            <EvalRow icon="♧" title="긴장도" subtitle="어깨, 손목, 팔에 불필요한 힘이 남지 않았나요?" value={form.tension} onChange={(value) => setForm({ ...form, tension: value })} warning />
+            <EvalRow icon="▥" title="난이도 체감" subtitle="현재 구간과 BPM이 오늘 컨디션에 맞았나요?" value={form.difficulty} onChange={(value) => setForm({ ...form, difficulty: value })} />
+          </div>
+          <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
+          <Field label="느낌"><input className="input" value={form.feeling} placeholder="예: 연결 좋아짐, 왼손 긴장" onChange={(e) => setForm({ ...form, feeling: e.target.value })} /></Field>
+          <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+        </Section>
+        <div className="practice-sticky">
+          <button className="button full dark-cta" type="button" onClick={save}>◎ 기록 저장하기</button>
+        </div>
+        <div className="rule-note">곡 세션에는 실제 연습 시간, 목표 시간, 구간 반복, 메트로놈, 연습 후 체크가 함께 저장됩니다.</div>
+      </>
+    );
+  }
+  return (
+    <>
+      <PageHeader icon="" title="곡 연습" subtitle={selectedPiece ? selectedPiece.title : "곡 선택"} action={<button className="icon-button" type="button" onClick={resetTimer}>◷</button>} />
+      <div className="timer-card practice-timer-card">
+        <div>
+          <div className="timer-label">연습 시간</div>
+          <div className="timer-time">{clockText(elapsedMs)}</div>
+        </div>
+        <div className="timer-goal">
+          <div className="timer-label">세션 목표</div>
+          <strong>{targetGoalText(targetMinutes)}</strong>
+          <span>›</span>
+        </div>
+        <div className="timer-buttons">
+          {!activeTimer || !activeTimer.running ? <button className="button" onClick={startTimer}>{elapsedMs ? "이어하기" : "시작"}</button> : <button className="button secondary" onClick={pauseTimer}>일시정지</button>}
+          <button className="button ghost" onClick={resetTimer}>초기화</button>
+        </div>
+      </div>
+      <Metronome
+        value={form.bpm}
+        signature={form.timeSignature}
+        onChange={(value) => setForm({ ...form, bpm: value })}
+        onSignatureChange={(value) => setForm({ ...form, timeSignature: value })}
+      />
+      <Field label="날짜"><input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
+      <Field label="곡"><select className="select" value={form.pieceId} onChange={(e) => changePiece(e.target.value)}>{pieces.map((piece) => <option key={piece.id} value={piece.id}>{piece.title}</option>)}</select></Field>
+      <Field label="구간"><input className="input" value={form.section} placeholder="예: 1~40마디, 코다, 왼손 도약" onChange={(e) => setForm({ ...form, section: e.target.value })} /></Field>
+      <Field label="구간 반복">
+        <div className="count-stepper" style={{ maxWidth: 180 }}>
+          <button className="count-button" type="button" onClick={decrementReps}>-</button>
+          <div className="count-value">{Number(form.repetitions) || 0}</div>
+          <button className="count-button" type="button" onClick={incrementReps}>+1</button>
+        </div>
+      </Field>
+      <div className="practice-sticky">
+        <button className="button full dark-cta" type="button" onClick={goToCheck}>◎ 연습 후 체크하기 <span>{Number(form.repetitions) || 0}</span></button>
+      </div>
+      <div className="rule-note">저장 전 체크 화면에서 흐름, 박자, 구간 정확도, 긴장도를 확인합니다.</div>
+    </>
+  );
+}
+function TechniqueForm({ item, techniques, setTechniques, onClose }) {
+  const [form, setForm] = useState(item || { title: "", category: "하농", targetBPM: 80, currentBPM: 60, status: "active", notes: "" });
+  const save = () => {
+    if (!form.title.trim()) return;
+    const next = { ...form, targetBPM: Number(form.targetBPM) || 0, currentBPM: Number(form.currentBPM) || 0 };
+    if (next.id) setTechniques(techniques.map((technique) => technique.id === next.id ? next : technique));
+    else setTechniques([...techniques, { ...next, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("테크닉을 삭제하시겠어요?")) return;
+    setTechniques(techniques.filter((technique) => technique.id !== form.id));
+    onClose();
+  };
+  return <ItemFormFrame icon="🎹" title={form.id ? "테크닉 수정" : "새 테크닉"} form={form} setForm={setForm} save={save} remove={form.id && remove} fields="technique" />;
+}
+function TechniquePlanDetail({ item, techniquePlans, setTechniquePlans, techniquePlanSessions, setScreen }) {
+  const plan = techniquePlans.find((candidate) => candidate.id === item.id) || item;
+  const sessions = techniquePlanSessions.filter((session) => session.planId === plan.id);
+  const stageSessions = sessions.filter((session) => !session.stageId || session.stageId === techniqueStageId(plan));
+  const assessment = assessTechniquePlan(plan, techniquePlanSessions);
+  const advance = () => {
+    if (!assessment.eligible) {
+      alert(`아직 다음 단계 조건이 부족합니다.\n- ${assessment.reasons.join("\n- ")}`);
+      return;
+    }
+    if (!confirm("현재 단계를 통과 처리하고 다음 단계로 이동할까요?")) return;
+    setTechniquePlans((prev) => prev.map((candidate) => candidate.id === plan.id ? advanceTechniquePlan(candidate) : candidate));
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title={techniqueTaskTitle(plan)} subtitle={plan.title} />
+      <Properties rows={[
+        { label: "오늘 할 것", value: techniqueTaskMeta(plan) },
+        { label: "진행 상태", value: techniqueHoldText(assessment) },
+        { label: "다음", value: techniqueNextText(plan) },
+      ]} />
+      <Section title="넘어가기 전에 볼 것">
+        <Row marker="1" title="두 번 안정적이었나" subtitle="같은 단계에서 통과 체크 2회, 날짜는 최소 2일" />
+        <Row marker="2" title="소리가 고르고 손가락이 버티나" subtitle="소리 고름, 음색 일정, 손가락 균형이 모두 4점 이상" />
+        <Row marker="3" title="몸이 괜찮나" subtitle="무너짐 없음, 긴장 2 이하, 통증이나 저림 없음" />
+      </Section>
+      <Section title="최근 체크" action={<button className="section-action" onClick={() => setScreen({ type: "technique-practice", data: { planIds: [plan.id] } })}>+ 체크</button>}>
+        {stageSessions.slice().sort(byDateDesc).slice(0, 8).map((session) => (
+          <Row
+            key={session.id}
+            marker={techniqueSessionPasses(session, plan) ? "✓" : "·"}
+            title={`${shortDate(session.date)} · ${techniqueSessionPasses(session, plan) ? "좋음" : "유지"}`}
+            subtitle={`${session.stageLabel || techniqueStageTitle(plan)} · ${bpmEntriesText(session.bpmEntries) || `${session.bpm || 0}BPM`} · 테크닉 연습 ${minText(session.practiceDuration || session.duration)} · 긴장 ${session.tension}`}
+            right={<Pill tone={techniqueSessionPasses(session, plan) ? "green" : ""}>{DIFFICULTY_LABELS[session.difficulty] || session.difficulty}</Pill>}
+          />
+        ))}
+        {!stageSessions.length && <Empty text="아직 체크한 기록 없음" />}
+      </Section>
+      <div className="button-row">
+        <button className="button" onClick={() => setScreen({ type: "technique-practice", data: { planIds: [plan.id] } })}>연습 시작</button>
+        <button className="button secondary" onClick={() => setScreen({ type: "technique-plan-form", item: plan })}>수정</button>
+      </div>
+      <button className={`button full ${assessment.eligible ? "" : "secondary"}`} style={{ marginTop: 8 }} onClick={advance}>다음 단계로 넘기기</button>
+      <div className="rule-note">앱은 조건만 확인해줘요. 통증이나 저림이 있으면 숫자와 상관없이 오늘은 유지하세요.</div>
+    </>
+  );
+}
+function TechniquePlanForm({ item, techniquePlans, setTechniquePlans, setTechniquePlanSessions, onClose }) {
+  const initial = item || {
+    title: "",
+    type: "hanon",
+    mode: "key-number",
+    status: "active",
+    currentKey: "C",
+    numberGroups: [[21, 22], [23, 24], [25, 26], [27, 28], [29, 30]],
+    currentGroupIndex: 0,
+    startBPM: 110,
+    currentBPM: 130,
+    targetBPM: 130,
+    bpmStep: 4,
+    notes: "",
+  };
+  const [form, setForm] = useState({ ...initial, groupsText: formatGroups(initial.numberGroups) });
+  const mode = form.mode || techniqueModeForType(form.type);
+  const groups = parseGroups(form.groupsText);
+  const groupOptions = mode === "bpm-complete" ? [[]] : groups;
+  const changeType = (type) => {
+    const nextMode = techniqueModeForType(type);
+    const defaultGroups = type === "hanon" ? "21,22 / 23,24 / 25,26 / 27,28 / 29,30" : type === "pischna" ? "1,2 / 3,4 / 5,6" : "";
+    setForm({ ...form, type, mode: nextMode, currentKey: nextMode === "key-number" ? (form.currentKey || "C") : "", groupsText: type === form.type && form.groupsText ? form.groupsText : defaultGroups, currentGroupIndex: 0 });
+  };
+  const save = () => {
+    if (!form.title.trim()) return;
+    const nextMode = techniqueModeForType(form.type);
+    const nextGroups = nextMode === "bpm-complete" ? [] : (groups.length ? groups : [[1, 2]]);
+    const next = {
+      ...form,
+      mode: nextMode,
+      keyOrder: nextMode === "key-number" ? TECHNIQUE_KEY_ORDER : [],
+      numberGroups: nextGroups,
+      currentGroupIndex: Math.min(Number(form.currentGroupIndex) || 0, Math.max(0, nextGroups.length - 1)),
+      startBPM: Number(form.startBPM) || 0,
+      currentBPM: Number(form.currentBPM) || 0,
+      targetBPM: Number(form.targetBPM) || 0,
+      bpmStep: Number(form.bpmStep) || 4,
+      completed: Boolean(form.completed),
+    };
+    delete next.groupsText;
+    if (next.id) setTechniquePlans(techniquePlans.map((plan) => plan.id === next.id ? next : plan));
+    else setTechniquePlans([...techniquePlans, { ...next, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("훈련 플랜과 관련 평가 기록을 삭제하시겠어요?")) return;
+    setTechniquePlans(techniquePlans.filter((plan) => plan.id !== form.id));
+    setTechniquePlanSessions((prev) => prev.filter((session) => session.planId !== form.id));
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title={form.id ? "훈련 플랜 수정" : "새 훈련 플랜"} subtitle={TECHNIQUE_MODES[mode]} />
+      <Field label="이름"><input className="input" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+      <Field label="종류"><select className="select" value={form.type} onChange={(e) => changeType(e.target.value)}>{Object.entries(TECHNIQUE_TYPES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+      {mode !== "bpm-complete" && <Field label="번호 묶음"><input className="input" value={form.groupsText || ""} placeholder="21,22 / 23,24" onChange={(e) => setForm({ ...form, groupsText: e.target.value, currentGroupIndex: 0 })} /></Field>}
+      {mode === "key-number" && <Field label="현재 키"><select className="select" value={form.currentKey || "C"} onChange={(e) => setForm({ ...form, currentKey: e.target.value })}>{TECHNIQUE_KEY_ORDER.map((key) => <option key={key} value={key}>{key}</option>)}</select></Field>}
+      {mode !== "bpm-complete" && <Field label="현재 묶음"><select className="select" value={Number(form.currentGroupIndex) || 0} onChange={(e) => setForm({ ...form, currentGroupIndex: Number(e.target.value) })}>{groupOptions.map((group, index) => <option key={index} value={index}>{groupText(group)}번</option>)}</select></Field>}
+      <div className="inline-fields">
+        <Field label="시작 BPM"><input className="input" type="number" value={form.startBPM || 0} onChange={(e) => setForm({ ...form, startBPM: e.target.value })} /></Field>
+        <Field label="현재 BPM"><input className="input" type="number" value={form.currentBPM || 0} onChange={(e) => setForm({ ...form, currentBPM: e.target.value })} /></Field>
+      </div>
+      <div className="inline-fields">
+        <Field label="목표 BPM"><input className="input" type="number" value={form.targetBPM || 0} onChange={(e) => setForm({ ...form, targetBPM: e.target.value })} /></Field>
+        <Field label="증가 단위"><input className="input" type="number" value={form.bpmStep || 4} onChange={(e) => setForm({ ...form, bpmStep: e.target.value })} /></Field>
+      </div>
+      <Field label="상태"><select className="select" value={form.status || "active"} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="active">활성</option><option value="paused">일시중지</option><option value="archived">보관</option></select></Field>
+      <Field label="메모"><textarea className="textarea" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
+      <div className="button-row"><button className="button" onClick={save}>저장</button>{form.id && <button className="button danger" onClick={remove}>삭제</button>}</div>
+    </>
+  );
+}
+function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, setTechniquePlanSessions, timer, setTimer, settings, onClose }) {
+  const availablePlans = techniquePlans.filter((plan) => plan.status === "active" && !plan.completed);
+  const requestedIds = data && Array.isArray(data.planIds) ? data.planIds : [];
+  const initialMetronomePlan = availablePlans.find((plan) => requestedIds.includes(plan.id)) || availablePlans[0];
+  const goals = settings && settings.goals || defSettings.goals;
+  const targetMinutes = Number(goals.techniqueSessionGoalMinutes ?? defSettings.goals.techniqueSessionGoalMinutes) || 0;
+  const defaultBpmEntry = (plan, repetitions = 0) => ({ id: uid(), bpm: Number(plan.currentBPM) || "", repetitions });
+  const [checked, setChecked] = useState(() => Object.fromEntries(availablePlans.map((plan) => [plan.id, requestedIds.length ? requestedIds.includes(plan.id) : false])));
+  const [bpmEntriesByPlan, setBpmEntriesByPlan] = useState(() => Object.fromEntries(availablePlans.map((plan) => [plan.id, [defaultBpmEntry(plan, requestedIds.includes(plan.id) ? 1 : 0)]])));
+  const [form, setForm] = useState({
+    date: today(),
+    completedAll: true,
+    evenness: 4,
+    soundConsistency: 4,
+    fingerIndependence: 4,
+    weakFingerDrop: "none",
+    collapse: "none",
+    tension: 1,
+    pain: "none",
+    difficulty: "good",
+    recordingId: "",
+    metronomeBPM: Number(data && data.metronomeBPM) || Number(initialMetronomePlan && initialMetronomePlan.currentBPM) || 80,
+    metronomeSignature: data && data.metronomeSignature || "4/4",
+    note: "",
+  });
+  const [step, setStep] = useState("practice");
+  const [now, setNow] = useState(Date.now());
+  const activeTimer = timer && timer.kind === "technique" ? timer : null;
+  useEffect(() => {
+    if (!activeTimer || !activeTimer.running) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [activeTimer && activeTimer.running, activeTimer && activeTimer.startedAt]);
+  const elapsedMs = activeTimer
+    ? (Number(activeTimer.accumulatedMs) || 0) + (activeTimer.running && activeTimer.startedAt ? Math.max(0, now - Date.parse(activeTimer.startedAt)) : 0)
+    : 0;
+  const entriesForPlan = (plan) => {
+    const entries = bpmEntriesByPlan[plan.id];
+    return entries && entries.length ? entries : [{ id: `${plan.id}-fallback`, bpm: Number(plan.currentBPM) || "", repetitions: 0 }];
+  };
+  const totalRepetitionsForPlan = (planId) => sum(bpmEntriesByPlan[planId] || [], (entry) => entry.repetitions);
+  const normalizedBpmEntries = (plan) => entriesForPlan(plan)
+    .map((entry) => ({ bpm: Number(entry.bpm) || Number(plan.currentBPM) || 0, repetitions: Number(entry.repetitions) || 0 }))
+    .filter((entry) => entry.bpm || entry.repetitions);
+  const selectedPlans = availablePlans.filter((plan) => checked[plan.id] || totalRepetitionsForPlan(plan.id) > 0);
+  const setPlanEntries = (plan, getNext, syncChecked = false) => setBpmEntriesByPlan((prev) => {
+    const current = prev[plan.id] && prev[plan.id].length ? prev[plan.id] : [defaultBpmEntry(plan)];
+    const next = getNext(current);
+    if (syncChecked) setChecked((checks) => ({ ...checks, [plan.id]: sum(next, (entry) => entry.repetitions) > 0 }));
+    return { ...prev, [plan.id]: next };
+  });
+  const togglePlan = (plan) => {
+    const id = plan.id;
+    const nextChecked = !checked[id];
+    setChecked((prev) => ({ ...prev, [id]: nextChecked }));
+    setPlanEntries(plan, (entries) => nextChecked
+      ? entries.map((entry, index) => index === 0 ? { ...entry, repetitions: Math.max(1, Number(entry.repetitions) || 0) } : entry)
+      : entries.map((entry) => ({ ...entry, repetitions: 0 })));
+  };
+  const updateBpmEntry = (plan, index, patch) => {
+    setPlanEntries(plan, (entries) => entries.map((entry, entryIndex) => entryIndex === index ? { ...entry, ...patch } : entry));
+  };
+  const addBpmEntry = (plan) => {
+    setChecked((prev) => ({ ...prev, [plan.id]: true }));
+    setPlanEntries(plan, (entries) => [...entries, defaultBpmEntry(plan)]);
+  };
+  const removeBpmEntry = (plan, index) => {
+    setPlanEntries(plan, (entries) => entries.length > 1 ? entries.filter((entry, entryIndex) => entryIndex !== index) : entries.map((entry) => ({ ...entry, repetitions: 0 })), true);
+  };
+  const incrementReps = (plan, index) => {
+    setChecked((prev) => ({ ...prev, [plan.id]: true }));
+    setPlanEntries(plan, (entries) => entries.map((entry, entryIndex) => entryIndex === index ? { ...entry, repetitions: (Number(entry.repetitions) || 0) + 1 } : entry));
+  };
+  const decrementReps = (plan, index) => {
+    setPlanEntries(plan, (entries) => entries.map((entry, entryIndex) => entryIndex === index ? { ...entry, repetitions: Math.max(0, (Number(entry.repetitions) || 0) - 1) } : entry), true);
+  };
+  const startTimer = () => {
+    const stamp = new Date().toISOString();
+    setTimer({ kind: "technique", running: true, startedAt: stamp, firstStartedAt: activeTimer && activeTimer.firstStartedAt || stamp, accumulatedMs: activeTimer ? Math.round(elapsedMs) : 0 });
+  };
+  const pauseTimer = () => setTimer(activeTimer ? { ...activeTimer, running: false, startedAt: null, accumulatedMs: Math.round(elapsedMs) } : null);
+  const resetTimer = () => setTimer(null);
+  const goToCheck = () => {
+    if (!selectedPlans.length) {
+      alert("먼저 체크할 테크닉 항목을 선택해주세요.");
+      return;
+    }
+    if (elapsedMs < 1000) {
+      alert("먼저 연습 시작을 눌러 실제 시간을 기록해주세요.");
+      return;
+    }
+    if (activeTimer && activeTimer.running) pauseTimer();
+    setStep("check");
+  };
+  const markStable = () => setForm((prev) => ({
+    ...prev,
+    completedAll: true,
+    evenness: 4,
+    soundConsistency: 4,
+    fingerIndependence: 4,
+    weakFingerDrop: "none",
+    collapse: "none",
+    tension: 1,
+    pain: "none",
+    difficulty: "good",
+  }));
+  const markCaution = () => setForm((prev) => ({
+    ...prev,
+    completedAll: false,
+    weakFingerDrop: prev.weakFingerDrop === "none" ? "mild" : prev.weakFingerDrop,
+    collapse: prev.collapse === "none" ? "mild" : prev.collapse,
+    tension: Math.max(Number(prev.tension) || 0, 3),
+    pain: prev.pain === "none" ? "discomfort" : prev.pain,
+    difficulty: ["easy", "good"].includes(prev.difficulty) ? "hard" : prev.difficulty,
+  }));
+  const evalFromScore = (score) => Number(score) >= 4 ? "good" : Number(score) >= 3 ? "normal" : "hard";
+  const scoreFromEval = (value) => value === "good" ? 5 : value === "normal" ? 3 : 1;
+  const evalFromPain = (value) => value === "none" ? "good" : value === "discomfort" ? "normal" : "hard";
+  const painFromEval = (value) => value === "good" ? "none" : value === "normal" ? "discomfort" : "pain";
+  const evalFromDifficulty = (value) => ["easy", "good"].includes(value) ? "good" : value === "hard" ? "normal" : "hard";
+  const difficultyFromEval = (value) => value === "good" ? "good" : value === "normal" ? "hard" : "tooHard";
+  const save = () => {
+    if (!selectedPlans.length) {
+      alert("체크한 테크닉 항목이 없습니다.");
+      return;
+    }
+    if (elapsedMs < 1000) {
+      alert("먼저 연습 시작을 눌러 실제 시간을 기록해주세요.");
+      return;
+    }
+    const practiceId = uid();
+    const endedAt = new Date().toISOString();
+    const duration = Math.max(1, Math.round(elapsedMs / 60000));
+    const planDuration = duration / Math.max(1, selectedPlans.length);
+    const items = selectedPlans.map((plan) => {
+      const bpmEntries = normalizedBpmEntries(plan);
+      return {
+        id: plan.id,
+        label: techniqueTaskTitle(plan),
+        stage: techniqueStageTitle(plan),
+        bpmEntries,
+        bpm: Math.max(0, ...bpmEntries.map((entry) => Number(entry.bpm) || 0)),
+        repetitions: sum(bpmEntries, (entry) => entry.repetitions),
+      };
+    });
+    const itemByPlanId = Object.fromEntries(items.map((item) => [item.id, item]));
+    const shared = {
+      date: form.date,
+      completedAll: Boolean(form.completedAll),
+      evenness: Number(form.evenness) || 0,
+      soundConsistency: Number(form.soundConsistency) || 0,
+      fingerIndependence: Number(form.fingerIndependence) || 0,
+      weakFingerDrop: form.weakFingerDrop,
+      collapse: form.collapse,
+      tension: Number(form.tension) || 0,
+      pain: form.pain,
+      difficulty: form.difficulty,
+      recordingId: form.recordingId,
+      metronomeBPM: Number(form.metronomeBPM) || 0,
+      metronomeSignature: form.metronomeSignature,
+      targetDuration: targetMinutes,
+      note: form.note,
+    };
+    setTechniquePractices((prev) => [...prev, {
+      id: practiceId,
+      ...shared,
+      startedAt: activeTimer && activeTimer.firstStartedAt || endedAt,
+      endedAt,
+      duration,
+      items,
+      createdAt: endedAt,
+    }]);
+    setTechniquePlanSessions((prev) => [
+      ...prev,
+      ...selectedPlans.map((plan) => {
+        const item = itemByPlanId[plan.id];
+        return {
+          id: uid(),
+          practiceId,
+          ...shared,
+          planId: plan.id,
+          planType: plan.type,
+          stageId: techniqueStageId(plan),
+          stageLabel: techniqueStageTitle(plan),
+          keyName: (plan.mode || techniqueModeForType(plan.type)) === "key-number" ? plan.currentKey || "C" : "",
+          numbers: groupText(techniqueGroup(plan)),
+          duration: 0,
+          practiceDuration: planDuration,
+          sessionDuration: duration,
+          bpmEntries: item.bpmEntries,
+          bpm: item.bpm,
+          repetitions: item.repetitions,
+          createdAt: endedAt,
+        };
+      }),
+    ]);
+    setTimer(null);
+    onClose();
+  };
+  if (!availablePlans.length) {
+    return (
+      <>
+        <PageHeader icon="🎹" title="테크닉 연습" subtitle="체크할 항목을 먼저 만들어주세요" />
+        <Empty text="활성 테크닉 항목 없음" />
+      </>
+    );
+  }
+    if (step === "check") {
+      return (
+        <>
+          <PageHeader icon="🎹" title="연습 후 체크" subtitle={`${selectedPlans.length}개 항목 · ${minText(Math.max(1, Math.round(elapsedMs / 60000)))}`} />
+          <button className="review-back" type="button" onClick={() => setStep("practice")}>← 연습으로 돌아가기</button>
+          <Section title="오늘 한 테크닉">
+            {selectedPlans.map((plan) => {
+              const repetitions = totalRepetitionsForPlan(plan.id);
+              const bpmText = bpmEntriesText(normalizedBpmEntries(plan));
+              return (
+                <Row
+                  key={plan.id}
+                  marker="✓"
+                  title={techniqueTaskTitle(plan)}
+                  subtitle={[techniqueTaskMeta(plan), bpmText, repetitions ? `${repetitions}회` : ""].filter(Boolean).join(" · ")}
+                />
+              );
+            })}
+          </Section>
+          <Section title="연습 상태 평가">
+            <div className="quick-checks">
+              <button className="quick-card stable" type="button" onClick={markStable}>
+                <strong>☺</strong>
+                <span>오늘 안정적</span>
+                <em>모든 항목 양호</em>
+              </button>
+              <button className="quick-card caution" type="button" onClick={markCaution}>
+                <strong>☹</strong>
+                <span>무리감 표시</span>
+                <em>어려움 있음</em>
+              </button>
+            </div>
+            <div className="eval-list">
+              <EvalRow icon="⌁" title="소리의 고름" subtitle="음색과 음량이 균일하게 유지되었나요?" value={evalFromScore(form.evenness)} onChange={(value) => setForm({ ...form, evenness: scoreFromEval(value), soundConsistency: scoreFromEval(value) })} />
+              <EvalRow icon="♖" title="손가락 밸런스" subtitle="특정 손가락이 약해지지 않았나요?" value={form.weakFingerDrop === "none" && evalFromScore(form.fingerIndependence) === "good" ? "good" : form.weakFingerDrop === "mild" ? "normal" : "hard"} onChange={(value) => setForm({ ...form, fingerIndependence: scoreFromEval(value), weakFingerDrop: value === "good" ? "none" : value === "normal" ? "mild" : "clear" })} />
+              <EvalRow icon="♧" title="긴장도" subtitle="불필요한 긴장 없이 편안했나요?" value={Number(form.tension) <= 2 ? "good" : Number(form.tension) === 3 ? "normal" : "hard"} onChange={(value) => setForm({ ...form, tension: value === "good" ? 1 : value === "normal" ? 3 : 5 })} />
+              <EvalRow icon="♡" title="통증 / 불편감" subtitle="통증이나 불편감이 없었나요?" value={evalFromPain(form.pain)} onChange={(value) => setForm({ ...form, pain: painFromEval(value) })} warning />
+              <EvalRow icon="▥" title="난이도 체감" subtitle="현재 BPM이 적절한 난이도였나요?" value={evalFromDifficulty(form.difficulty)} onChange={(value) => setForm({ ...form, difficulty: difficultyFromEval(value) })} />
+              <EvalRow icon="♖" title="한 손 연습" subtitle="필요한 경우 한 손 연습이 수월하게 되었나요?" value={Boolean(form.completedAll) ? "good" : "normal"} onChange={(value) => setForm({ ...form, completedAll: value !== "hard" })} />
+            </div>
+            <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
+            <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+          </Section>
+          <div className="practice-sticky">
+            <button className="button full dark-cta" type="button" onClick={save}>◎ 기록 저장하기</button>
+          </div>
+          <div className="rule-note">저장하면 연습 시간은 한 번만 기록되고, 체크한 항목들은 각자의 다음 단계 판정에 반영됩니다.</div>
+        </>
+      );
+    }
+    return (
+      <>
+        <PageHeader icon="" title="테크닉 연습" action={<button className="icon-button" type="button" onClick={resetTimer}>◷</button>} />
+        <div className="timer-card practice-timer-card">
+          <div>
+            <div className="timer-label">연습 시간</div>
+            <div className="timer-time">{clockText(elapsedMs)}</div>
+          </div>
+          <div className="timer-goal">
+            <div className="timer-label">세션 목표</div>
+            <strong>{targetGoalText(targetMinutes)}</strong>
+            <span>›</span>
+          </div>
+          <div className="timer-buttons">
+            {!activeTimer || !activeTimer.running ? <button className="button" onClick={startTimer}>{elapsedMs ? "이어하기" : "시작"}</button> : <button className="button secondary" onClick={pauseTimer}>일시정지</button>}
+            <button className="button ghost" onClick={resetTimer}>초기화</button>
+          </div>
+        </div>
+        <Metronome
+          value={form.metronomeBPM}
+          signature={form.metronomeSignature}
+          onChange={(value) => setForm({ ...form, metronomeBPM: value })}
+          onSignatureChange={(value) => setForm({ ...form, metronomeSignature: value })}
+        />
+        <Section title="현재 테크닉">
+          {availablePlans.map((plan) => {
+            const active = Boolean(checked[plan.id] || totalRepetitionsForPlan(plan.id) > 0);
+            const repetitions = totalRepetitionsForPlan(plan.id);
+            return (
+              <Row
+                key={plan.id}
+                marker={<span className="check-marker"><input type="checkbox" checked={active} readOnly /></span>}
+                title={techniqueTaskTitle(plan)}
+                subtitle={techniqueTaskMeta(plan)}
+                right={active ? <span className="mono">{repetitions}회</span> : <Pill>탭해서 추가</Pill>}
+                onClick={() => togglePlan(plan)}
+              >
+                {active && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    {entriesForPlan(plan).map((entry, index) => (
+                      <div className="bpm-entry" key={entry.id || index}>
+                        <div>
+                          <div className="practice-mini-label">BPM</div>
+                          <input className="input practice-mini-input" type="number" value={entry.bpm} onChange={(e) => updateBpmEntry(plan, index, { bpm: e.target.value })} />
+                        </div>
+                        <div>
+                          <div className="practice-mini-label">반복</div>
+                          <div className="count-stepper">
+                            <button className="count-button" type="button" onClick={() => decrementReps(plan, index)}>-</button>
+                            <div className="count-value">{Number(entry.repetitions) || 0}</div>
+                            <button className="count-button" type="button" onClick={() => incrementReps(plan, index)}>+1</button>
+                          </div>
+                        </div>
+                        <button className="bpm-entry-remove" type="button" onClick={() => removeBpmEntry(plan, index)}>×</button>
+                      </div>
+                    ))}
+                    <button className="bpm-add" type="button" onClick={() => addBpmEntry(plan)}>+ BPM 추가</button>
+                  </div>
+                )}
+              </Row>
+            );
+          })}
+        </Section>
+        <div className="practice-sticky">
+          <button className="button full dark-cta" type="button" onClick={goToCheck}>◎ 연습 후 체크하기 <span>{selectedPlans.length || 0}</span></button>
+        </div>
+      </>
+    );
+}
+function TechniquePlanSessionForm({ data, techniquePlans, setTechniquePlanSessions, onClose }) {
+  const activePlans = techniquePlans.filter((plan) => plan.status === "active" && !plan.completed);
+  const firstPlan = techniquePlans.find((plan) => plan.id === (data && data.planId)) || activePlans[0] || techniquePlans[0];
+  const [form, setForm] = useState({
+    date: today(),
+    planId: firstPlan ? firstPlan.id : "",
+    duration: 20,
+    bpm: firstPlan ? firstPlan.currentBPM || "" : "",
+    completedAll: true,
+    evenness: 4,
+    soundConsistency: 4,
+    fingerIndependence: 4,
+    weakFingerDrop: "none",
+    collapse: "none",
+    tension: 1,
+    pain: "none",
+    difficulty: "good",
+    recordingId: "",
+    note: "",
+    ...(data || {}),
+  });
+  if (!firstPlan) {
+    return (
+      <>
+        <PageHeader icon="🎹" title="테크닉 평가" />
+        <Empty text="먼저 훈련 플랜을 만들어야 합니다" />
+      </>
+    );
+  }
+  const plan = techniquePlans.find((candidate) => candidate.id === form.planId) || firstPlan;
+  const qualityPass = techniqueSessionPasses(form, plan);
+  const changePlan = (planId) => {
+    const nextPlan = techniquePlans.find((candidate) => candidate.id === planId);
+    setForm({ ...form, planId, bpm: nextPlan ? nextPlan.currentBPM || "" : "" });
+  };
+  const save = () => {
+    if (!plan) return;
+    const next = {
+      ...form,
+      id: uid(),
+      planType: plan.type,
+      stageId: techniqueStageId(plan),
+      stageLabel: techniqueStageTitle(plan),
+      keyName: plan.mode === "key-number" ? plan.currentKey || "C" : "",
+      numbers: groupText(techniqueGroup(plan)),
+      duration: Number(form.duration) || 0,
+      bpm: Number(form.bpm) || 0,
+      evenness: Number(form.evenness) || 0,
+      soundConsistency: Number(form.soundConsistency) || 0,
+      fingerIndependence: Number(form.fingerIndependence) || 0,
+      tension: Number(form.tension) || 0,
+      completedAll: Boolean(form.completedAll),
+      createdAt: new Date().toISOString(),
+    };
+    setTechniquePlanSessions((prev) => [...prev, next]);
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title="연습 후 체크" subtitle={techniqueTaskTitle(plan)} />
+      <Field label="훈련"><select className="select" value={form.planId} onChange={(e) => changePlan(e.target.value)}>{techniquePlans.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></Field>
+      <div className="inline-fields">
+        <Field label="날짜"><input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
+        <Field label="시간"><input type="number" className="input" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} /></Field>
+      </div>
+      <Field label="실제 BPM"><input type="number" className="input" value={form.bpm} onChange={(e) => setForm({ ...form, bpm: e.target.value })} /></Field>
+      <label className="checkline"><input type="checkbox" checked={Boolean(form.completedAll)} onChange={(e) => setForm({ ...form, completedAll: e.target.checked })} />오늘 정한 범위를 끝까지 쳤다</label>
+      <div className="score-grid">
+        <ScoreSelect label="소리 고름" value={form.evenness} onChange={(value) => setForm({ ...form, evenness: value })} />
+        <ScoreSelect label="음색 일정" value={form.soundConsistency} onChange={(value) => setForm({ ...form, soundConsistency: value })} />
+        <ScoreSelect label="손가락 균형" value={form.fingerIndependence} onChange={(value) => setForm({ ...form, fingerIndependence: value })} />
+      </div>
+      <div className="inline-fields" style={{ marginTop: 14 }}>
+        <Field label="특정 손가락"><select className="select" value={form.weakFingerDrop} onChange={(e) => setForm({ ...form, weakFingerDrop: e.target.value })}>{Object.entries(DROP_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+        <Field label="무너짐"><select className="select" value={form.collapse} onChange={(e) => setForm({ ...form, collapse: e.target.value })}>{Object.entries(COLLAPSE_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+      </div>
+      <div className="inline-fields">
+        <Field label="몸 긴장"><select className="select" value={form.tension} onChange={(e) => setForm({ ...form, tension: Number(e.target.value) })}>{[0,1,2,3,4,5].map((value) => <option key={value} value={value}>{value}</option>)}</select></Field>
+        <Field label="통증/저림"><select className="select" value={form.pain} onChange={(e) => setForm({ ...form, pain: e.target.value })}>{Object.entries(PAIN_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+      </div>
+      <Field label="난이도"><select className="select" value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })}>{Object.entries(DIFFICULTY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+      <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+      <Row marker={qualityPass ? "✓" : "·"} title={qualityPass ? "오늘 기록은 넘어가기 후보야" : "오늘은 같은 단계 유지가 좋아"} subtitle="같은 단계에서 후보 기록 2회와 날짜 2일이 모이면 다음으로 넘길 수 있어" />
+      <button className="button full" style={{ marginTop: 18 }} onClick={save}>저장</button>
+    </>
+  );
+}
+function ScoreSelect({ label, value, onChange }) {
+  return <ChoiceGroup label={label} value={value} onChange={(next) => onChange(Number(next))} options={[1,2,3,4,5].map((score) => ({ value: score, label: String(score) }))} compact warningValues={[1,2,3]} />;
+}
+function ItemFormFrame({ icon, title, form, setForm, save, remove, fields }) {
+  return (
+    <>
+      <PageHeader icon={icon} title={title} />
+      {fields === "piece" && <>
+        <Field label="제목"><input className="input" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+        <Field label="작곡가"><input className="input" value={form.composer || ""} onChange={(e) => setForm({ ...form, composer: e.target.value })} /></Field>
+        <Field label="Opus"><input className="input" value={form.opus || ""} onChange={(e) => setForm({ ...form, opus: e.target.value })} /></Field>
+        <Field label="현재 구간"><input className="input" value={form.currentSection || ""} onChange={(e) => setForm({ ...form, currentSection: e.target.value })} /></Field>
+      </>}
+      {fields === "technique" && <>
+        <Field label="제목"><input className="input" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+        <Field label="분류"><select className="select" value={form.category || "하농"} onChange={(e) => setForm({ ...form, category: e.target.value })}>{TECH_CATEGORIES.map((value) => <option key={value}>{value}</option>)}</select></Field>
+        <div className="inline-fields">
+          <Field label="현재 BPM"><input className="input" type="number" value={form.currentBPM || 0} onChange={(e) => setForm({ ...form, currentBPM: Number(e.target.value) || 0 })} /></Field>
+          <Field label="목표 BPM"><input className="input" type="number" value={form.targetBPM || 0} onChange={(e) => setForm({ ...form, targetBPM: Number(e.target.value) || 0 })} /></Field>
+        </div>
+      </>}
+      <Field label="상태"><select className="select" value={form.status || "active"} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="active">활성</option><option value="paused">일시중지</option><option value="archived">보관</option></select></Field>
+      <Field label="메모"><textarea className="textarea" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
+      <div className="button-row"><button className="button" onClick={save}>저장</button>{remove && <button className="button danger" onClick={remove}>삭제</button>}</div>
+    </>
+  );
+}
+function PianoSessionForm({ data, pieces, techniques, setPianoSessions, setTechniques, onClose }) {
+  const [form, setForm] = useState({ date: today(), type: "piece", targetId: pieces[0] && pieces[0].id || "", duration: 30, section: "", bpm: "", repetitions: "", note: "", feeling: "", ...(data || {}) });
+  const targets = form.type === "piece" ? pieces : techniques;
+  const save = () => {
+    if (!form.targetId) return;
+    const next = { ...form, duration: Number(form.duration) || 0, bpm: form.bpm === "" ? "" : Number(form.bpm) || 0, repetitions: form.repetitions === "" ? "" : Number(form.repetitions) || 0 };
+    setPianoSessions((prev) => [...prev, { ...next, id: uid() }]);
+    if (next.type === "technique" && next.bpm) {
+      setTechniques((prev) => prev.map((tech) => tech.id === next.targetId ? { ...tech, currentBPM: Math.max(Number(tech.currentBPM) || 0, Number(next.bpm) || 0) } : tech));
+    }
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title="피아노 세션" />
+      <Field label="날짜"><input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
+      <Field label="종류"><select className="select" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, targetId: e.target.value === "piece" ? (pieces[0] && pieces[0].id || "") : (techniques[0] && techniques[0].id || "") })}><option value="piece">곡</option><option value="technique">테크닉</option></select></Field>
+      <Field label="항목"><select className="select" value={form.targetId} onChange={(e) => setForm({ ...form, targetId: e.target.value })}>{targets.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></Field>
+      <div className="inline-fields">
+        <Field label="시간"><input type="number" className="input" value={form.duration} onChange={(e) => setForm({ ...form, duration: Number(e.target.value) || 0 })} /></Field>
+        <Field label="BPM"><input type="number" className="input" value={form.bpm} onChange={(e) => setForm({ ...form, bpm: e.target.value })} /></Field>
+      </div>
+      <div className="inline-fields">
+        <Field label="구간"><input className="input" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} /></Field>
+        <Field label="반복"><input type="number" className="input" value={form.repetitions} onChange={(e) => setForm({ ...form, repetitions: e.target.value })} /></Field>
+      </div>
+      <Field label="느낌"><input className="input" value={form.feeling} onChange={(e) => setForm({ ...form, feeling: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>저장</button>
+    </>
+  );
+}
+function ReviewForm({ item, reviews, setReviews, onClose }) {
+  const [form, setForm] = useState(item || { weekStart: weekStart(today()), win: "", focus: "", memo: "" });
+  const save = () => {
+    if (form.id) setReviews(reviews.map((review) => review.id === form.id ? { ...form, updatedAt: today() } : review));
+    else setReviews([...reviews, { ...form, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("리뷰를 삭제하시겠어요?")) return;
+    setReviews(reviews.filter((review) => review.id !== form.id));
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="📅" title="주간 리뷰" subtitle={fullDate(form.weekStart)} />
+      <Field label="잘한 것"><textarea className="textarea" value={form.win || ""} onChange={(e) => setForm({ ...form, win: e.target.value })} /></Field>
+      <Field label="다음 주 집중"><textarea className="textarea" value={form.focus || ""} onChange={(e) => setForm({ ...form, focus: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.memo || ""} onChange={(e) => setForm({ ...form, memo: e.target.value })} /></Field>
+      <div className="button-row"><button className="button" onClick={save}>저장</button>{form.id && <button className="button danger" onClick={remove}>삭제</button>}</div>
+    </>
+  );
+}
+function DayDetail({ date, pianoSessions, techniquePractices, pianoItemName }) {
+  const piano = pianoSessions.filter((session) => session.date === date);
+  const techniquePracticeItems = techniquePractices.filter((session) => session.date === date);
+  return (
+    <>
+      <PageHeader icon="📅" title={fullDate(date)} subtitle={`${piano.length + techniquePracticeItems.length}세션`} />
+      <Section title="피아노">{piano.map((session) => <Row key={session.id} marker="♪" title={session.type === "technique" ? "보조 테크닉" : pianoItemName(session) || "피아노"} subtitle={session.type === "technique" ? `${minText(session.duration)} · ${pianoItemName(session) || "테크닉"} · ${session.feeling || session.note || "메모 없음"}` : pieceSessionText(session)} />)}{!piano.length && <Empty />}</Section>
+      <Section title="테크닉 연습">{techniquePracticeItems.map((session) => <Row key={session.id} marker="✓" title="테크닉 연습" subtitle={[minText(session.duration), metronomeSessionText(session), practiceItemsText(session.items)].filter(Boolean).join(" · ")} />)}{!techniquePracticeItems.length && <Empty />}</Section>
+    </>
+  );
+}
+function FocusPicker({ pieces, techniques, monthFocus, setMonthFocus, onClose }) {
+  const hasPiece = (id) => (monthFocus.pieceIds || []).includes(id);
+  const hasTechnique = (id) => (monthFocus.techniqueIds || []).includes(id);
+  return (
+    <>
+      <PageHeader icon="🎹" title="집중 항목" />
+      <Section title="곡">{pieces.map((piece) => <Row key={piece.id} marker={hasPiece(piece.id) ? "✓" : "♪"} title={piece.title} subtitle={piece.composer || "작곡가 미정"} onClick={() => setMonthFocus({ pieceIds: hasPiece(piece.id) ? monthFocus.pieceIds.filter((id) => id !== piece.id) : [...(monthFocus.pieceIds || []), piece.id] })} />)}</Section>
+      <Section title="테크닉">{techniques.map((technique) => <Row key={technique.id} marker={hasTechnique(technique.id) ? "✓" : "♪"} title={technique.title} subtitle={technique.category} onClick={() => setMonthFocus({ techniqueIds: hasTechnique(technique.id) ? monthFocus.techniqueIds.filter((id) => id !== technique.id) : [...(monthFocus.techniqueIds || []), technique.id] })} />)}</Section>
+      <button className="button full" style={{ marginTop: 18 }} onClick={onClose}>완료</button>
+    </>
+  );
+}
+function PianoRoutineForm({ pieces, techniques, settings, updateSettings, onClose }) {
+  const [form, setForm] = useState({ day: 1, kind: "piece", targetId: pieces[0] && pieces[0].id || "", duration: 30 });
+  const targets = form.kind === "piece" ? pieces : techniques;
+  const save = () => {
+    updateSettings({ pianoRoutine: [...settings.pianoRoutine, { ...form, id: uid(), duration: Number(form.duration) || 30 }] });
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title="피아노 루틴 추가" />
+      <RoutineCommon form={form} setForm={setForm} />
+      <Field label="종류"><select className="select" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value, targetId: e.target.value === "piece" ? (pieces[0] && pieces[0].id || "") : (techniques[0] && techniques[0].id || "") })}><option value="piece">곡</option><option value="technique">테크닉</option></select></Field>
+      <Field label="항목"><select className="select" value={form.targetId} onChange={(e) => setForm({ ...form, targetId: e.target.value })}>{targets.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></Field>
+      <Field label="목표 시간"><input className="input" type="number" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>추가</button>
+    </>
+  );
+}
+function RoutineCommon({ form, setForm }) {
+  return <Field label="요일"><select className="select" value={form.day} onChange={(e) => setForm({ ...form, day: Number(e.target.value) })}>{DAYS.map((day, index) => <option key={day} value={index}>{day}요일</option>)}</select></Field>;
 }
 
-// === WORK DETAIL ===
-function WDetail(p){const{w,wSes,ttm,tcnt,r30,horizons,gc,onUpdate,onEdit,onDel,onAddLink,onRemLink,onStart,onClose,tg,btn,btnS,btnG,btnD,inp,bk,H1,H3,rb,pl,cd,em,P,CT,C}=p;
-  const[li,setLi]=useState("");
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 뒤로</button>
-    <div style={{...rb,marginBottom:8}}><div style={{...H1,marginBottom:0}}>{w.title}</div><div><button style={btnG} onClick={onEdit}>수정</button><button style={{...btnG,color:C.rd}} onClick={onDel}>삭제</button></div></div>
-    <div style={{color:C.txM,fontSize:14,marginBottom:24,fontWeight:500}}>{w.instrumentation||"편성 미정"}</div>
-    <div style={{...cd,display:"flex",justifyContent:"space-around",textAlign:"center",padding:"20px 18px"}}>
-      <div><div style={{fontSize:22,fontWeight:800,color:C.ac}}>{minStr(ttm)}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>총 투자</div></div><div style={{width:1,background:C.bd}}/>
-      <div><div style={{fontSize:22,fontWeight:800}}>{tcnt}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>세션</div></div><div style={{width:1,background:C.bd}}/>
-      <div><div style={{fontSize:22,fontWeight:800}}>{r30}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>최근30일</div></div></div>
-    <div style={cd}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(w.status===st),background:w.status===st?STATUS_COLORS[st]+"18":"transparent",color:w.status===st?STATUS_COLORS[st]:C.txD,border:w.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>onUpdate({...w,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
-    <div style={cd}><div style={H3}>장기 목표</div><div style={{display:"flex",flexWrap:"wrap"}}>{horizons.map(h=>{const has=(w.horizonIds||[]).indexOf(h.id)>=0;return(<button key={h.id} style={tg(has)} onClick={()=>{const ids=w.horizonIds||[];onUpdate({...w,horizonIds:has?ids.filter(x=>x!==h.id):[...ids,h.id]});}}>{h.icon} {h.title}</button>);})}</div></div>
-    {w.notes&&<div style={cd}><div style={H3}>메모</div><div style={{fontSize:14,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{w.notes}</div></div>}
-    <div style={cd}><div style={H3}>자료 링크 ({(w.links||[]).length})</div>{(w.links||[]).map(l=>(<div key={l.id} style={{...rb,padding:"8px 0",borderBottom:"1px solid "+C.bd}}>
-      <a href={l.url} target="_blank" rel="noopener noreferrer" style={{color:C.ac,textDecoration:"none",fontSize:13,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"80%"}}>{l.name||l.url}</a>
-      <button style={{...btnG,padding:4,color:C.txD}} onClick={()=>onRemLink(l.id)}>×</button></div>))}
-      <div style={{display:"flex",gap:8,marginTop:10}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="URL 추가" value={li} onChange={e=>setLi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){onAddLink(li);setLi("");}}}/>
-        <button style={btnS} onClick={()=>{onAddLink(li);setLi("");}}>+</button></div></div>
-    <div style={cd}><div style={H3}>세션 기록</div>{wSes.length===0?<div style={em}>아직 세션이 없습니다</div>:wSes.slice(0,10).map(ss=>(
-      <div key={ss.id} style={{padding:"10px 0",borderBottom:"1px solid "+C.bd}}><div style={rb}><span style={{color:C.txM,fontSize:12,fontWeight:500}}>{fmtFull(ss.date)}</span><span style={{color:C.ac,fontSize:13,fontWeight:700}}>{ss.duration}분</span></div>
-        <div style={{fontSize:13,marginTop:3,fontWeight:500}}>{gc(ss.type).icon} {gc(ss.type).label}</div>{ss.note&&<div style={{color:C.txD,fontSize:12,marginTop:3}}>{ss.note}</div>}</div>))}
-      {wSes.length>10&&<div style={{color:C.txD,fontSize:12,textAlign:"center",padding:"10px 0"}}>+{wSes.length-10}개 더</div>}</div>
-    <button style={{...btn,width:"100%",marginTop:10}} onClick={onStart}>이 곡으로 세션 시작</button></div></div>);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+if ("serviceWorker" in navigator && ["https:", "http:"].includes(location.protocol)) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
 }
-
-// === WORK FORM ===
-function WForm(p){const{data,onSave,onClose,tg,btn,inp,ta,bk,H1,H3,P,CT,C}=p;
-  const[f,setF]=useState({title:data&&data.title||"",status:data&&data.status||"idea",instrumentation:data&&data.instrumentation||"",notes:data&&data.notes||"",id:data&&data.id||null,horizonIds:data&&data.horizonIds||[],links:data&&data.links||[]});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"곡 수정":"새 곡"}</div>
-    <input style={inp} placeholder="제목" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
-    <input style={inp} placeholder="편성 (예: 피아노 솔로)" value={f.instrumentation} onChange={e=>setF({...f,instrumentation:e.target.value})}/>
-    <div style={{marginBottom:16}}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(f.status===st),background:f.status===st?STATUS_COLORS[st]+"18":"transparent",color:f.status===st?STATUS_COLORS[st]:C.txD,border:f.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>setF({...f,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
-    <textarea style={{...ta,height:90,marginBottom:24}} placeholder="메모" value={f.notes} onChange={e=>setF({...f,notes:e.target.value})}/>
-    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button></div></div>);
-}
-
-// === REVIEW FORM ===
-function RForm(p){const{data,cats,gp,onSave,onDel,onClose,tg,btn,btnD,ta,bk,H1,H3,cd,P,CT,C}=p;
-  const[f,setF]=useState({weekStart:data&&data.weekStart||wkStart(today()),win:data&&(data.win||data.text)||"",focus:data&&data.focus||"",memo:data&&data.memo||"",id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:20}}>주간 리뷰</div>
-    <div style={{...cd,marginBottom:20}}><div style={{display:"flex",justifyContent:"space-around"}}>{cats.slice(0,5).map(c=>{const pp=gp(c.id);return <div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:18}}>{c.icon}</div><div style={{fontSize:14,color:C.ac,fontWeight:700,marginTop:3}}>{pp.done}/{pp.goal}</div></div>;})}</div></div>
-    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.gn}}>✦</span> 이번 주 가장 잘한 것</div><textarea style={{...ta,height:90}} placeholder="가장 뿌듯했던 순간..." value={f.win} onChange={e=>setF({...f,win:e.target.value})}/></div>
-    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.am}}>◎</span> 다음 주 집중할 것</div><textarea style={{...ta,height:90}} placeholder="다음 주 우선순위..." value={f.focus} onChange={e=>setF({...f,focus:e.target.value})}/></div>
-    <div style={{marginBottom:24}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.txD}}>─</span> 기타 메모</div><textarea style={{...ta,height:70}} placeholder="자유 메모" value={f.memo} onChange={e=>setF({...f,memo:e.target.value})}/></div>
-    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.win||f.focus||f.memo)onSave(f);}}>저장</button>
-    {onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
-}
-
-// === CATEGORY FORM ===
-function CForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
-  const[f,setF]=useState({label:data&&data.label||"",icon:data&&data.icon||"🎵",id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"카테고리 수정":"새 카테고리"}</div>
-    <input style={inp} placeholder="이름" value={f.label} onChange={e=>setF({...f,label:e.target.value})}/>
-    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
-    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.label.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
-}
-
-// === HORIZON FORM ===
-function HForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
-  const[f,setF]=useState({title:data&&data.title||"",icon:data&&data.icon||"🎯",target:data&&data.target||10,id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"목표 수정":"새 목표"}</div>
-    <input style={inp} placeholder="목표 이름" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
-    <input style={inp} type="number" placeholder="목표 곡 수" value={f.target} onChange={e=>setF({...f,target:parseInt(e.target.value)||0})}/>
-    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.slice(0,14).map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
-    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
