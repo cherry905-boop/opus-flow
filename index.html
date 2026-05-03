@@ -7,20 +7,121 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Opus Flow">
-<meta name="theme-color" content="#FAFAF9">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎼</text></svg>">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>">
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css');
-*{margin:0;padding:0;box-sizing:border-box}
-html,body,#root{height:100%;background:#FAFAF9}
-body{font-family:'Pretendard Variable','Pretendard',-apple-system,'Noto Sans KR',sans-serif;-webkit-font-smoothing:antialiased}
-input,textarea,select,button{font-family:inherit;font-size:inherit}
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f7f6f3;
+  --bg-muted:#f1f1ef;
+  --text:#37352f;
+  --muted:#787774;
+  --subtle:#9b9a97;
+  --border:rgba(55,53,47,.09);
+  --border-soft:rgba(55,53,47,.06);
+  --blue-bg:#ddebf1;
+  --blue-text:#183347;
+  --green-bg:#ddedea;
+  --green-text:#1b5147;
+  --yellow-bg:#fbf3db;
+  --yellow-text:#614a19;
+  --red-bg:#fbe4e4;
+  --red-text:#5c1f1f;
+  --gray-bg:rgba(55,53,47,.06);
+  --gray-text:#787774;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{min-height:100%;background:var(--bg)}
+body{font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+button{touch-action:manipulation}
+input,textarea,select{outline:none}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.fi{animation:fi .22s ease-out}
-@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
-.pu{animation:pu 1.5s ease-in-out infinite}
-::selection{background:#DBEAFE;color:#1D4ED8}
+::selection{background:var(--blue-bg);color:var(--blue-text)}
+.app{min-height:100vh;background:var(--bg);color:var(--text)}
+.layout{max-width:1120px;margin:0 auto;min-height:100vh}
+.main{padding:28px 20px 92px;max-width:720px;margin:0 auto}
+.mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;border-top:1px solid var(--border);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 0 calc(8px + env(safe-area-inset-bottom))}
+.mobile-nav-inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.nav-button{border:0;background:transparent;color:var(--subtle);font-size:12px;font-weight:400;padding:10px 4px;cursor:pointer}
+.nav-button.active{color:var(--text);font-weight:650}
+.sidebar{display:none}
+.page-header{margin-bottom:24px}
+.page-icon{font-size:28px;line-height:1;margin-bottom:10px}
+.page-title{font-size:32px;font-weight:750;letter-spacing:-.4px;line-height:1.15;color:var(--text)}
+.page-subtitle{font-size:14px;font-weight:400;color:var(--muted);margin-top:6px}
+.grid{display:grid;gap:16px}
+.desktop-grid{display:grid;gap:16px}
+.properties{display:grid;grid-template-columns:88px 1fr;row-gap:8px;column-gap:16px;margin:0 0 26px}
+.property-label{font-size:14px;color:var(--muted);font-weight:400}
+.property-value{font-size:14px;color:var(--text);min-width:0}
+.section{margin-top:26px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.section-title{font-size:14px;font-weight:650;color:var(--text)}
+.section-action{border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.row{display:flex;align-items:center;gap:10px;min-height:43px;padding:10px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .12s ease}
+.row:first-child{border-top:1px solid var(--border-soft)}
+.row:hover{background:var(--bg-soft)}
+.row:active{background:var(--bg-muted)}
+.marker{width:16px;flex:0 0 16px;color:var(--muted);font-size:14px;text-align:center}
+.row-main{flex:1;min-width:0}
+.row-title{font-size:14px;font-weight:520;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-sub{font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-right{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;min-height:18px;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:550;line-height:1.25;white-space:nowrap;background:var(--gray-bg);color:var(--gray-text)}
+.pill.blue{background:var(--blue-bg);color:var(--blue-text)}
+.pill.green{background:var(--green-bg);color:var(--green-text)}
+.pill.yellow{background:var(--yellow-bg);color:var(--yellow-text)}
+.pill.red{background:var(--red-bg);color:var(--red-text)}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--border-soft);margin:0 -20px 12px;padding:0 20px}
+.tab{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:400;padding:8px 8px 9px;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
+.tab.active{color:var(--text);font-weight:650;border-bottom-color:var(--text)}
+.button{border:0;background:var(--text);color:#fff;border-radius:6px;padding:9px 13px;font-size:13px;font-weight:650;cursor:pointer}
+.button.secondary{background:var(--bg-muted);color:var(--text)}
+.button.ghost{background:transparent;color:var(--muted)}
+.button.danger{background:var(--red-bg);color:var(--red-text)}
+.button.full{width:100%}
+.button-row{display:flex;gap:8px;margin-top:18px}
+.button-row .button{flex:1}
+.field{display:block;margin-bottom:14px}
+.label{font-size:14px;color:var(--muted);font-weight:400;margin-bottom:6px}
+.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-size:14px;padding:9px 10px;line-height:1.4}
+.textarea{min-height:94px;resize:vertical;line-height:1.5}
+.inline-fields{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.progress{height:4px;border-radius:99px;background:var(--bg-muted);overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:99px;background:var(--text)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border-soft);border-left:1px solid var(--border-soft);margin-bottom:26px}
+.calendar-head,.calendar-day{border-right:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);text-align:center}
+.calendar-head{font-size:12px;color:var(--muted);padding:7px 0}
+.calendar-day{border-top:0;border-left:0;background:var(--bg);min-height:46px;padding:7px 0;color:var(--text);cursor:pointer}
+.calendar-day.muted{color:var(--subtle)}
+.calendar-day.today{box-shadow:inset 0 0 0 1.4px var(--text)}
+.dot{width:5px;height:5px;border-radius:99px;background:var(--text);margin:4px auto 0}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.stat{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:13px 0}
+.stat-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;font-weight:650;color:var(--text)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:2px}
+.overlay{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto}
+.overlay-inner{max-width:560px;margin:0 auto;min-height:100%;padding:20px 20px 34px}
+.back{border:0;background:transparent;color:var(--muted);font-size:14px;padding:8px 0 16px;cursor:pointer}
+.empty{color:var(--subtle);font-size:14px;font-weight:400}
+.mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;font-weight:550}
+.muted{color:var(--muted)}
+@media (hover:none){.row:hover{background:transparent}.row:active{background:var(--bg-soft)}}
+@media (min-width:900px){
+  .layout{display:grid;grid-template-columns:220px 1fr;max-width:1120px}
+  .sidebar{display:block;position:sticky;top:0;height:100vh;border-right:1px solid var(--border);padding:26px 18px;background:var(--bg)}
+  .brand{font-size:16px;font-weight:720;margin-bottom:24px}
+  .side-nav{display:flex;flex-direction:column;gap:2px}
+  .side-button{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:9px 10px;text-align:left;font-size:14px;cursor:pointer}
+  .side-button.active{background:var(--bg-soft);color:var(--text);font-weight:650}
+  .mobile-nav{display:none}
+  .main{max-width:none;margin:0;padding:36px 36px 60px}
+  .desktop-grid{grid-template-columns:1.1fr .9fr;align-items:start}
+  .overlay{background:rgba(255,255,255,.76);backdrop-filter:blur(4px)}
+  .overlay-inner{min-height:auto;margin:44px auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;box-shadow:0 16px 48px rgba(55,53,47,.12)}
+}
 </style>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -29,368 +130,942 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState, useEffect } = React;
+const { useMemo, useState, useEffect } = React;
 
-/* OPUS FLOW v3 — 배포용 (localStorage) */
+const LEGACY_KEYS = [
+  "of3-works",
+  "of3-sessions",
+  "of3-reviews",
+  "of3-cats",
+  "of3-routine",
+  "of3-goals",
+  "of3-horizons",
+  "of3-timer",
+];
+const KEYS = {
+  reviews: "of3-reviews",
+  pieces: "of3-piano-pieces",
+  techniques: "of3-piano-techniques",
+  pianoSessions: "of3-piano-sessions",
+  exercises: "of3-exercises",
+  exerciseSessions: "of3-exercise-sessions",
+  settings: "of3-settings",
+};
+const NEW_KEYS = [KEYS.pieces, KEYS.techniques, KEYS.pianoSessions, KEYS.exercises, KEYS.exerciseSessions, KEYS.settings];
+const ALL_BACKUP_KEYS = [...LEGACY_KEYS, ...NEW_KEYS];
 
-const WORK_STATUS = ["idea","sketch","wip","complete","repertoire","concert"];
-const STATUS_LABELS = {idea:"아이디어",sketch:"스케치",wip:"진행중",complete:"완성",repertoire:"레퍼토리",concert:"공연곡"};
-const STATUS_COLORS = {idea:"#94A3B8",sketch:"#D97706",wip:"#2563EB",complete:"#16A34A",repertoire:"#7C3AED",concert:"#DB2777"};
-const SLOTS = {morning:"오전",evening:"오후",free:"자유"};
-const DAYS_KR = ["일","월","화","수","목","금","토"];
-const ICONS = ["🎹","🎼","📖","🎬","💪","🏃","🧘","🎧","🎻","🎺","📝","🎨","🎵","⭐","🔥","💎","🎭","💿","🏆","🎯"];
-const DUR_PRE = [15,30,45,60,90,120];
+const DAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const DAYS_FULL = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+const PIANO_STATUS = { active: "활성", paused: "일시중지", archived: "보관" };
+const EXERCISE_STATUS = { active: "활성", paused: "일시중지", archived: "보관" };
+const TECH_CATEGORIES = ["하농", "피쉬나", "체르니", "스케일", "아르페지오", "기타"];
+const EXERCISE_CATEGORIES = ["근력", "유산소", "코어", "스트레칭", "재활", "기타"];
+const EXERCISE_UNITS = ["회", "kg", "분", "km", "초"];
 
-const ds = d => d.toISOString().split("T")[0];
-const now = () => new Date();
-const today = () => ds(now());
-const wkStart = d => { const t=new Date(d); t.setDate(t.getDate()-t.getDay()); return ds(t); };
-const shift = (s,n) => { const d=new Date(s); d.setDate(d.getDate()+n); return ds(d); };
-const fmtFull = s => { const d=new Date(s); return `${d.getMonth()+1}월 ${d.getDate()}일 ${DAYS_KR[d.getDay()]}`; };
-const wkDates = d => { const s=new Date(wkStart(d)); return Array.from({length:7},(_,i)=>{const x=new Date(s);x.setDate(s.getDate()+i);return ds(x);}); };
-const moDates = d => { const t=new Date(d),y=t.getFullYear(),m=t.getMonth(),f=new Date(y,m,1),l=new Date(y,m+1,0),r=[]; for(let i=0;i<f.getDay();i++){const x=new Date(f);x.setDate(1-f.getDay()+i);r.push(ds(x));} for(let i=1;i<=l.getDate();i++)r.push(ds(new Date(y,m,i))); while(r.length%7){const x=new Date(l);x.setDate(l.getDate()+(r.length-f.getDay()-l.getDate()+1));r.push(ds(x));} return r; };
-const minStr = m => m>=60?`${Math.floor(m/60)}시간${m%60?" "+m%60+"분":""}`:`${m}분`;
-const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const defPieces = [
+  { id: "piece-1", title: "발라드 1번", composer: "쇼팽", opus: "Op. 23", currentSection: "1~80마디", status: "active", notes: "큰 구조와 호흡을 먼저 잡기", createdAt: "2026-05-01" },
+  { id: "piece-2", title: "평균율 1권 C장조 프렐류드", composer: "바흐", opus: "BWV 846", currentSection: "전곡", status: "paused", notes: "", createdAt: "2026-05-01" },
+];
+const defTechniques = [
+  { id: "tech-1", title: "5번", category: "하농", targetBPM: 110, currentBPM: 100, status: "active", notes: "손목 힘 빼고 균일하게", createdAt: "2026-05-01" },
+  { id: "tech-2", title: "C장조", category: "스케일", targetBPM: 88, currentBPM: 76, status: "active", notes: "", createdAt: "2026-05-01" },
+];
+const defPianoSessions = [
+  { id: "ps-1", date: "2026-05-01", type: "piece", targetId: "piece-1", duration: 45, section: "1~40마디", bpm: "", repetitions: "", note: "", feeling: "큰 흐름 확인" },
+  { id: "ps-2", date: "2026-05-02", type: "piece", targetId: "piece-1", duration: 60, section: "1~80마디", bpm: "", repetitions: "", note: "", feeling: "중간부 연결 개선" },
+  { id: "ps-3", date: "2026-05-03", type: "technique", targetId: "tech-1", duration: 20, section: "", bpm: 100, repetitions: 5, note: "", feeling: "균일함 개선" },
+];
+const defExercises = [
+  { id: "ex-1", name: "스쿼트", category: "근력", unit: "kg", notes: "깊이보다 정렬 우선", status: "active", createdAt: "2026-05-01" },
+  { id: "ex-2", name: "플랭크", category: "코어", unit: "초", notes: "", status: "active", createdAt: "2026-05-01" },
+  { id: "ex-3", name: "걷기", category: "유산소", unit: "km", notes: "", status: "active", createdAt: "2026-05-01" },
+];
+const defExerciseSessions = [
+  { id: "es-1", date: "2026-05-01", exerciseId: "ex-1", sets: 3, reps: 12, weight: 20, duration: "", distance: "", note: "", feeling: "가볍게" },
+  { id: "es-2", date: "2026-05-03", exerciseId: "ex-2", sets: 3, reps: "", weight: "", duration: 3, distance: "", note: "60초씩", feeling: "복부 집중" },
+];
+const defSettings = {
+  goals: { weeklyPianoMinutes: 240, weeklyExerciseCount: 3 },
+  monthlyFocus: {
+    "2026-05": {
+      intent: "발라드 1번의 큰 구조를 잡고, 하농 5번과 C장조 스케일을 짧게 자주 유지한다.",
+      pieceIds: ["piece-1"],
+      techniqueIds: ["tech-1", "tech-2"],
+    },
+  },
+  pianoRoutine: [
+    { id: "pr-1", day: 1, kind: "piece", targetId: "piece-1", duration: 45 },
+    { id: "pr-2", day: 3, kind: "technique", targetId: "tech-1", duration: 20 },
+    { id: "pr-3", day: 5, kind: "piece", targetId: "piece-1", duration: 45 },
+  ],
+  exerciseRoutine: [
+    { id: "er-1", day: 1, exerciseId: "ex-1", sets: 3, reps: 12 },
+    { id: "er-2", day: 3, exerciseId: "ex-2", sets: 3, reps: 60 },
+    { id: "er-3", day: 6, exerciseId: "ex-3", duration: 40 },
+  ],
+};
 
-const KS = {w:"of3-works",s:"of3-sessions",r:"of3-reviews",c:"of3-cats",rt:"of3-routine",g:"of3-goals",h:"of3-horizons",tmr:"of3-timer"};
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const readJSON = (key, fallback) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw == null ? fallback : JSON.parse(raw);
+  } catch (error) {
+    return fallback;
+  }
+};
+const writeJSON = (key, value) => {
+  try {
+    if (value === undefined || value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+};
+function useStored(key, fallback) {
+  const [value, setValue] = useState(() => readJSON(key, fallback));
+  useEffect(() => writeJSON(key, value), [key, value]);
+  return [value, setValue];
+}
+const dateKey = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+const today = () => dateKey(new Date());
+const parseDate = (value) => new Date(`${value}T00:00:00`);
+const shiftDate = (value, amount) => {
+  const d = parseDate(value);
+  d.setDate(d.getDate() + amount);
+  return dateKey(d);
+};
+const weekStart = (value) => {
+  const d = parseDate(value);
+  d.setDate(d.getDate() - d.getDay());
+  return dateKey(d);
+};
+const weekDates = (value) => Array.from({ length: 7 }, (_, index) => shiftDate(weekStart(value), index));
+const monthKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+const shiftMonth = (ym, amount) => {
+  const [year, month] = ym.split("-").map(Number);
+  return monthKey(new Date(year, month - 1 + amount, 1));
+};
+const monthTitle = (ym) => {
+  const [year, month] = ym.split("-").map(Number);
+  return `${year}년 ${month}월`;
+};
+const monthDates = (ym) => {
+  const [year, month] = ym.split("-").map(Number);
+  const first = new Date(year, month - 1, 1);
+  const last = new Date(year, month, 0);
+  const dates = [];
+  for (let i = 0; i < first.getDay(); i++) dates.push(shiftDate(dateKey(first), i - first.getDay()));
+  for (let d = 1; d <= last.getDate(); d++) dates.push(dateKey(new Date(year, month - 1, d)));
+  while (dates.length % 7) dates.push(shiftDate(dateKey(last), dates.length - first.getDay() - last.getDate() + 1));
+  return dates;
+};
+const fullDate = (value) => {
+  const d = parseDate(value);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${DAYS_FULL[d.getDay()]}`;
+};
+const shortDate = (value) => {
+  const d = parseDate(value);
+  return `${d.getMonth() + 1}.${d.getDate()}`;
+};
+const minText = (minutes) => {
+  const value = Number(minutes) || 0;
+  if (value < 60) return `${value}m`;
+  const h = Math.floor(value / 60);
+  const m = value % 60;
+  return m ? `${h}h ${m}m` : `${h}h`;
+};
+const sum = (items, getValue) => items.reduce((total, item) => total + (Number(getValue(item)) || 0), 0);
+const statusClass = (status) => status === "active" ? "blue" : status === "archived" ? "red" : "";
+const byDateDesc = (a, b) => (b.date || "").localeCompare(a.date || "");
+const normalizeSettings = (settings) => ({
+  goals: { ...defSettings.goals, ...((settings && settings.goals) || {}) },
+  monthlyFocus: { ...defSettings.monthlyFocus, ...((settings && settings.monthlyFocus) || {}) },
+  pianoRoutine: Array.isArray(settings && settings.pianoRoutine) ? settings.pianoRoutine : defSettings.pianoRoutine,
+  exerciseRoutine: Array.isArray(settings && settings.exerciseRoutine) ? settings.exerciseRoutine : defSettings.exerciseRoutine,
+});
 
-// localStorage helpers
-const ld = (k,fb) => { try { const v=localStorage.getItem(k); return v?JSON.parse(v):fb; } catch(e){ return fb; } };
-const sv = (k,v) => { try { localStorage.setItem(k,JSON.stringify(v)); } catch(e){} };
-
-const defCats=[{id:"piano",label:"피아노",icon:"🎹"},{id:"composition",label:"작곡",icon:"🎼"},{id:"counterpoint",label:"대위법",icon:"📖"},{id:"av",label:"영상음악",icon:"🎬"},{id:"exercise",label:"운동",icon:"💪"}];
-const defRoutine=[{day:1,slot:"morning",type:"piano"},{day:2,slot:"morning",type:"piano"},{day:3,slot:"morning",type:"piano"},{day:4,slot:"morning",type:"piano"},{day:5,slot:"morning",type:"piano"},{day:1,slot:"evening",type:"composition"},{day:2,slot:"evening",type:"counterpoint"},{day:3,slot:"evening",type:"composition"},{day:4,slot:"evening",type:"counterpoint"},{day:5,slot:"evening",type:"composition"},{day:6,slot:"morning",type:"exercise"},{day:0,slot:"morning",type:"exercise"}];
-const defGoals=[{categoryId:"piano",target:5},{categoryId:"composition",target:3},{categoryId:"counterpoint",target:2},{categoryId:"av",target:2},{categoryId:"exercise",target:3}];
-const defWorks=[{id:"w1",title:"겨울 서곡",status:"sketch",instrumentation:"피아노 솔로",notes:"",horizonIds:[],links:[]},{id:"w2",title:"무제 현악4중주",status:"wip",instrumentation:"현악 4중주",notes:"",horizonIds:[],links:[]}];
-const defHorizons=[{id:"h1",title:"1시간 공연",icon:"🎭",target:12},{id:"h2",title:"자작곡 음반",icon:"💿",target:10}];
-
-const C={bg:"#FAFAF9",bg1:"#FFFFFF",bg2:"#F5F5F4",bd:"#E7E5E4",bdL:"#D6D3D1",tx:"#1C1917",txM:"#78716C",txD:"#A8A29E",ac:"#1D4ED8",acL:"#DBEAFE",acD:"#1E40AF",gn:"#16A34A",gnL:"#DCFCE7",rd:"#DC2626",rdL:"#FEE2E2",am:"#D97706"};
-
-function App(){
-  const[works,setWorks]=useState(()=>ld(KS.w,defWorks));
-  const[sessions,setSessions]=useState(()=>ld(KS.s,[]));
-  const[reviews,setReviews]=useState(()=>ld(KS.r,[]));
-  const[cats,setCats]=useState(()=>ld(KS.c,defCats));
-  const[routine,setRoutine]=useState(()=>ld(KS.rt,defRoutine));
-  const[goals,setGoals]=useState(()=>ld(KS.g,defGoals));
-  const[horizons,setHorizons]=useState(()=>ld(KS.h,defHorizons));
-  const[tab,setTab]=useState("home");
-  const[scr,setScr]=useState(null);
-  const[tmr,setTmr]=useState(()=>ld(KS.tmr,null));
-  const[elapsed,setElapsed]=useState(0);
-
-  // Save on change
-  useEffect(()=>{sv(KS.w,works);},[works]);
-  useEffect(()=>{sv(KS.s,sessions);},[sessions]);
-  useEffect(()=>{sv(KS.r,reviews);},[reviews]);
-  useEffect(()=>{sv(KS.c,cats);},[cats]);
-  useEffect(()=>{sv(KS.rt,routine);},[routine]);
-  useEffect(()=>{sv(KS.g,goals);},[goals]);
-  useEffect(()=>{sv(KS.h,horizons);},[horizons]);
-
-  // Timer backup + tick
-  useEffect(()=>{if(tmr){sv(KS.tmr,tmr);}else{localStorage.removeItem(KS.tmr);}},[tmr]);
-  useEffect(()=>{if(!tmr)return;setElapsed(Math.floor((Date.now()-tmr.startTime)/1000));const iv=setInterval(()=>setElapsed(Math.floor((Date.now()-tmr.startTime)/1000)),1000);return()=>clearInterval(iv);},[tmr]);
-
-  const gc=id=>cats.find(c=>c.id===id)||{id,label:id,icon:"❓"};
-  const gw=id=>works.find(w=>w.id===id);
-  const td=today();
-  const ws=wkStart(td);
-  const tRout=routine.filter(r=>r.day===now().getDay());
-  const tSess=sessions.filter(x=>x.date===td);
-  const wSess=sessions.filter(x=>x.date>=ws);
-  const gp=(cid)=>{const d=wSess.filter(x=>x.type===cid).length;const g=goals.find(x=>x.categoryId===cid);return{done:d,goal:g?g.target:0};};
-  const wt=wid=>sessions.filter(x=>x.linkedWorkId===wid).reduce((a,x)=>a+(x.duration||0),0);
-  const wc=wid=>sessions.filter(x=>x.linkedWorkId===wid).length;
-
-  const nav=(t,d)=>setScr(t?{t,d}:null);
-  const startT=(type,slot,wid)=>{setTmr({type,slot:slot||"free",startTime:Date.now(),wid:wid||null});setElapsed(0);setScr(null);};
-
-  // Styles
-  const P={minHeight:"100vh",paddingBottom:80,background:C.bg,color:C.tx,fontSize:15,lineHeight:1.5};
-  const CT={padding:"20px 20px 28px",maxWidth:480,margin:"0 auto"};
-  const NV={display:"flex",justifyContent:"space-around",padding:"6px 0 calc(10px + env(safe-area-inset-bottom))",borderTop:"1px solid "+C.bd,background:"rgba(250,250,249,.95)",backdropFilter:"blur(12px)",WebkitBackdropFilter:"blur(12px)",position:"fixed",bottom:0,left:0,right:0,zIndex:100};
-  const nb=a=>({background:"none",border:"none",color:a?C.ac:C.txD,fontSize:11,padding:"10px 16px",cursor:"pointer",fontWeight:a?700:500});
-  const cd={background:C.bg1,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid "+C.bd,boxShadow:"0 1px 3px rgba(28,25,23,.04)"};
-  const cdH={background:C.acL,borderRadius:14,padding:"16px 18px",marginBottom:12,border:"1px solid #BFDBFE"};
-  const H1={fontSize:24,fontWeight:800,letterSpacing:"-0.4px",color:C.tx};
-  const H3={fontSize:12,color:C.txM,fontWeight:600,marginBottom:10,textTransform:"uppercase",letterSpacing:".04em"};
-  const btn={background:C.ac,color:"#fff",border:"none",padding:"13px 28px",borderRadius:12,cursor:"pointer",fontSize:15,fontWeight:700,boxShadow:"0 1px 3px rgba(29,78,216,.15)"};
-  const btnS={background:C.ac,color:"#fff",border:"none",padding:"8px 18px",borderRadius:10,cursor:"pointer",fontSize:13,fontWeight:700};
-  const btnG={background:"transparent",color:C.txM,border:"none",padding:"8px 12px",cursor:"pointer",fontSize:13,fontWeight:500};
-  const btnD={background:C.rdL,color:C.rd,border:"1px solid #FECACA",padding:"11px 20px",borderRadius:12,cursor:"pointer",fontSize:14,fontWeight:600};
-  const inp={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",marginBottom:12,fontSize:15,outline:"none",boxSizing:"border-box"};
-  const ta={background:C.bg1,border:"1px solid "+C.bd,color:C.tx,padding:"12px 14px",borderRadius:12,width:"100%",fontSize:15,outline:"none",resize:"none",lineHeight:1.7,boxSizing:"border-box"};
-  const tg=a=>({display:"inline-flex",alignItems:"center",padding:"7px 16px",borderRadius:10,fontSize:13,fontWeight:600,background:a?C.ac:C.bg2,color:a?"#fff":C.txM,marginRight:6,marginBottom:6,cursor:"pointer",border:a?"none":"1px solid "+C.bd});
-  const pl=c=>({display:"inline-block",padding:"3px 10px",borderRadius:8,fontSize:11,fontWeight:700,background:c+"18",color:c});
-  const pr={background:C.bg2,borderRadius:6,height:7,overflow:"hidden"};
-  const pf=p=>({background:C.ac,height:"100%",width:Math.min(p,100)+"%",borderRadius:6,transition:"width .4s ease"});
-  const bk={background:"none",border:"none",color:C.txM,padding:"8px 0",cursor:"pointer",fontSize:15,marginBottom:14,fontWeight:500};
-  const rb={display:"flex",justifyContent:"space-between",alignItems:"center"};
-  const ck=d=>({width:22,height:22,borderRadius:7,border:"2px solid "+(d?C.ac:C.bdL),background:d?C.ac:C.bg1,cursor:"pointer",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:12,fontWeight:700});
-  const em={color:C.txD,fontSize:14,textAlign:"center",padding:"28px 0"};
-
-  // === TIMER ===
-  if(tmr){
-    const cat=gc(tmr.type);const lw=tmr.wid?gw(tmr.wid):null;
-    const mins=Math.floor(elapsed/60),secs=elapsed%60;
-    return(<div style={P}><div style={{...CT,paddingTop:60}} className="fi">
-      <div style={{textAlign:"center"}}>
-        <div style={{color:C.txM,fontSize:13,marginBottom:10,fontWeight:500}}>{SLOTS[tmr.slot]} 세션</div>
-        <div style={{fontSize:26,fontWeight:800,marginBottom:8,color:C.tx}}>{cat.icon} {cat.label}</div>
-        {lw&&<div style={{color:C.txM,fontSize:14,marginBottom:28}}>→ {lw.title}</div>}
-        <div style={{fontSize:72,fontWeight:200,color:C.ac,fontVariantNumeric:"tabular-nums",marginBottom:8,letterSpacing:"-2px"}}>{String(mins).padStart(2,"0")}:{String(secs).padStart(2,"0")}</div>
-        <div className="pu" style={{color:C.ac,fontSize:13,marginBottom:56,fontWeight:600}}>● 진행 중</div>
-        <button style={{...btn,width:"100%",padding:16,fontSize:17,borderRadius:14}} onClick={()=>{
-          const dur=Math.max(1,Math.floor((Date.now()-tmr.startTime)/60000));
-          setScr({t:"comp",d:{type:tmr.type,slot:tmr.slot,duration:dur,linkedWorkId:tmr.wid,note:"",checklist:[],date:td}});
-          setTmr(null);
-        }}>세션 완료</button>
-        <button style={{...btnG,marginTop:16,fontSize:14}} onClick={()=>{setTmr(null);setElapsed(0);}}>취소</button>
+function PageHeader({ icon, title, subtitle }) {
+  return (
+    <header className="page-header">
+      <div className="page-icon">{icon}</div>
+      <h1 className="page-title">{title}</h1>
+      {subtitle && <div className="page-subtitle">{subtitle}</div>}
+    </header>
+  );
+}
+function Properties({ rows }) {
+  return (
+    <div className="properties">
+      {rows.map((row) => (
+        <React.Fragment key={row.label}>
+          <div className="property-label">{row.label}</div>
+          <div className="property-value">{row.value || "-"}</div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+function Section({ title, action, children }) {
+  return (
+    <section className="section">
+      <div className="section-head">
+        <div className="section-title">{title}</div>
+        {action}
       </div>
-    </div></div>);
+      <div>{React.Children.toArray(children).filter(Boolean)}</div>
+    </section>
+  );
+}
+function Row({ marker, title, subtitle, right, onClick, children }) {
+  return (
+    <div className="row" onClick={onClick}>
+      <div className="marker">{marker}</div>
+      <div className="row-main">
+        <div className="row-title">{title}</div>
+        {subtitle && <div className="row-sub">{subtitle}</div>}
+        {children}
+      </div>
+      {right && <div className="row-right">{right}</div>}
+    </div>
+  );
+}
+function Pill({ children, tone = "" }) {
+  return <span className={`pill ${tone}`}>{children}</span>;
+}
+function Tabs({ value, onChange, items }) {
+  return (
+    <div className="tabs">
+      {items.map((item) => <button key={item.value} className={`tab ${value === item.value ? "active" : ""}`} onClick={() => onChange(item.value)}>{item.label}</button>)}
+    </div>
+  );
+}
+function Progress({ value }) {
+  return <div className="progress"><div className="progress-fill" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} /></div>;
+}
+function Field({ label, children }) {
+  return <label className="field"><div className="label">{label}</div>{children}</label>;
+}
+function Empty({ text = "항목 없음" }) {
+  return <Row marker="·" title={<span className="empty">{text}</span>} />;
+}
+
+function App() {
+  const [pieces, setPieces] = useStored(KEYS.pieces, defPieces);
+  const [techniques, setTechniques] = useStored(KEYS.techniques, defTechniques);
+  const [pianoSessions, setPianoSessions] = useStored(KEYS.pianoSessions, defPianoSessions);
+  const [exercises, setExercises] = useStored(KEYS.exercises, defExercises);
+  const [exerciseSessions, setExerciseSessions] = useStored(KEYS.exerciseSessions, defExerciseSessions);
+  const [reviews, setReviews] = useStored(KEYS.reviews, []);
+  const [settingsRaw, setSettingsRaw] = useStored(KEYS.settings, defSettings);
+  const settings = normalizeSettings(settingsRaw);
+  const updateSettings = (patch) => setSettingsRaw((prev) => normalizeSettings({ ...normalizeSettings(prev), ...patch }));
+
+  const [tab, setTab] = useState("today");
+  const [screen, setScreen] = useState(null);
+  const [pianoView, setPianoView] = useState("month");
+  const [exerciseView, setExerciseView] = useState("today");
+  const [settingsView, setSettingsView] = useState("libraries");
+  const [calendarMode, setCalendarMode] = useState("week");
+  const [calendarAnchor, setCalendarAnchor] = useState(today());
+  const [selectedMonth, setSelectedMonth] = useState(monthKey(new Date()));
+
+  const td = today();
+  const ws = weekStart(td);
+  const we = shiftDate(ws, 7);
+  const pieceMap = useMemo(() => Object.fromEntries(pieces.map((item) => [item.id, item])), [pieces]);
+  const techniqueMap = useMemo(() => Object.fromEntries(techniques.map((item) => [item.id, item])), [techniques]);
+  const exerciseMap = useMemo(() => Object.fromEntries(exercises.map((item) => [item.id, item])), [exercises]);
+  const pianoItemName = (session) => session.type === "piece" ? (pieceMap[session.targetId] && pieceMap[session.targetId].title) : (techniqueMap[session.targetId] && techniqueMap[session.targetId].title);
+  const weekPianoSessions = pianoSessions.filter((session) => session.date >= ws && session.date < we);
+  const weekExerciseSessions = exerciseSessions.filter((session) => session.date >= ws && session.date < we);
+  const weekPianoMinutes = sum(weekPianoSessions, (session) => session.duration);
+  const activityDates = [...pianoSessions.map((s) => s.date), ...exerciseSessions.map((s) => s.date)].filter(Boolean);
+  const lastActivity = activityDates.slice().sort().slice(-1)[0] || null;
+  const streak = getStreak(activityDates, td);
+  const monthFocus = settings.monthlyFocus[selectedMonth] || { intent: "", pieceIds: [], techniqueIds: [] };
+  const setMonthFocus = (patch) => updateSettings({ monthlyFocus: { ...settings.monthlyFocus, [selectedMonth]: { ...monthFocus, ...patch } } });
+  const openTab = (id) => { setTab(id); setScreen(null); };
+  const common = {
+    pieces, setPieces, techniques, setTechniques, pianoSessions, setPianoSessions,
+    exercises, setExercises, exerciseSessions, setExerciseSessions,
+    reviews, setReviews, settings, updateSettings,
+    td, ws, we, pieceMap, techniqueMap, exerciseMap, pianoItemName,
+    weekPianoMinutes, weekExerciseSessions, streak, lastActivity,
+    selectedMonth, setSelectedMonth, monthFocus, setMonthFocus,
+    screen, setScreen, pianoView, setPianoView, exerciseView, setExerciseView,
+    settingsView, setSettingsView, calendarMode, setCalendarMode, calendarAnchor, setCalendarAnchor,
+    openTab,
+  };
+
+  const navItems = [
+    { id: "today", label: "오늘" },
+    { id: "piano", label: "피아노" },
+    { id: "exercise", label: "운동" },
+    { id: "record", label: "기록" },
+    { id: "settings", label: "설정" },
+  ];
+  return (
+    <div className="app">
+      <div className="layout">
+        <aside className="sidebar">
+          <div className="brand">Opus Flow</div>
+          <nav className="side-nav">
+            {navItems.map((item) => <button key={item.id} className={`side-button ${tab === item.id ? "active" : ""}`} onClick={() => openTab(item.id)}>{item.label}</button>)}
+          </nav>
+        </aside>
+        <main className="main">
+          {tab === "today" && <TodayView {...common} />}
+          {tab === "piano" && <PianoView {...common} />}
+          {tab === "exercise" && <ExerciseView {...common} />}
+          {tab === "record" && <RecordView {...common} />}
+          {tab === "settings" && <SettingsView {...common} />}
+        </main>
+      </div>
+      <nav className="mobile-nav"><div className="mobile-nav-inner">
+        {navItems.map((item) => <button key={item.id} className={`nav-button ${tab === item.id ? "active" : ""}`} onClick={() => openTab(item.id)}>{item.label}</button>)}
+      </div></nav>
+      {screen && <Overlay screen={screen} onClose={() => setScreen(null)} {...common} />}
+    </div>
+  );
+}
+
+function getStreak(dates, todayValue) {
+  const set = new Set(dates);
+  let count = 0;
+  let cursor = todayValue;
+  while (set.has(cursor)) {
+    count += 1;
+    cursor = shiftDate(cursor, -1);
   }
-
-  // === OVERLAYS ===
-  if(scr){const{t:st,d:sd}=scr;
-    if(st==="comp"||st==="edS"||st==="addS"){
-      return <SessForm init={sd||{date:td,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]}}
-        cats={cats} works={works} isComp={st==="comp"} canDel={!!(sd&&sd.id)} gc={gc}
-        onSave={s=>{if(s.id){setSessions(p=>p.map(x=>x.id===s.id?s:x));}else{setSessions(p=>[...p,{...s,id:uid()}]);}setScr(null);}}
-        onDel={sd&&sd.id?()=>{setSessions(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null}
-        onClose={()=>setScr(null)} tg={tg} btn={btn} btnS={btnS} btnD={btnD} btnG={btnG} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} ck={ck} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="wD"){
-      const w=gw(sd);if(!w){setScr(null);return null;}
-      const wSes=sessions.filter(x=>x.linkedWorkId===w.id).sort((a,b)=>b.date.localeCompare(a.date));
-      return <WDetail w={w} wSes={wSes} ttm={wt(w.id)} tcnt={wc(w.id)} r30={wSes.filter(x=>(Date.now()-new Date(x.date))/(864e5)<=30).length} horizons={horizons} gc={gc}
-        onUpdate={w2=>setWorks(p=>p.map(x=>x.id===w2.id?w2:x))}
-        onEdit={()=>nav("eW",w)} onDel={()=>{setWorks(p=>p.filter(x=>x.id!==w.id));setSessions(p=>p.map(x=>x.linkedWorkId===w.id?{...x,linkedWorkId:null}:x));setScr(null);}}
-        onAddLink={url=>{if(!url||!url.trim())return;setWorks(p=>p.map(x=>x.id===w.id?{...x,links:[...(x.links||[]),{id:uid(),url,name:url}]}:x));}}
-        onRemLink={lid=>setWorks(p=>p.map(x=>x.id===w.id?{...x,links:(x.links||[]).filter(l=>l.id!==lid)}:x))}
-        onStart={()=>startT(cats[0]&&cats[0].id,"free",w.id)} onClose={()=>setScr(null)}
-        tg={tg} btn={btn} btnS={btnS} btnG={btnG} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} em={em} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="nW"||st==="eW"){
-      return <WForm data={sd} onSave={w=>{if(w.id&&works.find(x=>x.id===w.id)){setWorks(p=>p.map(x=>x.id===w.id?w:x));}else{setWorks(p=>[...p,{...w,id:uid(),horizonIds:[],links:[]}]);}setScr(null);}}
-        onClose={()=>setScr(null)} tg={tg} btn={btn} inp={inp} ta={ta} bk={bk} H1={H1} H3={H3} P={P} CT={CT} C={C}/>;
-    }
-    if(st==="dD"){const dt=sd,dss=sessions.filter(x=>x.date===dt);
-      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 뒤로</button>
-        <div style={{...rb,marginBottom:24}}><button style={btnG} onClick={()=>nav("dD",shift(dt,-1))}>←</button><div style={{textAlign:"center"}}><div style={{fontSize:18,fontWeight:700}}>{fmtFull(dt)}</div>{dt===td&&<div style={{color:C.ac,fontSize:11,marginTop:3,fontWeight:600}}>오늘</div>}</div><button style={btnG} onClick={()=>nav("dD",shift(dt,1))}>→</button></div>
-        <div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>세션 ({dss.length})</span><button style={btnS} onClick={()=>nav("addS",{date:dt,type:cats[0]&&cats[0].id,slot:"free",linkedWorkId:null,note:"",duration:30,checklist:[]})}>+ 추가</button></div>
-        {dss.length===0?<div style={em}>기록 없음</div>:dss.map(ss=>{const cat=gc(ss.type);const lw=ss.linkedWorkId?gw(ss.linkedWorkId):null;
-          return(<div key={ss.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("edS",ss)}><div style={rb}><span style={{fontWeight:700}}>{cat.icon} {cat.label}</span><span style={{color:C.ac,fontWeight:700,fontSize:14}}>{ss.duration}분</span></div>
-            {lw&&<div style={{color:C.txM,fontSize:13,marginTop:5}}>→ {lw.title}</div>}{ss.note&&<div style={{color:C.txD,fontSize:13,marginTop:4}}>{ss.note}</div>}</div>);})}
-      </div></div>);
-    }
-    if(st==="rF"){return <RForm data={sd} cats={cats} gp={gp} onSave={r=>{if(r.id){setReviews(p=>p.map(x=>x.id===r.id?{...r,updatedAt:td}:x));}else{setReviews(p=>[...p,{...r,id:uid(),createdAt:td}]);}setScr(null);}} onDel={sd&&sd.id?()=>{setReviews(p=>p.filter(x=>x.id!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} ta={ta} bk={bk} H1={H1} H3={H3} cd={cd} P={P} CT={CT} C={C}/>;}
-    if(st==="eC"){return <CForm data={sd} onSave={c=>{if(sd&&sd.id)setCats(p=>p.map(x=>x.id===c.id?c:x));else setCats(p=>[...p,{...c,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setCats(p=>p.filter(x=>x.id!==sd.id));setRoutine(p=>p.filter(r=>r.type!==sd.id));setGoals(p=>p.filter(g=>g.categoryId!==sd.id));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
-    if(st==="eH"){return <HForm data={sd} onSave={h=>{if(sd&&sd.id)setHorizons(p=>p.map(x=>x.id===h.id?h:x));else setHorizons(p=>[...p,{...h,id:uid()}]);setScr(null);}} onDel={sd&&sd.id?()=>{setHorizons(p=>p.filter(x=>x.id!==sd.id));setWorks(p=>p.map(w=>({...w,horizonIds:(w.horizonIds||[]).filter(x=>x!==sd.id)})));setScr(null);}:null} onClose={()=>setScr(null)} tg={tg} btn={btn} btnD={btnD} inp={inp} bk={bk} H1={H1} H3={H3} P={P} CT={CT}/>;}
-    if(st==="eRS"){const day=sd.day,sl=sd.slot;const cur=routine.find(r=>r.day===day&&r.slot===sl);
-      return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={()=>setScr(null)}>← 취소</button><div style={{...H1,marginBottom:24}}>{DAYS_KR[day]} {SLOTS[sl]}</div>
-        {cats.map(c=>(<div key={c.id} style={{...cd,borderColor:cur&&cur.type===c.id?C.ac:C.bd,cursor:"pointer",background:cur&&cur.type===c.id?C.acL:C.bg1}} onClick={()=>{setRoutine([...routine.filter(r=>!(r.day===day&&r.slot===sl)),{day,slot:sl,type:c.id}]);setScr(null);}}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}
-        <button style={{...btnD,width:"100%",marginTop:10}} onClick={()=>{setRoutine(routine.filter(r=>!(r.day===day&&r.slot===sl)));setScr(null);}}>비우기</button></div></div>);
-    }
-  }
-
-  // === MAIN TABS ===
-  return(<div style={P}><div style={CT}>
-    {tab==="home"&&(<div className="fi">
-      <div style={{marginBottom:24}}><div style={{color:C.txM,fontSize:13,marginBottom:4,fontWeight:500}}>{now().getMonth()+1}월 {now().getDate()}일 {DAYS_KR[now().getDay()]}</div><div style={H1}>작업실</div></div>
-      <div style={{...cd,marginBottom:18}}><div style={{...rb,marginBottom:10}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>오늘 진행률</span><span style={{color:C.ac,fontWeight:800,fontSize:15}}>{tSess.length}/{tRout.length||"−"}</span></div><div style={pr}><div style={pf(tRout.length?Math.round(tSess.length/tRout.length*100):0)}/></div></div>
-      {tRout.length>0?(<div style={{marginBottom:24}}><div style={H3}>오늘 루틴</div>
-        {tRout.map((r,i)=>{const cat=gc(r.type);const done=tSess.some(x=>x.slot===r.slot&&x.type===r.type);
-          return(<div key={i} style={{...(done?cd:cdH),display:"flex",justifyContent:"space-between",alignItems:"center",opacity:done?.55:1}}><div><div style={{color:C.txM,fontSize:11,marginBottom:3,fontWeight:600}}>{SLOTS[r.slot]}</div><div style={{fontWeight:700,fontSize:15}}>{cat.icon} {cat.label}</div></div>
-            {done?<span style={pl(C.gn)}>완료</span>:<button style={btnS} onClick={()=>startT(r.type,r.slot)}>시작</button>}</div>);})}</div>
-      ):(<div style={{...cd,textAlign:"center",padding:"24px 18px",marginBottom:24}}><div style={{fontSize:14,color:C.txM,marginBottom:12,fontWeight:500}}>오늘은 자유 연습일</div>
-        <div style={{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}}>{cats.slice(0,4).map(c=>(<button key={c.id} style={{...tg(false),padding:"10px 18px"}} onClick={()=>startT(c.id)}><span style={{marginRight:6}}>{c.icon}</span>{c.label}</button>))}</div></div>)}
-      {works.filter(w=>w.status==="sketch"||w.status==="wip").length>0&&(<div style={{marginBottom:24}}><div style={H3}>진행 중인 곡</div>
-        {works.filter(w=>w.status==="sketch"||w.status==="wip").slice(0,5).map(w=>{const tm=wt(w.id);
-          return(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={rb}><div style={{fontWeight:700}}>{w.title}</div><span style={pl(STATUS_COLORS[w.status])}>{STATUS_LABELS[w.status]}</span></div>
-            <div style={{color:C.txM,fontSize:13,marginTop:6}}>{w.instrumentation||"편성 미정"} · 총 {minStr(tm)}</div></div>);})}</div>)}
-      <div style={cd}><div style={{...H3,marginBottom:14}}>이번 주</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat("+Math.min(cats.length,5)+",1fr)",gap:10}}>{cats.slice(0,5).map(c=>{const p=gp(c.id);const ok=p.goal&&p.done>=p.goal;
-          return(<div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:20,marginBottom:6}}>{c.icon}</div><div style={{fontSize:14,fontWeight:700,color:ok?C.gn:C.tx}}>{p.done}<span style={{color:C.txD,fontWeight:400}}>/{p.goal}</span></div></div>);})}</div></div>
-      <button style={{...btnG,width:"100%",marginTop:14,color:C.txM,fontWeight:600}} onClick={()=>nav("addS",null)}>+ 직접 기록 추가</button>
-    </div>)}
-
-    {tab==="works"&&<WorksTab works={works} horizons={horizons} wt={wt} wc={wc} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} C={C}/>}
-    {tab==="record"&&<RecordTab sessions={sessions} reviews={reviews} cats={cats} td={td} ws={ws} gp={gp} gc={gc} nav={nav} tg={tg} btnS={btnS} btnG={btnG} H1={H1} H3={H3} rb={rb} pl={pl} pr={pr} pf={pf} cd={cd} C={C}/>}
-    {tab==="settings"&&<SetTab cats={cats} routine={routine} goals={goals} horizons={horizons} works={works} sessions={sessions} reviews={reviews} gc={gc} gp={gp} setGoals={setGoals} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} cd={cd} C={C}/>}
-  </div>
-  <nav style={NV}>{[["home","작업실"],["works","곡"],["record","기록"],["settings","설정"]].map(x=>(
-    <button key={x[0]} style={nb(tab===x[0])} onClick={()=>{setTab(x[0]);setScr(null);}}>{x[1]}</button>
-  ))}</nav></div>);
+  return count;
+}
+function lastText(date) {
+  if (!date) return "없음";
+  const diff = Math.floor((parseDate(today()) - parseDate(date)) / 864e5);
+  if (diff === 0) return "오늘";
+  if (diff === 1) return "어제";
+  return `${diff}일 전`;
+}
+function todayRoutineItems(settings, day, pieceMap, techniqueMap, exerciseMap) {
+  const piano = settings.pianoRoutine.filter((item) => item.day === day).map((item) => ({
+    id: item.id,
+    kind: "piano",
+    title: item.kind === "piece" ? (pieceMap[item.targetId] && pieceMap[item.targetId].title) || "삭제된 곡" : (techniqueMap[item.targetId] && techniqueMap[item.targetId].title) || "삭제된 테크닉",
+    subtitle: item.kind === "piece" ? "피아노 곡" : "피아노 테크닉",
+    marker: "♪",
+    source: item,
+  }));
+  const exercise = settings.exerciseRoutine.filter((item) => item.day === day).map((item) => ({
+    id: item.id,
+    kind: "exercise",
+    title: (exerciseMap[item.exerciseId] && exerciseMap[item.exerciseId].name) || "삭제된 운동",
+    subtitle: "운동 루틴",
+    marker: "□",
+    source: item,
+  }));
+  return [...piano, ...exercise];
 }
 
-// === WORKS TAB ===
-function WorksTab(p){const{works,horizons,wt,wc,nav,tg,btnS,inp,H1,H3,rb,pl,cd,C}=p;
-  const[search,setSearch]=useState("");
-  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>곡</div><button style={btnS} onClick={()=>nav("nW",{title:"",status:"idea",instrumentation:"",notes:""})}>+ 새 곡</button></div>
-    <input style={inp} placeholder="검색..." value={search} onChange={e=>setSearch(e.target.value)}/>
-    {["wip","sketch","idea","complete","repertoire","concert"].map(st=>{const f=works.filter(w=>w.status===st&&(!search||w.title.toLowerCase().indexOf(search.toLowerCase())>=0));if(!f.length)return null;
-      return(<div key={st} style={{marginBottom:20}}><div style={{...H3,display:"flex",alignItems:"center",gap:8}}><span style={pl(STATUS_COLORS[st])}>{STATUS_LABELS[st]}</span><span style={{color:C.txD,fontSize:12}}>{f.length}</span></div>
-        {f.map(w=>(<div key={w.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("wD",w.id)}><div style={{fontWeight:700,marginBottom:4}}>{w.title}</div><div style={{color:C.txM,fontSize:13}}>{w.instrumentation||"−"} · {wc(w.id)}회 · {minStr(wt(w.id))}</div></div>))}</div>);})}</div>);
+function TodayView(p) {
+  const day = parseDate(p.td).getDay();
+  const routine = todayRoutineItems(p.settings, day, p.pieceMap, p.techniqueMap, p.exerciseMap);
+  const todayPiano = p.pianoSessions.filter((session) => session.date === p.td);
+  const todayExercise = p.exerciseSessions.filter((session) => session.date === p.td);
+  const completedTitles = new Set([
+    ...todayPiano.map((session) => `${session.type}:${session.targetId}`),
+    ...todayExercise.map((session) => `exercise:${session.exerciseId}`),
+  ]);
+  return (
+    <>
+      <PageHeader icon="🌤️" title="오늘" subtitle={fullDate(p.td)} />
+      <Properties rows={[
+        { label: "완료", value: `${todayPiano.length + todayExercise.length} 세션` },
+        { label: "루틴", value: `${routine.length}개` },
+        { label: "마지막 활동", value: lastText(p.lastActivity) },
+      ]} />
+      <Section title="오늘 루틴">
+        {routine.map((item) => {
+          const completed = item.kind === "piano"
+            ? completedTitles.has(`${item.source.kind}:${item.source.targetId}`)
+            : completedTitles.has(`exercise:${item.source.exerciseId}`);
+          return (
+            <Row
+              key={item.id}
+              marker={completed ? "✓" : item.marker}
+              title={item.title}
+              subtitle={item.subtitle}
+              right={<Pill tone={item.kind === "piano" ? "blue" : "green"}>{completed ? "완료" : item.kind === "piano" ? "피아노" : "운동"}</Pill>}
+              onClick={() => item.kind === "piano"
+                ? p.setScreen({ type: "piano-session", data: { type: item.source.kind, targetId: item.source.targetId, duration: item.source.duration || 30 } })
+                : p.setScreen({ type: "exercise-session", data: { exerciseId: item.source.exerciseId, sets: item.source.sets || "", reps: item.source.reps || "", duration: item.source.duration || "" } })}
+            />
+          );
+        })}
+        {!routine.length && <Empty text="오늘 루틴 없음" />}
+      </Section>
+      <Section title="빠른 시작">
+        <Row marker="♪" title="피아노 세션 기록" subtitle="곡 또는 테크닉 선택" right={<Pill tone="blue">시작</Pill>} onClick={() => p.setScreen({ type: "piano-session" })} />
+        <Row marker="□" title="운동 세션 기록" subtitle="운동 항목 선택" right={<Pill tone="green">시작</Pill>} onClick={() => p.setScreen({ type: "exercise-session" })} />
+      </Section>
+      <Section title="오늘 완료한 세션">
+        {todayPiano.sort(byDateDesc).map((session) => <Row key={session.id} marker="♪" title={p.pianoItemName(session) || "피아노"} subtitle={`${minText(session.duration)} · ${session.feeling || session.note || "메모 없음"}`} />)}
+        {todayExercise.sort(byDateDesc).map((session) => {
+          const exercise = p.exerciseMap[session.exerciseId];
+          return <Row key={session.id} marker="□" title={exercise ? exercise.name : "운동"} subtitle={`${exerciseSummary(session)} · ${session.feeling || session.note || "메모 없음"}`} />;
+        })}
+        {!todayPiano.length && !todayExercise.length && <Empty text="아직 완료한 세션 없음" />}
+      </Section>
+    </>
+  );
 }
 
-// === RECORD TAB ===
-function RecordTab(p){const{sessions,reviews,cats,td,ws,gp,gc,nav,tg,btnS,btnG,H1,H3,rb,pl,pr,pf,cd,C}=p;
-  const[mode,setMode]=useState("week");const[calD,setCalD]=useState(td);
-  const calDates=mode==="week"?wkDates(calD):moDates(calD);const wR=reviews.find(r=>r.weekStart===ws);const dt=new Date(calD);
-  return(<div className="fi"><div style={{...rb,marginBottom:20}}><div style={H1}>기록</div><div><button style={tg(mode==="week")} onClick={()=>setMode("week")}>주간</button><button style={tg(mode==="month")} onClick={()=>setMode("month")}>월간</button></div></div>
-    <div style={{...rb,marginBottom:14}}><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?-7:-30))}>←</button><span style={{fontWeight:700,fontSize:15}}>{dt.getFullYear()}년 {dt.getMonth()+1}월</span><button style={btnG} onClick={()=>setCalD(shift(calD,mode==="week"?7:30))}>→</button></div>
-    <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:5,marginBottom:18}}>
-      {DAYS_KR.map(d=><div key={d} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
-      {calDates.map(dd=>{const isT=dd===td;const count=sessions.filter(x=>x.date===dd).length;const isCur=new Date(dd).getMonth()===dt.getMonth();
-        return(<div key={dd} style={{background:isT?C.acL:C.bg1,borderRadius:10,padding:"9px 2px",textAlign:"center",cursor:"pointer",opacity:isCur?1:.3,border:isT?"1.5px solid "+C.ac:"1px solid "+C.bd}} onClick={()=>nav("dD",dd)}>
-          <div style={{fontSize:13,color:isT?C.ac:C.txM,fontWeight:isT?800:500}}>{new Date(dd).getDate()}</div>{count>0&&<div style={{width:5,height:5,borderRadius:"50%",background:C.ac,margin:"3px auto 0"}}/>}</div>);})}</div>
-    <div style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{weekStart:ws,win:wR?wR.win||wR.text||"":"",focus:wR?wR.focus||"":"",memo:wR?wR.memo||"":"",id:wR?wR.id:null})}><div style={rb}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>주간 리뷰</span><span style={{color:C.ac,fontSize:12,fontWeight:700}}>{wR?"수정":"작성 →"}</span></div>
-      {wR?<div style={{color:C.tx,fontSize:14,marginTop:8}}>✦ {(wR.win||wR.text||"").slice(0,60)}</div>:<div style={{color:C.txD,fontSize:13,marginTop:6}}>이번 주를 돌아보세요</div>}</div>
-    <div style={cd}><div style={H3}>이번 주 진행률</div>{cats.map(c=>{const pp=gp(c.id);if(pp.goal===0&&pp.done===0)return null;const pct=pp.goal?Math.round(pp.done/pp.goal*100):0;
-      return(<div key={c.id} style={{marginBottom:12}}><div style={{...rb,marginBottom:5}}><span style={{fontSize:14,fontWeight:600}}>{c.icon} {c.label}</span><span style={{color:pct>=100?C.gn:C.txM,fontSize:13,fontWeight:700}}>{pp.done}/{pp.goal}</span></div><div style={pr}><div style={pf(pct)}/></div></div>);})}</div>
-    {reviews.length>0&&(<div style={{marginTop:10}}><div style={H3}>지난 리뷰</div>{reviews.slice().sort((a,b)=>(b.weekStart||"").localeCompare(a.weekStart||"")).slice(0,5).map(r=>(
-      <div key={r.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("rF",{...r,win:r.win||r.text||"",focus:r.focus||"",memo:r.memo||""})}><span style={{fontSize:13,color:C.txM}}>{r.weekStart?fmtFull(r.weekStart):"−"}</span>{(r.win||r.text)&&<div style={{fontSize:13,marginTop:4}}>✦ {(r.win||r.text||"").slice(0,50)}</div>}</div>))}</div>)}</div>);
+function PianoView(p) {
+  const monthSessions = p.pianoSessions.filter((session) => session.date && session.date.startsWith(p.selectedMonth));
+  const focusPieces = (p.monthFocus.pieceIds || []).map((id) => p.pieceMap[id]).filter(Boolean);
+  const focusTechniques = (p.monthFocus.techniqueIds || []).map((id) => p.techniqueMap[id]).filter(Boolean);
+  const totalMinutes = sum(monthSessions, (session) => session.duration);
+  return (
+    <>
+      <PageHeader icon="🎹" title="피아노" subtitle={`${monthTitle(p.selectedMonth)} · ${minText(totalMinutes)}`} />
+      <Tabs value={p.pianoView} onChange={p.setPianoView} items={[
+        { value: "month", label: "이번 달" },
+        { value: "pieces", label: "곡" },
+        { value: "techniques", label: "테크닉" },
+        { value: "sessions", label: "세션" },
+      ]} />
+      {p.pianoView === "month" && (
+        <>
+          <div className="properties">
+            <div className="property-label">월</div>
+            <div className="property-value" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button className="button ghost" onClick={() => p.setSelectedMonth(shiftMonth(p.selectedMonth, -1))}>←</button>
+              <span>{monthTitle(p.selectedMonth)}</span>
+              <button className="button ghost" onClick={() => p.setSelectedMonth(shiftMonth(p.selectedMonth, 1))}>→</button>
+            </div>
+            <div className="property-label">의도</div>
+            <div className="property-value">
+              <textarea className="textarea" style={{ minHeight: 64 }} value={p.monthFocus.intent || ""} placeholder="이번 달 피아노 의도" onChange={(e) => p.setMonthFocus({ intent: e.target.value })} />
+            </div>
+          </div>
+          <Section title="집중 곡" action={<button className="section-action" onClick={() => p.setScreen({ type: "focus-picker" })}>편집</button>}>
+            {focusPieces.map((piece) => <PianoPieceRow key={piece.id} piece={piece} sessions={monthSessions.filter((session) => session.type === "piece" && session.targetId === piece.id)} onRecord={() => p.setScreen({ type: "piano-session", data: { type: "piece", targetId: piece.id } })} />)}
+            {!focusPieces.length && <Empty text="집중 곡 없음" />}
+          </Section>
+          <Section title="집중 테크닉">
+            {focusTechniques.map((technique) => <TechniqueRow key={technique.id} technique={technique} sessions={monthSessions.filter((session) => session.type === "technique" && session.targetId === technique.id)} onRecord={() => p.setScreen({ type: "piano-session", data: { type: "technique", targetId: technique.id } })} />)}
+            {!focusTechniques.length && <Empty text="집중 테크닉 없음" />}
+          </Section>
+        </>
+      )}
+      {p.pianoView === "pieces" && <PianoPieceLibrary {...p} />}
+      {p.pianoView === "techniques" && <TechniqueLibrary {...p} />}
+      {p.pianoView === "sessions" && <PianoSessionList {...p} />}
+    </>
+  );
+}
+function PianoPieceRow({ piece, sessions, onRecord }) {
+  const minutes = sum(sessions, (session) => session.duration);
+  return <Row marker="♪" title={piece.title} subtitle={`${piece.composer || "작곡가 미정"} · ${piece.currentSection || "구간 없음"}`} right={<span className="mono">{minText(minutes)}</span>} onClick={onRecord} />;
+}
+function TechniqueRow({ technique, sessions, onRecord }) {
+  const minutes = sum(sessions, (session) => session.duration);
+  const current = Number(technique.currentBPM) || Math.max(0, ...sessions.map((s) => Number(s.bpm) || 0));
+  const target = Number(technique.targetBPM) || 0;
+  return (
+    <Row marker="♪" title={technique.title} subtitle={`${technique.category} · ${current}/${target} BPM`} right={<span className="mono">{minText(minutes)}</span>} onClick={onRecord}>
+      <Progress value={target ? Math.round(current / target * 100) : 0} />
+    </Row>
+  );
+}
+function PianoPieceLibrary(p) {
+  return (
+    <Section title="곡 라이브러리" action={<button className="section-action" onClick={() => p.setScreen({ type: "piece-form" })}>+ 새 곡</button>}>
+      {p.pieces.map((piece) => <Row key={piece.id} marker="♪" title={piece.title} subtitle={`${piece.composer || "작곡가 미정"} · ${piece.opus || "-"} · ${piece.currentSection || "구간 없음"}`} right={<Pill tone={statusClass(piece.status)}>{PIANO_STATUS[piece.status] || piece.status}</Pill>} onClick={() => p.setScreen({ type: "piece-form", item: piece })} />)}
+    </Section>
+  );
+}
+function TechniqueLibrary(p) {
+  return (
+    <Section title="테크닉 라이브러리" action={<button className="section-action" onClick={() => p.setScreen({ type: "technique-form" })}>+ 새 테크닉</button>}>
+      {p.techniques.map((technique) => <Row key={technique.id} marker="♪" title={technique.title} subtitle={`${technique.category} · ${technique.currentBPM || 0}/${technique.targetBPM || 0} BPM`} right={<Pill tone={statusClass(technique.status)}>{PIANO_STATUS[technique.status] || technique.status}</Pill>} onClick={() => p.setScreen({ type: "technique-form", item: technique })} />)}
+    </Section>
+  );
+}
+function PianoSessionList(p) {
+  return (
+    <Section title="연습 세션" action={<button className="section-action" onClick={() => p.setScreen({ type: "piano-session" })}>+ 기록</button>}>
+      {p.pianoSessions.slice().sort(byDateDesc).slice(0, 30).map((session) => <Row key={session.id} marker="♪" title={p.pianoItemName(session) || "삭제된 항목"} subtitle={`${shortDate(session.date)} · ${minText(session.duration)} · ${session.feeling || session.note || "메모 없음"}`} />)}
+    </Section>
+  );
 }
 
-// === SETTINGS TAB ===
-function SetTab(p){const{cats,routine,goals,horizons,works,sessions,reviews,gc,gp,setGoals,nav,tg,btnS,inp,H1,H3,rb,cd,C}=p;
-  const[stab,setStab]=useState("horizon");
-  const KS_ALL=["of3-works","of3-sessions","of3-reviews","of3-cats","of3-routine","of3-goals","of3-horizons","of3-timer"];
-  const expData=()=>{
-    const data={};KS_ALL.forEach(k=>{const v=localStorage.getItem(k);data[k]=v?JSON.parse(v):null;});
-    const obj={schemaVersion:1,exportedAt:new Date().toISOString(),appVersion:"v3",data};
-    const dt=new Date(),pad=n=>String(n).padStart(2,"0");
-    const fn=`opus-flow-backup-${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}-${pad(dt.getHours())}${pad(dt.getMinutes())}.json`;
-    const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");a.href=url;a.download=fn;a.click();
+function ExerciseView(p) {
+  const day = parseDate(p.td).getDay();
+  const todayRoutine = p.settings.exerciseRoutine.filter((item) => item.day === day);
+  return (
+    <>
+      <PageHeader icon="🏃" title="운동" subtitle={`이번 주 ${p.weekExerciseSessions.length}회 · 연속 ${p.streak}일`} />
+      <Tabs value={p.exerciseView} onChange={p.setExerciseView} items={[
+        { value: "today", label: "오늘" },
+        { value: "library", label: "라이브러리" },
+        { value: "sessions", label: "세션" },
+      ]} />
+      {p.exerciseView === "today" && (
+        <>
+          <Section title="오늘 운동">
+            {todayRoutine.map((item) => {
+              const exercise = p.exerciseMap[item.exerciseId];
+              return <Row key={item.id} marker="□" title={exercise ? exercise.name : "삭제된 운동"} subtitle={routineExerciseText(item)} right={<Pill tone="green">운동</Pill>} onClick={() => p.setScreen({ type: "exercise-session", data: { exerciseId: item.exerciseId, sets: item.sets || "", reps: item.reps || "", duration: item.duration || "" } })} />;
+            })}
+            {!todayRoutine.length && <Empty text="오늘 운동 없음" />}
+          </Section>
+          <Section title="빠른 기록">
+            <Row marker="+" title="운동 세션 기록" subtitle="운동 항목 선택" right={<Pill tone="green">기록</Pill>} onClick={() => p.setScreen({ type: "exercise-session" })} />
+          </Section>
+        </>
+      )}
+      {p.exerciseView === "library" && (
+        <Section title="운동 항목 라이브러리" action={<button className="section-action" onClick={() => p.setScreen({ type: "exercise-form" })}>+ 새 항목</button>}>
+          {p.exercises.map((exercise) => <Row key={exercise.id} marker="□" title={exercise.name} subtitle={`${exercise.category} · 단위 ${exercise.unit}`} right={<Pill tone={statusClass(exercise.status)}>{EXERCISE_STATUS[exercise.status] || exercise.status}</Pill>} onClick={() => p.setScreen({ type: "exercise-form", item: exercise })} />)}
+        </Section>
+      )}
+      {p.exerciseView === "sessions" && (
+        <Section title="운동 세션" action={<button className="section-action" onClick={() => p.setScreen({ type: "exercise-session" })}>+ 기록</button>}>
+          {p.exerciseSessions.slice().sort(byDateDesc).slice(0, 30).map((session) => {
+            const exercise = p.exerciseMap[session.exerciseId];
+            return <Row key={session.id} marker="□" title={exercise ? exercise.name : "삭제된 운동"} subtitle={`${shortDate(session.date)} · ${exerciseSummary(session)} · ${session.feeling || session.note || "메모 없음"}`} />;
+          })}
+        </Section>
+      )}
+    </>
+  );
+}
+function routineExerciseText(item) {
+  const parts = [];
+  if (item.sets) parts.push(`${item.sets}세트`);
+  if (item.reps) parts.push(`${item.reps}회`);
+  if (item.duration) parts.push(`${item.duration}분`);
+  return parts.join(" · ") || "자유 기록";
+}
+function exerciseSummary(session) {
+  const parts = [];
+  if (session.sets) parts.push(`${session.sets}세트`);
+  if (session.reps) parts.push(`${session.reps}회`);
+  if (session.weight) parts.push(`${session.weight}kg`);
+  if (session.duration) parts.push(`${session.duration}분`);
+  if (session.distance) parts.push(`${session.distance}km`);
+  return parts.join(" · ") || "기록";
+}
+
+function RecordView(p) {
+  const ym = monthKey(parseDate(p.calendarAnchor));
+  const dates = p.calendarMode === "week" ? weekDates(p.calendarAnchor) : monthDates(ym);
+  const weekReview = p.reviews.find((review) => review.weekStart === p.ws);
+  const countForDate = (date) => p.pianoSessions.filter((s) => s.date === date).length + p.exerciseSessions.filter((s) => s.date === date).length;
+  return (
+    <>
+      <PageHeader icon="📅" title="기록" subtitle={`이번 주 피아노 ${minText(p.weekPianoMinutes)} · 운동 ${p.weekExerciseSessions.length}회`} />
+      <div className="stat-grid">
+        <div className="stat"><div className="stat-value">{minText(p.weekPianoMinutes)}</div><div className="stat-label">피아노</div></div>
+        <div className="stat"><div className="stat-value">{p.weekExerciseSessions.length}</div><div className="stat-label">운동</div></div>
+        <div className="stat"><div className="stat-value">{p.streak}</div><div className="stat-label">연속일</div></div>
+      </div>
+      <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px" }}>
+        <button className="button ghost" onClick={() => p.setCalendarAnchor(shiftDate(p.calendarAnchor, p.calendarMode === "week" ? -7 : -30))}>←</button>
+        <div style={{ fontSize: 14, fontWeight: 650 }}>{p.calendarMode === "week" ? `${shortDate(dates[0])} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
+        <button className="button ghost" onClick={() => p.setCalendarAnchor(shiftDate(p.calendarAnchor, p.calendarMode === "week" ? 7 : 30))}>→</button>
+      </div>
+      <div className="calendar">
+        {DAYS.map((day) => <div key={day} className="calendar-head">{day}</div>)}
+        {dates.map((date) => {
+          const count = countForDate(date);
+          const isToday = date === p.td;
+          return (
+            <button key={date} className={`calendar-day ${date.startsWith(ym) ? "" : "muted"} ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
+              <div>{parseDate(date).getDate()}</div>
+              {count > 0 && <div className="dot" />}
+            </button>
+          );
+        })}
+      </div>
+      <Section title="주간 리뷰">
+        <Row marker="□" title={weekReview ? "이번 주 리뷰" : "작성하기"} subtitle={weekReview ? (weekReview.win || weekReview.text || weekReview.focus || "작성된 리뷰") : "아직 작성된 리뷰 없음"} right={<Pill>{weekReview ? "수정" : "작성"}</Pill>} onClick={() => p.setScreen({ type: "review-form", item: weekReview || { weekStart: p.ws, win: "", focus: "", memo: "" } })} />
+      </Section>
+      <Section title="지난 리뷰">
+        {p.reviews.slice().sort((a, b) => (b.weekStart || "").localeCompare(a.weekStart || "")).slice(0, 5).map((review) => <Row key={review.id} marker="□" title={review.weekStart ? fullDate(review.weekStart) : "날짜 없음"} subtitle={(review.win || review.text || review.focus || review.memo || "").slice(0, 70) || "내용 없음"} onClick={() => p.setScreen({ type: "review-form", item: { ...review, win: review.win || review.text || "" } })} />)}
+        {!p.reviews.length && <Empty text="지난 리뷰 없음" />}
+      </Section>
+    </>
+  );
+}
+
+function SettingsView(p) {
+  return (
+    <>
+      <PageHeader icon="⚙️" title="설정" subtitle="라이브러리, 루틴, 목표, 데이터" />
+      <Tabs value={p.settingsView} onChange={p.setSettingsView} items={[
+        { value: "libraries", label: "라이브러리" },
+        { value: "routine", label: "루틴" },
+        { value: "goals", label: "목표" },
+        { value: "data", label: "데이터" },
+      ]} />
+      {p.settingsView === "libraries" && (
+        <div className="desktop-grid">
+          <Section title="피아노 라이브러리 관리">
+            <Row marker="♪" title={`곡 ${p.pieces.length}개`} subtitle="피아노 탭에서 추가/수정" onClick={() => { p.setPianoView("pieces"); p.openTab("piano"); }} />
+            <Row marker="♪" title={`테크닉 ${p.techniques.length}개`} subtitle="피아노 탭에서 추가/수정" onClick={() => { p.setPianoView("techniques"); p.openTab("piano"); }} />
+          </Section>
+          <Section title="운동 항목 관리">
+            <Row marker="□" title={`운동 ${p.exercises.length}개`} subtitle="운동 탭에서 추가/수정" onClick={() => { p.setExerciseView("library"); p.openTab("exercise"); }} />
+          </Section>
+        </div>
+      )}
+      {p.settingsView === "routine" && <RoutineSettings {...p} />}
+      {p.settingsView === "goals" && <GoalSettings {...p} />}
+      {p.settingsView === "data" && <DataSettings {...p} />}
+    </>
+  );
+}
+function RoutineSettings(p) {
+  const setPianoRoutine = (items) => p.updateSettings({ pianoRoutine: items });
+  const setExerciseRoutine = (items) => p.updateSettings({ exerciseRoutine: items });
+  return (
+    <div className="desktop-grid">
+      <Section title="피아노 루틴" action={<button className="section-action" onClick={() => p.setScreen({ type: "piano-routine-form" })}>+ 추가</button>}>
+        {p.settings.pianoRoutine.map((item) => <Row key={item.id} marker="♪" title={item.kind === "piece" ? (p.pieceMap[item.targetId] && p.pieceMap[item.targetId].title) || "삭제된 곡" : (p.techniqueMap[item.targetId] && p.techniqueMap[item.targetId].title) || "삭제된 테크닉"} subtitle={`${DAYS[item.day]}요일 · ${item.duration || 30}분`} right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); setPianoRoutine(p.settings.pianoRoutine.filter((x) => x.id !== item.id)); }}>삭제</button>} />)}
+      </Section>
+      <Section title="운동 루틴" action={<button className="section-action" onClick={() => p.setScreen({ type: "exercise-routine-form" })}>+ 추가</button>}>
+        {p.settings.exerciseRoutine.map((item) => <Row key={item.id} marker="□" title={(p.exerciseMap[item.exerciseId] && p.exerciseMap[item.exerciseId].name) || "삭제된 운동"} subtitle={`${DAYS[item.day]}요일 · ${routineExerciseText(item)}`} right={<button className="button ghost" onClick={(e) => { e.stopPropagation(); setExerciseRoutine(p.settings.exerciseRoutine.filter((x) => x.id !== item.id)); }}>삭제</button>} />)}
+      </Section>
+    </div>
+  );
+}
+function GoalSettings(p) {
+  const goals = p.settings.goals;
+  return (
+    <Section title="목표 설정">
+      <div className="row" style={{ cursor: "default" }}>
+        <div className="marker">♪</div>
+        <div className="row-main"><div className="row-title">주간 피아노 시간</div><div className="row-sub">분 단위</div></div>
+        <input className="input" style={{ width: 92 }} type="number" value={goals.weeklyPianoMinutes} onChange={(e) => p.updateSettings({ goals: { ...goals, weeklyPianoMinutes: Number(e.target.value) || 0 } })} />
+      </div>
+      <div className="row" style={{ cursor: "default" }}>
+        <div className="marker">□</div>
+        <div className="row-main"><div className="row-title">주간 운동 횟수</div><div className="row-sub">세션 수</div></div>
+        <input className="input" style={{ width: 92 }} type="number" value={goals.weeklyExerciseCount} onChange={(e) => p.updateSettings({ goals: { ...goals, weeklyExerciseCount: Number(e.target.value) || 0 } })} />
+      </div>
+    </Section>
+  );
+}
+function DataSettings(p) {
+  const exportBackup = () => {
+    const data = {};
+    ALL_BACKUP_KEYS.forEach((key) => { data[key] = readJSON(key, null); });
+    const backup = { schemaVersion: 3, exportedAt: new Date().toISOString(), appVersion: "piano-fitness-redesign", data };
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const filename = `opus-flow-backup-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}.json`;
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
     URL.revokeObjectURL(url);
   };
-  const impData=e=>{
-    const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();
-    r.onload=ev=>{
-      let obj;try{obj=JSON.parse(ev.target.result);}catch(err){alert("파일을 읽을 수 없습니다");return;}
-      if(!obj||obj.schemaVersion!==1||!obj.data||typeof obj.data!=="object"){alert("지원하지 않는 백업 파일입니다");return;}
-      if(!confirm("현재 데이터가 모두 교체됩니다. 계속하시겠어요?"))return;
-      Object.entries(obj.data).forEach(([k,v])=>{if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));});
+  const importBackup = (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      let backup;
+      try { backup = JSON.parse(ev.target.result); } catch (error) { alert("파일을 읽을 수 없습니다"); return; }
+      if (!backup || !backup.data || typeof backup.data !== "object" || ![1,2,3].includes(Number(backup.schemaVersion))) {
+        alert("지원하지 않는 백업 파일입니다");
+        return;
+      }
+      if (!confirm("현재 데이터가 백업 파일 내용으로 교체됩니다. 계속하시겠어요?")) return;
+      LEGACY_KEYS.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(backup.data, key)) writeJSON(key, backup.data[key]);
+      });
+      writeJSON(KEYS.pieces, backup.data[KEYS.pieces] || backup.data["of3-pieces"] || defPieces);
+      writeJSON(KEYS.techniques, backup.data[KEYS.techniques] || backup.data["of3-techniques"] || defTechniques);
+      writeJSON(KEYS.pianoSessions, backup.data[KEYS.pianoSessions] || migrateOldPianoSessions(backup.data) || []);
+      writeJSON(KEYS.exercises, backup.data[KEYS.exercises] || defExercises);
+      writeJSON(KEYS.exerciseSessions, backup.data[KEYS.exerciseSessions] || []);
+      writeJSON(KEYS.settings, backup.data[KEYS.settings] || defSettings);
       location.reload();
     };
-    r.readAsText(f);e.target.value="";
+    reader.readAsText(file);
+    event.target.value = "";
   };
-  const lastSes=sessions.length?sessions.map(x=>x.date).sort().slice(-1)[0]:null;
-  return(<div className="fi"><div style={{...H1,marginBottom:20}}>설정</div>
-    <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>{[["horizon","장기 목표"],["category","카테고리"],["routine","루틴"],["goals","주간 목표"],["data","데이터"]].map(x=><button key={x[0]} style={tg(stab===x[0])} onClick={()=>setStab(x[0])}>{x[1]}</button>)}</div>
-    {stab==="horizon"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>장기 목표</span><button style={btnS} onClick={()=>nav("eH",{title:"",icon:"🎯",target:10})}>+ 추가</button></div>
-      {horizons.map(h=>{const linked=works.filter(w=>(w.horizonIds||[]).indexOf(h.id)>=0&&["complete","repertoire","concert"].indexOf(w.status)>=0).length;return(<div key={h.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eH",{...h})}><div style={rb}><span style={{fontWeight:700}}>{h.icon} {h.title}</span><span style={{color:C.ac,fontWeight:700}}>{linked}/{h.target}</span></div></div>);})}</div>}
-    {stab==="category"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>카테고리</span><button style={btnS} onClick={()=>nav("eC",{label:"",icon:"🎵"})}>+ 추가</button></div>
-      {cats.map(c=>(<div key={c.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eC",{...c})}><span style={{fontSize:20,marginRight:12}}>{c.icon}</span><span style={{fontWeight:600}}>{c.label}</span></div>))}</div>}
-    {stab==="routine"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>탭하여 수정</div>
-      <div style={{display:"grid",gridTemplateColumns:"auto repeat(7,1fr)",gap:4}}><div/>{DAYS_KR.map((d,i)=><div key={i} style={{textAlign:"center",color:C.txD,fontSize:10,padding:"4px 0",fontWeight:700}}>{d}</div>)}
-        {["morning","evening"].map(slot=>{const cells=[<div key={slot+"l"} style={{color:C.txM,fontSize:10,padding:"8px 2px",fontWeight:700}}>{SLOTS[slot]}</div>];
-          for(let day=0;day<7;day++){const d=day;const r=routine.find(x=>x.day===d&&x.slot===slot);cells.push(<div key={d} style={{textAlign:"center",padding:"10px 2px",background:C.bg1,borderRadius:8,cursor:"pointer",fontSize:16,border:"1px solid "+C.bd}} onClick={()=>nav("eRS",{day:d,slot})}>{r?gc(r.type).icon:"·"}</div>);}return cells;})}</div></div>}
-    {stab==="goals"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>카테고리별 주간 목표</div>
-      {cats.map(c=>{const g=goals.find(x=>x.categoryId===c.id);return(<div key={c.id} style={{...cd,display:"flex",alignItems:"center",gap:12}}><span style={{flex:1,fontSize:15,fontWeight:600}}>{c.icon} {c.label}</span>
-        <input type="number" style={{...inp,width:64,marginBottom:0,textAlign:"center",padding:8}} value={g?g.target:0} onChange={e=>{const v=parseInt(e.target.value)||0;const ex=goals.find(x=>x.categoryId===c.id);if(ex)setGoals(goals.map(x=>x.categoryId===c.id?{...x,target:v}:x));else setGoals([...goals,{categoryId:c.id,target:v}]);}}/>
-        <span style={{color:C.txD,fontSize:13}}>회</span></div>);})}</div>}
-    {stab==="data"&&<div>
-      <div style={cd}><div style={H3}>현재 저장된 데이터</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>{[["곡",works.length],["세션",sessions.length],["리뷰",reviews.length],["카테고리",cats.length]].map(x=>(<div key={x[0]} style={{textAlign:"center"}}><div style={{fontSize:20,fontWeight:800}}>{x[1]}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>{x[0]}</div></div>))}</div>
-        <div style={{color:C.txM,fontSize:13,fontWeight:500}}>마지막 활동 <span style={{color:C.tx,fontWeight:600,marginLeft:6}}>{lastSes?fmtFull(lastSes):"없음"}</span></div></div>
-      <div style={cd}><div style={H3}>백업 내보내기</div><button style={btnS} onClick={expData}>JSON 파일로 저장</button></div>
-      <div style={cd}><div style={H3}>백업 불러오기</div><label style={{...btnS,display:"inline-block"}}>JSON 파일 선택<input type="file" accept="application/json,.json" style={{display:"none"}} onChange={impData}/></label></div></div>}</div>);
+  return (
+    <>
+      <Section title="데이터 요약">
+        <Row marker="♪" title={`피아노 곡 ${p.pieces.length}개 · 테크닉 ${p.techniques.length}개`} subtitle={`피아노 세션 ${p.pianoSessions.length}개`} />
+        <Row marker="□" title={`운동 항목 ${p.exercises.length}개`} subtitle={`운동 세션 ${p.exerciseSessions.length}개`} />
+        <Row marker="📅" title={`리뷰 ${p.reviews.length}개`} subtitle={`마지막 활동 ${p.lastActivity ? fullDate(p.lastActivity) : "없음"}`} />
+      </Section>
+      <Section title="백업/복원">
+        <Row marker="↓" title="백업 내보내기" subtitle="schemaVersion 3 JSON" onClick={exportBackup} />
+        <div className="row" style={{ cursor: "default" }}>
+          <div className="marker">↑</div>
+          <div className="row-main"><div className="row-title">백업 불러오기</div><div className="row-sub">기존 v1/v2 백업 호환</div></div>
+          <label className="button">선택<input type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importBackup} /></label>
+        </div>
+      </Section>
+    </>
+  );
+}
+function migrateOldPianoSessions(data) {
+  const pieceSessions = data["of3-piece-sessions"];
+  const techniqueSessions = data["of3-technique-sessions"];
+  if (!Array.isArray(pieceSessions) && !Array.isArray(techniqueSessions)) return null;
+  return [
+    ...(Array.isArray(pieceSessions) ? pieceSessions.map((s) => ({ id: s.id || uid(), date: s.date, type: "piece", targetId: s.pieceId, duration: s.duration, section: s.section || "", bpm: "", repetitions: "", note: s.note || "", feeling: s.feeling || "" })) : []),
+    ...(Array.isArray(techniqueSessions) ? techniqueSessions.map((s) => ({ id: s.id || uid(), date: s.date, type: "technique", targetId: s.techniqueId, duration: s.duration, section: "", bpm: s.bpm || "", repetitions: s.repetitions || "", note: s.note || "", feeling: s.feeling || "" })) : []),
+  ];
 }
 
-// === SESSION FORM ===
-function SessForm(p){const{init,cats,works,isComp,canDel,gc,onSave,onDel,onClose,tg,btn,btnS,btnD,btnG,inp,ta,bk,H1,H3,ck,P,CT,C}=p;
-  const[f,setF]=useState({date:init.date||today(),type:init.type,slot:init.slot||"free",linkedWorkId:init.linkedWorkId||null,note:init.note||"",duration:init.duration||30,checklist:init.checklist||[],id:init.id||null});
-  const[nc,setNc]=useState("");const u=patch=>setF(prev=>({...prev,...patch}));
-  const aw=works.filter(w=>["sketch","wip","complete"].indexOf(w.status)>=0);
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button>
-    <div style={{...H1,marginBottom:24}}>{isComp?"세션 기록":f.id?"세션 수정":"세션 추가"}</div>
-    {isComp&&f.duration?(<div style={{textAlign:"center",marginBottom:28}}><div style={{fontSize:52,fontWeight:200,color:C.ac}}>{f.duration}분</div><div style={{color:C.txM,fontSize:14,marginTop:6,fontWeight:500}}>{gc(f.type).icon} {gc(f.type).label} · {SLOTS[f.slot]}</div></div>
-    ):(<div><div style={{marginBottom:16}}><div style={H3}>날짜</div><input type="date" style={inp} value={f.date} onChange={e=>u({date:e.target.value})}/></div>
-      <div style={{marginBottom:16}}><div style={H3}>종류</div><div style={{display:"flex",flexWrap:"wrap"}}>{cats.map(c=><button key={c.id} style={tg(f.type===c.id)} onClick={()=>u({type:c.id})}>{c.icon} {c.label}</button>)}</div></div>
-      <div style={{marginBottom:16}}><div style={H3}>시간</div><div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:10}}>{DUR_PRE.map(d=><button key={d} style={tg(f.duration===d)} onClick={()=>u({duration:d})}>{d}분</button>)}</div><input type="number" style={{...inp,width:110}} value={f.duration} onChange={e=>u({duration:parseInt(e.target.value)||0})} placeholder="직접 입력"/></div></div>)}
-    <div style={{marginBottom:16}}><div style={H3}>연결 곡</div><div style={{display:"flex",flexWrap:"wrap"}}><button style={tg(!f.linkedWorkId)} onClick={()=>u({linkedWorkId:null})}>없음</button>{aw.map(w=><button key={w.id} style={tg(f.linkedWorkId===w.id)} onClick={()=>u({linkedWorkId:w.id})}>{w.title}</button>)}</div></div>
-    <div style={{marginBottom:16}}><div style={H3}>체크리스트</div>{(f.checklist||[]).map(c=>(<div key={c.id} style={{display:"flex",alignItems:"center",gap:12,padding:"7px 0"}}><div style={ck(c.done)} onClick={()=>u({checklist:f.checklist.map(x=>x.id===c.id?{...x,done:!x.done}:x)})}>{c.done?"✓":""}</div>
-      <span style={{flex:1,fontSize:14,textDecoration:c.done?"line-through":"none",color:c.done?C.txD:C.tx,fontWeight:500}}>{c.text}</span><button style={{...btnG,color:C.txD,padding:4}} onClick={()=>u({checklist:f.checklist.filter(x=>x.id!==c.id)})}>×</button></div>))}
-      <div style={{display:"flex",gap:8}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="항목 추가" value={nc} onChange={e=>setNc(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}/>
-        <button style={btnS} onClick={()=>{if(nc.trim()){u({checklist:[...f.checklist,{id:uid(),text:nc,done:false}]});setNc("");}}}>+</button></div></div>
-    <div style={{marginBottom:24}}><div style={H3}>메모</div><textarea style={{...ta,height:80}} value={f.note} onChange={e=>u({note:e.target.value})}/></div>
-    <button style={{...btn,width:"100%"}} onClick={()=>onSave(f)}>저장</button>
-    {canDel&&onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
+function Overlay({ screen, onClose, ...p }) {
+  return (
+    <div className="overlay">
+      <div className="overlay-inner">
+        <button className="back" onClick={onClose}>← 닫기</button>
+        {screen.type === "piece-form" && <PieceForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "technique-form" && <TechniqueForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "exercise-form" && <ExerciseForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "piano-session" && <PianoSessionForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "exercise-session" && <ExerciseSessionForm data={screen.data} onClose={onClose} {...p} />}
+        {screen.type === "review-form" && <ReviewForm item={screen.item} onClose={onClose} {...p} />}
+        {screen.type === "day-detail" && <DayDetail date={screen.date} {...p} />}
+        {screen.type === "focus-picker" && <FocusPicker onClose={onClose} {...p} />}
+        {screen.type === "piano-routine-form" && <PianoRoutineForm onClose={onClose} {...p} />}
+        {screen.type === "exercise-routine-form" && <ExerciseRoutineForm onClose={onClose} {...p} />}
+      </div>
+    </div>
+  );
+}
+function PieceForm({ item, pieces, setPieces, setMonthFocus, monthFocus, onClose }) {
+  const [form, setForm] = useState(item || { title: "", composer: "", opus: "", currentSection: "", status: "active", notes: "" });
+  const save = () => {
+    if (!form.title.trim()) return;
+    if (form.id) setPieces(pieces.map((piece) => piece.id === form.id ? form : piece));
+    else setPieces([...pieces, { ...form, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("곡을 삭제하시겠어요?")) return;
+    setPieces(pieces.filter((piece) => piece.id !== form.id));
+    setMonthFocus({ pieceIds: (monthFocus.pieceIds || []).filter((id) => id !== form.id) });
+    onClose();
+  };
+  return <ItemFormFrame icon="🎹" title={form.id ? "곡 수정" : "새 곡"} form={form} setForm={setForm} save={save} remove={form.id && remove} fields="piece" />;
+}
+function TechniqueForm({ item, techniques, setTechniques, onClose }) {
+  const [form, setForm] = useState(item || { title: "", category: "하농", targetBPM: 80, currentBPM: 60, status: "active", notes: "" });
+  const save = () => {
+    if (!form.title.trim()) return;
+    const next = { ...form, targetBPM: Number(form.targetBPM) || 0, currentBPM: Number(form.currentBPM) || 0 };
+    if (next.id) setTechniques(techniques.map((technique) => technique.id === next.id ? next : technique));
+    else setTechniques([...techniques, { ...next, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("테크닉을 삭제하시겠어요?")) return;
+    setTechniques(techniques.filter((technique) => technique.id !== form.id));
+    onClose();
+  };
+  return <ItemFormFrame icon="🎹" title={form.id ? "테크닉 수정" : "새 테크닉"} form={form} setForm={setForm} save={save} remove={form.id && remove} fields="technique" />;
+}
+function ExerciseForm({ item, exercises, setExercises, onClose }) {
+  const [form, setForm] = useState(item || { name: "", category: "근력", unit: "회", notes: "", status: "active" });
+  const save = () => {
+    if (!form.name.trim()) return;
+    if (form.id) setExercises(exercises.map((exercise) => exercise.id === form.id ? form : exercise));
+    else setExercises([...exercises, { ...form, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("운동 항목을 삭제하시겠어요?")) return;
+    setExercises(exercises.filter((exercise) => exercise.id !== form.id));
+    onClose();
+  };
+  return <ItemFormFrame icon="🏃" title={form.id ? "운동 수정" : "새 운동"} form={form} setForm={setForm} save={save} remove={form.id && remove} fields="exercise" />;
+}
+function ItemFormFrame({ icon, title, form, setForm, save, remove, fields }) {
+  return (
+    <>
+      <PageHeader icon={icon} title={title} />
+      {fields === "piece" && <>
+        <Field label="제목"><input className="input" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+        <Field label="작곡가"><input className="input" value={form.composer || ""} onChange={(e) => setForm({ ...form, composer: e.target.value })} /></Field>
+        <Field label="Opus"><input className="input" value={form.opus || ""} onChange={(e) => setForm({ ...form, opus: e.target.value })} /></Field>
+        <Field label="현재 구간"><input className="input" value={form.currentSection || ""} onChange={(e) => setForm({ ...form, currentSection: e.target.value })} /></Field>
+      </>}
+      {fields === "technique" && <>
+        <Field label="제목"><input className="input" value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></Field>
+        <Field label="분류"><select className="select" value={form.category || "하농"} onChange={(e) => setForm({ ...form, category: e.target.value })}>{TECH_CATEGORIES.map((value) => <option key={value}>{value}</option>)}</select></Field>
+        <div className="inline-fields">
+          <Field label="현재 BPM"><input className="input" type="number" value={form.currentBPM || 0} onChange={(e) => setForm({ ...form, currentBPM: Number(e.target.value) || 0 })} /></Field>
+          <Field label="목표 BPM"><input className="input" type="number" value={form.targetBPM || 0} onChange={(e) => setForm({ ...form, targetBPM: Number(e.target.value) || 0 })} /></Field>
+        </div>
+      </>}
+      {fields === "exercise" && <>
+        <Field label="이름"><input className="input" value={form.name || ""} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+        <Field label="분류"><select className="select" value={form.category || "근력"} onChange={(e) => setForm({ ...form, category: e.target.value })}>{EXERCISE_CATEGORIES.map((value) => <option key={value}>{value}</option>)}</select></Field>
+        <Field label="단위"><select className="select" value={form.unit || "회"} onChange={(e) => setForm({ ...form, unit: e.target.value })}>{EXERCISE_UNITS.map((value) => <option key={value}>{value}</option>)}</select></Field>
+      </>}
+      <Field label="상태"><select className="select" value={form.status || "active"} onChange={(e) => setForm({ ...form, status: e.target.value })}><option value="active">활성</option><option value="paused">일시중지</option><option value="archived">보관</option></select></Field>
+      <Field label="메모"><textarea className="textarea" value={form.notes || ""} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></Field>
+      <div className="button-row"><button className="button" onClick={save}>저장</button>{remove && <button className="button danger" onClick={remove}>삭제</button>}</div>
+    </>
+  );
+}
+function PianoSessionForm({ data, pieces, techniques, setPianoSessions, setTechniques, onClose }) {
+  const [form, setForm] = useState({ date: today(), type: "piece", targetId: pieces[0] && pieces[0].id || "", duration: 30, section: "", bpm: "", repetitions: "", note: "", feeling: "", ...(data || {}) });
+  const targets = form.type === "piece" ? pieces : techniques;
+  const save = () => {
+    if (!form.targetId) return;
+    const next = { ...form, duration: Number(form.duration) || 0, bpm: form.bpm === "" ? "" : Number(form.bpm) || 0, repetitions: form.repetitions === "" ? "" : Number(form.repetitions) || 0 };
+    setPianoSessions((prev) => [...prev, { ...next, id: uid() }]);
+    if (next.type === "technique" && next.bpm) {
+      setTechniques((prev) => prev.map((tech) => tech.id === next.targetId ? { ...tech, currentBPM: Math.max(Number(tech.currentBPM) || 0, Number(next.bpm) || 0) } : tech));
+    }
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title="피아노 세션" />
+      <Field label="날짜"><input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
+      <Field label="종류"><select className="select" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, targetId: e.target.value === "piece" ? (pieces[0] && pieces[0].id || "") : (techniques[0] && techniques[0].id || "") })}><option value="piece">곡</option><option value="technique">테크닉</option></select></Field>
+      <Field label="항목"><select className="select" value={form.targetId} onChange={(e) => setForm({ ...form, targetId: e.target.value })}>{targets.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></Field>
+      <div className="inline-fields">
+        <Field label="시간"><input type="number" className="input" value={form.duration} onChange={(e) => setForm({ ...form, duration: Number(e.target.value) || 0 })} /></Field>
+        <Field label="BPM"><input type="number" className="input" value={form.bpm} onChange={(e) => setForm({ ...form, bpm: e.target.value })} /></Field>
+      </div>
+      <div className="inline-fields">
+        <Field label="구간"><input className="input" value={form.section} onChange={(e) => setForm({ ...form, section: e.target.value })} /></Field>
+        <Field label="반복"><input type="number" className="input" value={form.repetitions} onChange={(e) => setForm({ ...form, repetitions: e.target.value })} /></Field>
+      </div>
+      <Field label="느낌"><input className="input" value={form.feeling} onChange={(e) => setForm({ ...form, feeling: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>저장</button>
+    </>
+  );
+}
+function ExerciseSessionForm({ data, exercises, setExerciseSessions, onClose }) {
+  const [form, setForm] = useState({ date: today(), exerciseId: exercises[0] && exercises[0].id || "", sets: "", reps: "", weight: "", duration: "", distance: "", note: "", feeling: "", ...(data || {}) });
+  const save = () => {
+    if (!form.exerciseId) return;
+    setExerciseSessions((prev) => [...prev, { ...form, id: uid(), sets: numberOrEmpty(form.sets), reps: numberOrEmpty(form.reps), weight: numberOrEmpty(form.weight), duration: numberOrEmpty(form.duration), distance: numberOrEmpty(form.distance) }]);
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🏃" title="운동 세션" />
+      <Field label="날짜"><input type="date" className="input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></Field>
+      <Field label="운동"><select className="select" value={form.exerciseId} onChange={(e) => setForm({ ...form, exerciseId: e.target.value })}>{exercises.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>
+      <div className="inline-fields"><Field label="세트"><input type="number" className="input" value={form.sets} onChange={(e) => setForm({ ...form, sets: e.target.value })} /></Field><Field label="반복"><input type="number" className="input" value={form.reps} onChange={(e) => setForm({ ...form, reps: e.target.value })} /></Field></div>
+      <div className="inline-fields"><Field label="무게"><input type="number" className="input" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} /></Field><Field label="시간"><input type="number" className="input" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} /></Field></div>
+      <Field label="거리"><input type="number" className="input" value={form.distance} onChange={(e) => setForm({ ...form, distance: e.target.value })} /></Field>
+      <Field label="느낌"><input className="input" value={form.feeling} onChange={(e) => setForm({ ...form, feeling: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>저장</button>
+    </>
+  );
+}
+const numberOrEmpty = (value) => value === "" ? "" : Number(value) || 0;
+function ReviewForm({ item, reviews, setReviews, onClose }) {
+  const [form, setForm] = useState(item || { weekStart: weekStart(today()), win: "", focus: "", memo: "" });
+  const save = () => {
+    if (form.id) setReviews(reviews.map((review) => review.id === form.id ? { ...form, updatedAt: today() } : review));
+    else setReviews([...reviews, { ...form, id: uid(), createdAt: today() }]);
+    onClose();
+  };
+  const remove = () => {
+    if (!form.id || !confirm("리뷰를 삭제하시겠어요?")) return;
+    setReviews(reviews.filter((review) => review.id !== form.id));
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="📅" title="주간 리뷰" subtitle={fullDate(form.weekStart)} />
+      <Field label="잘한 것"><textarea className="textarea" value={form.win || ""} onChange={(e) => setForm({ ...form, win: e.target.value })} /></Field>
+      <Field label="다음 주 집중"><textarea className="textarea" value={form.focus || ""} onChange={(e) => setForm({ ...form, focus: e.target.value })} /></Field>
+      <Field label="메모"><textarea className="textarea" value={form.memo || ""} onChange={(e) => setForm({ ...form, memo: e.target.value })} /></Field>
+      <div className="button-row"><button className="button" onClick={save}>저장</button>{form.id && <button className="button danger" onClick={remove}>삭제</button>}</div>
+    </>
+  );
+}
+function DayDetail({ date, pianoSessions, exerciseSessions, pianoItemName, exerciseMap }) {
+  const piano = pianoSessions.filter((session) => session.date === date);
+  const exercise = exerciseSessions.filter((session) => session.date === date);
+  return (
+    <>
+      <PageHeader icon="📅" title={fullDate(date)} subtitle={`${piano.length + exercise.length}세션`} />
+      <Section title="피아노">{piano.map((session) => <Row key={session.id} marker="♪" title={pianoItemName(session) || "피아노"} subtitle={`${minText(session.duration)} · ${session.feeling || session.note || "메모 없음"}`} />)}{!piano.length && <Empty />}</Section>
+      <Section title="운동">{exercise.map((session) => <Row key={session.id} marker="□" title={(exerciseMap[session.exerciseId] && exerciseMap[session.exerciseId].name) || "운동"} subtitle={`${exerciseSummary(session)} · ${session.feeling || session.note || "메모 없음"}`} />)}{!exercise.length && <Empty />}</Section>
+    </>
+  );
+}
+function FocusPicker({ pieces, techniques, monthFocus, setMonthFocus, onClose }) {
+  const hasPiece = (id) => (monthFocus.pieceIds || []).includes(id);
+  const hasTechnique = (id) => (monthFocus.techniqueIds || []).includes(id);
+  return (
+    <>
+      <PageHeader icon="🎹" title="집중 항목" />
+      <Section title="곡">{pieces.map((piece) => <Row key={piece.id} marker={hasPiece(piece.id) ? "✓" : "♪"} title={piece.title} subtitle={piece.composer || "작곡가 미정"} onClick={() => setMonthFocus({ pieceIds: hasPiece(piece.id) ? monthFocus.pieceIds.filter((id) => id !== piece.id) : [...(monthFocus.pieceIds || []), piece.id] })} />)}</Section>
+      <Section title="테크닉">{techniques.map((technique) => <Row key={technique.id} marker={hasTechnique(technique.id) ? "✓" : "♪"} title={technique.title} subtitle={technique.category} onClick={() => setMonthFocus({ techniqueIds: hasTechnique(technique.id) ? monthFocus.techniqueIds.filter((id) => id !== technique.id) : [...(monthFocus.techniqueIds || []), technique.id] })} />)}</Section>
+      <button className="button full" style={{ marginTop: 18 }} onClick={onClose}>완료</button>
+    </>
+  );
+}
+function PianoRoutineForm({ pieces, techniques, settings, updateSettings, onClose }) {
+  const [form, setForm] = useState({ day: 1, kind: "piece", targetId: pieces[0] && pieces[0].id || "", duration: 30 });
+  const targets = form.kind === "piece" ? pieces : techniques;
+  const save = () => {
+    updateSettings({ pianoRoutine: [...settings.pianoRoutine, { ...form, id: uid(), duration: Number(form.duration) || 30 }] });
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🎹" title="피아노 루틴 추가" />
+      <RoutineCommon form={form} setForm={setForm} />
+      <Field label="종류"><select className="select" value={form.kind} onChange={(e) => setForm({ ...form, kind: e.target.value, targetId: e.target.value === "piece" ? (pieces[0] && pieces[0].id || "") : (techniques[0] && techniques[0].id || "") })}><option value="piece">곡</option><option value="technique">테크닉</option></select></Field>
+      <Field label="항목"><select className="select" value={form.targetId} onChange={(e) => setForm({ ...form, targetId: e.target.value })}>{targets.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}</select></Field>
+      <Field label="목표 시간"><input className="input" type="number" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>추가</button>
+    </>
+  );
+}
+function ExerciseRoutineForm({ exercises, settings, updateSettings, onClose }) {
+  const [form, setForm] = useState({ day: 1, exerciseId: exercises[0] && exercises[0].id || "", sets: "", reps: "", duration: "" });
+  const save = () => {
+    updateSettings({ exerciseRoutine: [...settings.exerciseRoutine, { ...form, id: uid(), sets: numberOrEmpty(form.sets), reps: numberOrEmpty(form.reps), duration: numberOrEmpty(form.duration) }] });
+    onClose();
+  };
+  return (
+    <>
+      <PageHeader icon="🏃" title="운동 루틴 추가" />
+      <RoutineCommon form={form} setForm={setForm} />
+      <Field label="운동"><select className="select" value={form.exerciseId} onChange={(e) => setForm({ ...form, exerciseId: e.target.value })}>{exercises.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></Field>
+      <div className="inline-fields"><Field label="세트"><input className="input" type="number" value={form.sets} onChange={(e) => setForm({ ...form, sets: e.target.value })} /></Field><Field label="반복/초"><input className="input" type="number" value={form.reps} onChange={(e) => setForm({ ...form, reps: e.target.value })} /></Field></div>
+      <Field label="시간"><input className="input" type="number" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} /></Field>
+      <button className="button full" onClick={save}>추가</button>
+    </>
+  );
+}
+function RoutineCommon({ form, setForm }) {
+  return <Field label="요일"><select className="select" value={form.day} onChange={(e) => setForm({ ...form, day: Number(e.target.value) })}>{DAYS.map((day, index) => <option key={day} value={index}>{day}요일</option>)}</select></Field>;
 }
 
-// === WORK DETAIL ===
-function WDetail(p){const{w,wSes,ttm,tcnt,r30,horizons,gc,onUpdate,onEdit,onDel,onAddLink,onRemLink,onStart,onClose,tg,btn,btnS,btnG,btnD,inp,bk,H1,H3,rb,pl,cd,em,P,CT,C}=p;
-  const[li,setLi]=useState("");
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 뒤로</button>
-    <div style={{...rb,marginBottom:8}}><div style={{...H1,marginBottom:0}}>{w.title}</div><div><button style={btnG} onClick={onEdit}>수정</button><button style={{...btnG,color:C.rd}} onClick={onDel}>삭제</button></div></div>
-    <div style={{color:C.txM,fontSize:14,marginBottom:24,fontWeight:500}}>{w.instrumentation||"편성 미정"}</div>
-    <div style={{...cd,display:"flex",justifyContent:"space-around",textAlign:"center",padding:"20px 18px"}}>
-      <div><div style={{fontSize:22,fontWeight:800,color:C.ac}}>{minStr(ttm)}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>총 투자</div></div><div style={{width:1,background:C.bd}}/>
-      <div><div style={{fontSize:22,fontWeight:800}}>{tcnt}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>세션</div></div><div style={{width:1,background:C.bd}}/>
-      <div><div style={{fontSize:22,fontWeight:800}}>{r30}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>최근30일</div></div></div>
-    <div style={cd}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(w.status===st),background:w.status===st?STATUS_COLORS[st]+"18":"transparent",color:w.status===st?STATUS_COLORS[st]:C.txD,border:w.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>onUpdate({...w,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
-    <div style={cd}><div style={H3}>장기 목표</div><div style={{display:"flex",flexWrap:"wrap"}}>{horizons.map(h=>{const has=(w.horizonIds||[]).indexOf(h.id)>=0;return(<button key={h.id} style={tg(has)} onClick={()=>{const ids=w.horizonIds||[];onUpdate({...w,horizonIds:has?ids.filter(x=>x!==h.id):[...ids,h.id]});}}>{h.icon} {h.title}</button>);})}</div></div>
-    {w.notes&&<div style={cd}><div style={H3}>메모</div><div style={{fontSize:14,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{w.notes}</div></div>}
-    <div style={cd}><div style={H3}>자료 링크 ({(w.links||[]).length})</div>{(w.links||[]).map(l=>(<div key={l.id} style={{...rb,padding:"8px 0",borderBottom:"1px solid "+C.bd}}>
-      <a href={l.url} target="_blank" rel="noopener noreferrer" style={{color:C.ac,textDecoration:"none",fontSize:13,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"80%"}}>{l.name||l.url}</a>
-      <button style={{...btnG,padding:4,color:C.txD}} onClick={()=>onRemLink(l.id)}>×</button></div>))}
-      <div style={{display:"flex",gap:8,marginTop:10}}><input style={{...inp,flex:1,marginBottom:0}} placeholder="URL 추가" value={li} onChange={e=>setLi(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){onAddLink(li);setLi("");}}}/>
-        <button style={btnS} onClick={()=>{onAddLink(li);setLi("");}}>+</button></div></div>
-    <div style={cd}><div style={H3}>세션 기록</div>{wSes.length===0?<div style={em}>아직 세션이 없습니다</div>:wSes.slice(0,10).map(ss=>(
-      <div key={ss.id} style={{padding:"10px 0",borderBottom:"1px solid "+C.bd}}><div style={rb}><span style={{color:C.txM,fontSize:12,fontWeight:500}}>{fmtFull(ss.date)}</span><span style={{color:C.ac,fontSize:13,fontWeight:700}}>{ss.duration}분</span></div>
-        <div style={{fontSize:13,marginTop:3,fontWeight:500}}>{gc(ss.type).icon} {gc(ss.type).label}</div>{ss.note&&<div style={{color:C.txD,fontSize:12,marginTop:3}}>{ss.note}</div>}</div>))}
-      {wSes.length>10&&<div style={{color:C.txD,fontSize:12,textAlign:"center",padding:"10px 0"}}>+{wSes.length-10}개 더</div>}</div>
-    <button style={{...btn,width:"100%",marginTop:10}} onClick={onStart}>이 곡으로 세션 시작</button></div></div>);
-}
-
-// === WORK FORM ===
-function WForm(p){const{data,onSave,onClose,tg,btn,inp,ta,bk,H1,H3,P,CT,C}=p;
-  const[f,setF]=useState({title:data&&data.title||"",status:data&&data.status||"idea",instrumentation:data&&data.instrumentation||"",notes:data&&data.notes||"",id:data&&data.id||null,horizonIds:data&&data.horizonIds||[],links:data&&data.links||[]});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"곡 수정":"새 곡"}</div>
-    <input style={inp} placeholder="제목" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
-    <input style={inp} placeholder="편성 (예: 피아노 솔로)" value={f.instrumentation} onChange={e=>setF({...f,instrumentation:e.target.value})}/>
-    <div style={{marginBottom:16}}><div style={H3}>상태</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{WORK_STATUS.map(st=>(<button key={st} style={{...tg(f.status===st),background:f.status===st?STATUS_COLORS[st]+"18":"transparent",color:f.status===st?STATUS_COLORS[st]:C.txD,border:f.status===st?"1.5px solid "+STATUS_COLORS[st]+"55":"1px solid "+C.bd}} onClick={()=>setF({...f,status:st})}>{STATUS_LABELS[st]}</button>))}</div></div>
-    <textarea style={{...ta,height:90,marginBottom:24}} placeholder="메모" value={f.notes} onChange={e=>setF({...f,notes:e.target.value})}/>
-    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button></div></div>);
-}
-
-// === REVIEW FORM ===
-function RForm(p){const{data,cats,gp,onSave,onDel,onClose,tg,btn,btnD,ta,bk,H1,H3,cd,P,CT,C}=p;
-  const[f,setF]=useState({weekStart:data&&data.weekStart||wkStart(today()),win:data&&(data.win||data.text)||"",focus:data&&data.focus||"",memo:data&&data.memo||"",id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:20}}>주간 리뷰</div>
-    <div style={{...cd,marginBottom:20}}><div style={{display:"flex",justifyContent:"space-around"}}>{cats.slice(0,5).map(c=>{const pp=gp(c.id);return <div key={c.id} style={{textAlign:"center"}}><div style={{fontSize:18}}>{c.icon}</div><div style={{fontSize:14,color:C.ac,fontWeight:700,marginTop:3}}>{pp.done}/{pp.goal}</div></div>;})}</div></div>
-    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.gn}}>✦</span> 이번 주 가장 잘한 것</div><textarea style={{...ta,height:90}} placeholder="가장 뿌듯했던 순간..." value={f.win} onChange={e=>setF({...f,win:e.target.value})}/></div>
-    <div style={{marginBottom:16}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.am}}>◎</span> 다음 주 집중할 것</div><textarea style={{...ta,height:90}} placeholder="다음 주 우선순위..." value={f.focus} onChange={e=>setF({...f,focus:e.target.value})}/></div>
-    <div style={{marginBottom:24}}><div style={{...H3,display:"flex",alignItems:"center",gap:6}}><span style={{color:C.txD}}>─</span> 기타 메모</div><textarea style={{...ta,height:70}} placeholder="자유 메모" value={f.memo} onChange={e=>setF({...f,memo:e.target.value})}/></div>
-    <button style={{...btn,width:"100%"}} onClick={()=>{if(f.win||f.focus||f.memo)onSave(f);}}>저장</button>
-    {onDel&&<button style={{...btnD,width:"100%",marginTop:12}} onClick={onDel}>삭제</button>}</div></div>);
-}
-
-// === CATEGORY FORM ===
-function CForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
-  const[f,setF]=useState({label:data&&data.label||"",icon:data&&data.icon||"🎵",id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"카테고리 수정":"새 카테고리"}</div>
-    <input style={inp} placeholder="이름" value={f.label} onChange={e=>setF({...f,label:e.target.value})}/>
-    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
-    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.label.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
-}
-
-// === HORIZON FORM ===
-function HForm(p){const{data,onSave,onDel,onClose,tg,btn,btnD,inp,bk,H1,H3,P,CT}=p;
-  const[f,setF]=useState({title:data&&data.title||"",icon:data&&data.icon||"🎯",target:data&&data.target||10,id:data&&data.id||null});
-  return(<div style={P}><div style={CT} className="fi"><button style={bk} onClick={onClose}>← 취소</button><div style={{...H1,marginBottom:24}}>{f.id?"목표 수정":"새 목표"}</div>
-    <input style={inp} placeholder="목표 이름" value={f.title} onChange={e=>setF({...f,title:e.target.value})}/>
-    <input style={inp} type="number" placeholder="목표 곡 수" value={f.target} onChange={e=>setF({...f,target:parseInt(e.target.value)||0})}/>
-    <div style={{marginBottom:20}}><div style={H3}>아이콘</div><div style={{display:"flex",flexWrap:"wrap",gap:8}}>{ICONS.slice(0,14).map(ic=><button key={ic} style={{...tg(f.icon===ic),fontSize:20,padding:"10px 14px"}} onClick={()=>setF({...f,icon:ic})}>{ic}</button>)}</div></div>
-    <div style={{display:"flex",gap:12}}><button style={btn} onClick={()=>{if(f.title.trim())onSave(f);}}>저장</button>{onDel&&<button style={btnD} onClick={onDel}>삭제</button>}</div></div></div>);
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
