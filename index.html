@@ -41,10 +41,10 @@ input,textarea,select{outline:none}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 ::selection{background:var(--blue-bg);color:var(--blue-text)}
 .app{min-height:100vh;background:var(--bg);color:var(--text)}
-.layout{max-width:1120px;margin:0 auto;min-height:100vh}
-.main{padding:28px 20px 92px;max-width:720px;margin:0 auto}
+.layout{max-width:390px;margin:0 auto;min-height:100vh}
+.main{padding:28px 20px 92px;max-width:390px;margin:0 auto}
 .mobile-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;border-top:1px solid var(--border);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 0 calc(8px + env(safe-area-inset-bottom))}
-.mobile-nav-inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.mobile-nav-inner{max-width:390px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
 .nav-button{border:0;background:transparent;color:var(--subtle);font-size:12px;font-weight:400;padding:10px 4px;cursor:pointer}
 .nav-button.active{color:var(--text);font-weight:650}
 .sidebar{display:none}
@@ -58,16 +58,16 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .property-label{font-size:14px;color:var(--muted);font-weight:400}
 .property-value{font-size:14px;color:var(--text);min-width:0}
 .section{margin-top:26px}
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .section-title{font-size:14px;font-weight:650;color:var(--text)}
 .section-action{border:0;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
-.row{display:flex;align-items:center;gap:10px;min-height:43px;padding:10px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .12s ease}
+.row{display:flex;align-items:center;gap:10px;min-height:66px;padding:12px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background .12s ease}
 .row:first-child{border-top:1px solid var(--border-soft)}
 .row:hover{background:var(--bg-soft)}
 .row:active{background:var(--bg-muted)}
-.marker{width:16px;flex:0 0 16px;color:var(--muted);font-size:14px;text-align:center}
+.marker{width:20px;flex:0 0 20px;color:var(--muted);font-size:14px;text-align:center}
 .row-main{flex:1;min-width:0}
-.row-title{font-size:14px;font-weight:520;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row-title{font-size:14px;font-weight:600;line-height:1.35;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-sub{font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row-right{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
 .pill{display:inline-flex;align-items:center;min-height:18px;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:550;line-height:1.25;white-space:nowrap;background:var(--gray-bg);color:var(--gray-text)}
@@ -78,7 +78,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--border-soft);margin:0 -20px 12px;padding:0 20px}
 .tab{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:400;padding:8px 8px 9px;border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer}
 .tab.active{color:var(--text);font-weight:650;border-bottom-color:var(--text)}
-.button{border:0;background:var(--text);color:#fff;border-radius:6px;padding:9px 13px;font-size:13px;font-weight:650;cursor:pointer}
+.period-nav{display:grid;grid-template-columns:34px 1fr 34px;align-items:center;margin:0 0 18px}
+.period-nav .button{min-height:34px;padding:0}
+.period-title{font-size:14px;font-weight:650;text-align:center;color:var(--text)}
+.button{border:0;background:var(--text);color:#fff;border-radius:6px;min-height:42px;padding:9px 13px;font-size:13px;font-weight:650;cursor:pointer}
 .button.secondary{background:var(--bg-muted);color:var(--text)}
 .button.ghost{background:transparent;color:var(--muted)}
 .button.danger{background:var(--red-bg);color:var(--red-text)}
@@ -104,7 +107,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .stat-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;font-weight:650;color:var(--text)}
 .stat-label{font-size:12px;color:var(--muted);margin-top:2px}
 .overlay{position:fixed;inset:0;z-index:50;background:var(--bg);overflow:auto}
-.overlay-inner{max-width:560px;margin:0 auto;min-height:100%;padding:20px 20px 34px}
+.overlay-inner{max-width:390px;margin:0 auto;min-height:100%;padding:28px 20px 124px}
 .back{border:0;background:transparent;color:var(--muted);font-size:14px;padding:8px 0 16px;cursor:pointer}
 .empty{color:var(--subtle);font-size:14px;font-weight:400}
 .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;font-weight:550}
@@ -119,9 +122,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .choice-button.warning.active{background:var(--yellow-bg);border-color:var(--yellow-bg);color:var(--yellow-text)}
 .quick-checks{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
 .rule-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:8px}
-.timer-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:16px 0;margin:0 0 22px}
+.timer-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:22px 0;margin:0 0 26px}
 .timer-time{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:36px;font-weight:650;letter-spacing:0;line-height:1.1;margin-bottom:12px}
-.metronome-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:13px 0;margin:-8px 0 22px}
+.metronome-card{border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);padding:16px 0;margin:-2px 0 26px}
 .metronome-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .metronome-title{font-size:14px;font-weight:650;color:var(--text)}
 .metronome-state{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
@@ -131,7 +134,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .metronome-beat{width:6px;height:6px;border-radius:99px;background:var(--border);transition:background .08s ease,transform .08s ease}
 .metronome-beat.accent{width:7px;height:7px}
 .metronome-beat.active{background:var(--text);transform:scale(1.35)}
-.metronome-controls{display:grid;grid-template-columns:38px 1fr 38px auto;gap:8px;align-items:center}
+.metronome-controls{display:grid;grid-template-columns:38px minmax(0,1fr) 38px 84px;gap:8px;align-items:center}
+.metronome-controls .button{min-height:42px;padding:0}
 .metronome-bpm{display:grid;grid-template-columns:1fr 42px;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
 .metronome-bpm input{border:0;border-radius:0;text-align:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:17px;font-weight:650;padding:8px 6px}
 .metronome-bpm span{font-size:11px;color:var(--muted);border-left:1px solid var(--border);padding:0 8px}
@@ -139,6 +143,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .metronome-mini{display:grid;grid-template-columns:42px 1fr;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)}
 .metronome-mini span{font-size:11px;color:var(--muted);padding:0 8px;border-right:1px solid var(--border)}
 .metronome-mini select{border:0;border-radius:0;background:var(--bg);padding:8px 8px;color:var(--text)}
+.metronome-advanced{margin-top:8px}
+.metronome-advanced summary{list-style:none;cursor:pointer;font-size:12px;color:var(--muted);padding:5px 0}
+.metronome-advanced summary::-webkit-details-marker{display:none}
 .metronome-volume{display:grid;grid-template-columns:44px 1fr 50px;gap:10px;align-items:center;margin-top:12px;font-size:12px;color:var(--muted)}
 .metronome-volume input{width:100%;height:24px;accent-color:var(--text);cursor:pointer}
 .metronome-volume input::-webkit-slider-runnable-track{height:8px;border-radius:99px;background:var(--bg-muted)}
@@ -156,22 +163,22 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .count-stepper{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;min-height:36px;background:var(--bg)}
 .count-button{border:0;background:var(--bg-soft);color:var(--text);font-size:13px;font-weight:650;height:100%;cursor:pointer}
 .count-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;text-align:center;font-size:14px;font-weight:650}
-.practice-sticky{position:sticky;bottom:0;z-index:4;margin:18px -20px -34px;padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border-soft);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.practice-sticky{position:fixed;left:50%;bottom:0;z-index:60;width:min(390px,100vw);transform:translateX(-50%);padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border-soft);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .practice-step-note{font-size:13px;color:var(--muted);line-height:1.5;margin:-10px 0 20px}
 .review-back{border:0;background:transparent;color:var(--muted);font-size:13px;padding:0 0 16px;cursor:pointer}
 @media (hover:none){.row:hover{background:transparent}.row:active{background:var(--bg-soft)}}
 @media (min-width:900px){
-  .layout{display:grid;grid-template-columns:220px 1fr;max-width:1120px}
-  .sidebar{display:block;position:sticky;top:0;height:100vh;border-right:1px solid var(--border);padding:26px 18px;background:var(--bg)}
+  .layout{display:block;max-width:390px}
+  .sidebar{display:none}
   .brand{font-size:16px;font-weight:720;margin-bottom:24px}
   .side-nav{display:flex;flex-direction:column;gap:2px}
   .side-button{border:0;background:transparent;color:var(--muted);border-radius:6px;padding:9px 10px;text-align:left;font-size:14px;cursor:pointer}
   .side-button.active{background:var(--bg-soft);color:var(--text);font-weight:650}
-  .mobile-nav{display:none}
-  .main{max-width:none;margin:0;padding:36px 36px 60px}
-  .desktop-grid{grid-template-columns:1.1fr .9fr;align-items:start}
-  .overlay{background:rgba(255,255,255,.76);backdrop-filter:blur(4px)}
-  .overlay-inner{min-height:auto;margin:44px auto;background:var(--bg);border:1px solid var(--border);border-radius:8px;box-shadow:0 16px 48px rgba(55,53,47,.12)}
+  .mobile-nav{display:block}
+  .main{max-width:390px;margin:0;padding:28px 20px 92px}
+  .desktop-grid{grid-template-columns:1fr;align-items:start}
+  .overlay{background:var(--bg);backdrop-filter:none}
+  .overlay-inner{min-height:100%;margin:0 auto;background:var(--bg);border:0;border-radius:0;box-shadow:none}
 }
 </style>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -787,7 +794,7 @@ function Metronome({ value = 80, signature = "4/4", onChange, onSignatureChange 
         </div>
       </div>
       <div className="metronome-controls">
-        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm - 5)}>-5</button>
+        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm - 5)}>-</button>
         <div className="metronome-bpm">
           <input
             type="number"
@@ -805,37 +812,40 @@ function Metronome({ value = 80, signature = "4/4", onChange, onSignatureChange 
           />
           <span>BPM</span>
         </div>
-        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm + 5)}>+5</button>
+        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm + 5)}>+</button>
         {running ? <button className="button secondary" type="button" onClick={stop}>정지</button> : <button className="button" type="button" onClick={start}>켜기</button>}
       </div>
-      <div className="metronome-options">
-        <div className="metronome-mini">
-          <span>박자</span>
-          <select value={timeSignature} onChange={(e) => setSignatureValue(e.target.value)}>
-            {METRONOME_SIGNATURES.map((item) => <option key={item} value={item}>{item}</option>)}
-          </select>
+      <details className="metronome-advanced">
+        <summary>박자·볼륨</summary>
+        <div className="metronome-options">
+          <div className="metronome-mini">
+            <span>박자</span>
+            <select value={timeSignature} onChange={(e) => setSignatureValue(e.target.value)}>
+              {METRONOME_SIGNATURES.map((item) => <option key={item} value={item}>{item}</option>)}
+            </select>
+          </div>
+          <div className="metronome-mini">
+            <span>강세</span>
+            <select value={timeSignature === "6/8" ? "1·4" : "1"} disabled>
+              <option value="1">1박</option>
+              <option value="1·4">1·4박</option>
+            </select>
+          </div>
         </div>
-        <div className="metronome-mini">
-          <span>강세</span>
-          <select value={timeSignature === "6/8" ? "1·4" : "1"} disabled>
-            <option value="1">1박</option>
-            <option value="1·4">1·4박</option>
-          </select>
-        </div>
-      </div>
-      <label className="metronome-volume">
-        <span>볼륨</span>
-        <input
-          type="range"
-          min="0"
-          max="150"
-          step="5"
-          value={volume}
-          onInput={(e) => setVolumeValue(e.currentTarget.value)}
-          onChange={(e) => setVolumeValue(e.currentTarget.value)}
-        />
-        <span className="metronome-volume-value">{volume}%</span>
-      </label>
+        <label className="metronome-volume">
+          <span>볼륨</span>
+          <input
+            type="range"
+            min="0"
+            max="150"
+            step="5"
+            value={volume}
+            onInput={(e) => setVolumeValue(e.currentTarget.value)}
+            onChange={(e) => setVolumeValue(e.currentTarget.value)}
+          />
+          <span className="metronome-volume-value">{volume}%</span>
+        </label>
+      </details>
     </div>
   );
 }
@@ -975,6 +985,7 @@ function PianoDashboard({
   monthControls,
   onEditFocus,
   showPracticeStart = true,
+  compact = false,
 }) {
   const pieceMinutes = sum(pieceSessions, (session) => session.duration);
   const techniqueMinutes = sum(simpleTechniqueSessions, (session) => session.duration) + sum(techniquePractices, (session) => session.duration);
@@ -1009,7 +1020,7 @@ function PianoDashboard({
     .slice()
     .sort((a, b) => b.minutes - a.minutes || (b.lastDate || "").localeCompare(a.lastDate || ""));
   const activePlans = techniquePlans.filter((plan) => plan.status === "active");
-  const recentRows = [
+    const recentRows = [
     ...pieceSessions.map((session) => ({
       id: session.id,
       date: session.date,
@@ -1030,9 +1041,65 @@ function PianoDashboard({
       marker: "✓",
       title: "테크닉 연습",
       subtitle: [shortDate(session.date), minText(session.duration), metronomeSessionText(session), practiceItemsText(session.items)].filter(Boolean).join(" · "),
-    })),
-  ].sort(byDateDesc).slice(0, 5);
-  return (
+      })),
+    ].sort(byDateDesc).slice(0, 5);
+    if (compact) {
+      const leadPiece = pieceStats[0];
+      const leadFocusTechnique = mode === "month" && focusTechniques[0];
+      const leadPlan = activePlans[0];
+      return (
+        <>
+          {monthControls}
+          <div className="stat-grid">
+            <div className="stat"><div className="stat-value">{minText(totalMinutes)}</div><div className="stat-label">총 시간</div></div>
+            <div className="stat"><div className="stat-value">{minText(pieceMinutes)}</div><div className="stat-label">곡</div></div>
+            <div className="stat"><div className="stat-value">{minText(techniqueMinutes)}</div><div className="stat-label">테크닉</div></div>
+          </div>
+          <Section title="대시보드">
+            <Row
+              marker="%"
+              title={mode === "week" ? "주간 목표" : "월간 목표"}
+              subtitle={goal ? `${minText(totalMinutes)} / ${minText(goal)} · ${activeDays}일 연습` : `${minText(totalMinutes)} · ${activeDays}일 연습`}
+              right={<Pill tone={progress >= 100 ? "green" : "blue"}>{goal ? `${Math.min(progress, 999)}%` : "기록"}</Pill>}
+            >
+              <Progress value={goal ? progress : 0} />
+            </Row>
+            {leadPiece ? (
+              <Row
+                marker="♪"
+                title={pieceDisplayName(leadPiece.piece)}
+                subtitle={pieceProgressText(leadPiece.piece, leadPiece.sessions)}
+                right={<span className="mono">{minText(leadPiece.minutes)}{leadPiece.repetitions ? ` · ${leadPiece.repetitions}회` : ""}</span>}
+                onClick={() => setScreen({ type: "piece-practice", data: { pieceId: leadPiece.piece.id } })}
+              />
+            ) : <Row marker="♪" title="곡 연습" subtitle="아직 기록 없음" right={<Pill>대기</Pill>} onClick={() => setScreen({ type: "piece-practice" })} />}
+            {leadFocusTechnique ? (() => {
+              const sessions = simpleTechniqueSessions.filter((session) => session.targetId === leadFocusTechnique.id);
+              const current = Number(leadFocusTechnique.currentBPM) || Math.max(0, ...sessions.map((session) => Number(session.bpm) || 0));
+              const minutes = sum(sessions, (session) => session.duration);
+              return (
+                <Row
+                  marker="♪"
+                  title={leadFocusTechnique.title}
+                  subtitle={`${leadFocusTechnique.category} ${current || 0}BPM까지 진행`}
+                  right={minutes ? <span className="mono">{minText(minutes)}</span> : <Pill>대기</Pill>}
+                  onClick={() => setScreen({ type: "piano-session", data: { type: "technique", targetId: leadFocusTechnique.id } })}
+                />
+              );
+            })() : leadPlan ? (
+              <Row
+                marker={leadPlan.completed ? "✓" : "♪"}
+                title={techniquePlanCompactText(leadPlan)}
+                subtitle={techniqueNextText(leadPlan)}
+                right={<Pill tone={leadPlan.completed ? "green" : statusClass(leadPlan.status)}>{leadPlan.completed ? "완료" : "진행"}</Pill>}
+                onClick={() => setScreen({ type: "technique-plan-detail", item: leadPlan })}
+              />
+            ) : <Row marker="♪" title="테크닉" subtitle="진행 중인 항목 없음" right={<Pill>대기</Pill>} onClick={() => setScreen({ type: "technique-practice" })} />}
+          </Section>
+        </>
+      );
+    }
+    return (
     <>
       {monthControls}
       <div className="stat-grid">
@@ -1228,9 +1295,9 @@ function RecordView(p) {
     <>
       <PageHeader icon="📅" title="기록" subtitle={`${p.calendarMode === "week" ? `${shortDate(periodStart)} - ${shortDate(shiftDate(periodEnd, -1))}` : monthTitle(ym)} · ${minText(periodTotalMinutes)}`} />
       <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px" }}>
+      <div className="period-nav">
         <button className="button ghost" onClick={() => moveCalendar(-1)}>←</button>
-        <div style={{ fontSize: 14, fontWeight: 650 }}>{p.calendarMode === "week" ? `${shortDate(dates[0])} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
+        <div className="period-title">{p.calendarMode === "week" ? `${shortDate(dates[0])} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
         <button className="button ghost" onClick={() => moveCalendar(1)}>→</button>
       </div>
       <PianoDashboard
@@ -1249,6 +1316,7 @@ function RecordView(p) {
         pianoItemName={p.pianoItemName}
         setScreen={p.setScreen}
         showPracticeStart={false}
+        compact
         monthControls={p.calendarMode === "month" ? (
           <div className="properties">
             <div className="property-label">의도</div>
@@ -1259,19 +1327,21 @@ function RecordView(p) {
         ) : null}
         onEditFocus={p.calendarMode === "month" ? () => { p.setSelectedMonth(ym); p.setScreen({ type: "focus-picker" }); } : null}
       />
-      <div className="calendar">
-        {DAYS.map((day) => <div key={day} className="calendar-head">{day}</div>)}
-        {dates.map((date) => {
-          const count = countForDate(date);
-          const isToday = date === p.td;
-          return (
-            <button key={date} className={`calendar-day ${date.startsWith(ym) ? "" : "muted"} ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
-              <div>{parseDate(date).getDate()}</div>
-              {count > 0 && <div className="dot" />}
-            </button>
-          );
-        })}
-      </div>
+      <Section title="캘린더">
+        <div className="calendar">
+          {DAYS.map((day) => <div key={day} className="calendar-head">{day}</div>)}
+          {dates.map((date) => {
+            const count = countForDate(date);
+            const isToday = date === p.td;
+            return (
+              <button key={date} className={`calendar-day ${date.startsWith(ym) ? "" : "muted"} ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
+                <div>{parseDate(date).getDate()}</div>
+                {count > 0 && <div className="dot" />}
+              </button>
+            );
+          })}
+        </div>
+      </Section>
       <Section title="주간 리뷰">
         <Row marker="□" title={weekReview ? "이번 주 리뷰" : "작성하기"} subtitle={weekReview ? (weekReview.win || weekReview.text || weekReview.focus || "작성된 리뷰") : "아직 작성된 리뷰 없음"} right={<Pill>{weekReview ? "수정" : "작성"}</Pill>} onClick={() => p.setScreen({ type: "review-form", item: weekReview || { weekStart: reviewWeekStart, win: "", focus: "", memo: "" } })} />
       </Section>
