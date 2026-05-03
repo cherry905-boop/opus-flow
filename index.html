@@ -495,6 +495,83 @@ const writeJSON = (key, value) => {
     else localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {}
 };
+const legacyId = (prefix, item, index) => item.id || `${prefix}-${index}-${String(item.title || item.date || "item").replace(/[^\w가-힣-]+/g, "-")}`;
+const mergeById = (current, incoming) => {
+  const map = new Map();
+  [...(Array.isArray(current) ? current : []), ...(Array.isArray(incoming) ? incoming : [])].forEach((item) => {
+    if (!item || !item.id) return;
+    map.set(item.id, { ...(map.get(item.id) || {}), ...item });
+  });
+  return Array.from(map.values());
+};
+const migrateLegacyPianoStorage = () => {
+  const legacyPieces = readJSON("of3-pieces", null);
+  const legacyTechniques = readJSON("of3-techniques", null);
+  const legacyPieceSessions = readJSON("of3-piece-sessions", null);
+  const legacyTechniqueSessions = readJSON("of3-technique-sessions", null);
+  const legacyMonthlyGoals = readJSON("of3-monthly-goals", null);
+
+  if (Array.isArray(legacyPieces) && legacyPieces.length) {
+    const incoming = legacyPieces.map((piece, index) => ({ ...piece, id: legacyId("legacy-piece", piece, index) }));
+    writeJSON(KEYS.pieces, mergeById(readJSON(KEYS.pieces, []), incoming));
+  }
+  if (Array.isArray(legacyTechniques) && legacyTechniques.length) {
+    const incoming = legacyTechniques.map((technique, index) => ({ ...technique, id: legacyId("legacy-technique", technique, index) }));
+    writeJSON(KEYS.techniques, mergeById(readJSON(KEYS.techniques, []), incoming));
+  }
+
+  const migratedSessions = [
+    ...(Array.isArray(legacyPieceSessions) ? legacyPieceSessions.map((session, index) => ({
+      id: session.id || `legacy-piece-session-${index}-${session.date || "date"}-${session.pieceId || session.targetId || "piece"}`,
+      date: session.date,
+      type: "piece",
+      targetId: session.pieceId || session.targetId,
+      duration: Number(session.duration) || 0,
+      section: session.section || "",
+      bpm: session.bpm === undefined ? "" : session.bpm,
+      repetitions: session.repetitions === undefined ? "" : session.repetitions,
+      note: session.note || "",
+      feeling: session.feeling || "",
+      createdAt: session.createdAt,
+    })) : []),
+    ...(Array.isArray(legacyTechniqueSessions) ? legacyTechniqueSessions.filter((session) => session && !session.planId && (session.techniqueId || session.targetId)).map((session, index) => ({
+      id: session.id || `legacy-technique-session-${index}-${session.date || "date"}-${session.techniqueId || session.targetId || "technique"}`,
+      date: session.date,
+      type: "technique",
+      targetId: session.techniqueId || session.targetId,
+      duration: Number(session.duration) || 0,
+      section: session.section || "",
+      bpm: session.bpm === undefined ? "" : session.bpm,
+      repetitions: session.repetitions === undefined ? "" : session.repetitions,
+      note: session.note || "",
+      feeling: session.feeling || "",
+      createdAt: session.createdAt,
+    })) : []),
+  ].filter((session) => session.date && session.targetId);
+  if (migratedSessions.length) {
+    writeJSON(KEYS.pianoSessions, mergeById(readJSON(KEYS.pianoSessions, []), migratedSessions));
+  }
+
+  if (Array.isArray(legacyTechniqueSessions)) {
+    const planSessions = legacyTechniqueSessions.filter((session) => session && session.planId);
+    if (planSessions.length !== legacyTechniqueSessions.length) writeJSON(KEYS.techniquePlanSessions, planSessions);
+  }
+
+  if (Array.isArray(legacyMonthlyGoals) && legacyMonthlyGoals.length) {
+    const settings = normalizeSettings(readJSON(KEYS.settings, defSettings));
+    const monthlyFocus = { ...settings.monthlyFocus };
+    legacyMonthlyGoals.forEach((goal) => {
+      if (!goal || !goal.yearMonth) return;
+      monthlyFocus[goal.yearMonth] = {
+        ...(monthlyFocus[goal.yearMonth] || {}),
+        pieceIds: Array.isArray(goal.pieceIds) ? goal.pieceIds : (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].pieceIds) || [],
+        techniqueIds: Array.isArray(goal.techniqueIds) ? goal.techniqueIds : (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].techniqueIds) || [],
+        intent: goal.intent || (monthlyFocus[goal.yearMonth] && monthlyFocus[goal.yearMonth].intent) || "",
+      };
+    });
+    writeJSON(KEYS.settings, normalizeSettings({ ...settings, monthlyFocus }));
+  }
+};
 function useStored(key, fallback) {
   const [value, setValue] = useState(() => readJSON(key, fallback));
   useEffect(() => writeJSON(key, value), [key, value]);
@@ -548,9 +625,12 @@ const shortDate = (value) => {
 };
 const minText = (minutes) => {
   const value = Number(minutes) || 0;
-  if (value < 60) return `${value}m`;
+  if (value < 60) {
+    const rounded = Math.round(value * 10) / 10;
+    return `${Number.isInteger(rounded) ? rounded : rounded.toFixed(1)}m`;
+  }
   const h = Math.floor(value / 60);
-  const m = value % 60;
+  const m = Math.round(value % 60);
   return m ? `${h}h ${m}m` : `${h}h`;
 };
 const clockText = (ms) => {
@@ -572,6 +652,7 @@ const normalizeSettings = (settings) => {
     pianoRoutine: Array.isArray(settings && settings.pianoRoutine) ? settings.pianoRoutine : defSettings.pianoRoutine,
   };
 };
+migrateLegacyPianoStorage();
 const techniqueModeForType = (type) => type === "hanon" ? "key-number" : type === "pischna" ? "bpm-number" : "bpm-complete";
 const techniqueGroup = (plan) => {
   const groups = Array.isArray(plan && plan.numberGroups) ? plan.numberGroups : [];
@@ -640,17 +721,6 @@ const practiceItemsText = (items) => (items || []).map((item) => {
 }).join(" · ") || "체크 항목 없음";
 const metronomeSessionText = (session) => [session.timeSignature || session.metronomeSignature, session.bpm || session.metronomeBPM ? `${session.bpm || session.metronomeBPM}BPM` : ""].filter(Boolean).join(" ");
 const pieceSessionText = (session) => [minText(session.duration), session.section, metronomeSessionText(session), session.repetitions ? `${session.repetitions}회` : "", session.feeling || session.note || "메모 없음"].filter(Boolean).join(" · ");
-const latestByDate = (items) => items.slice().sort(byDateDesc)[0] || null;
-const pieceDisplayName = (piece) => [piece.composer, piece.title].filter(Boolean).join(" ") || "곡";
-const pieceProgressText = (piece, sessions) => {
-  const latest = latestByDate(sessions);
-  if (["done", "complete", "completed", "finished"].includes(piece.status)) return "완성";
-  const section = latest && latest.section || piece.currentSection || "";
-  const bpm = latest && latest.bpm || Math.max(0, ...sessions.map((session) => Number(session.bpm) || 0));
-  if (section) return /마디|m\.|measure|bar/i.test(section) ? `${section}까지 진행` : `${section} 진행`;
-  if (bpm) return `${bpm}BPM까지 진행`;
-  return sessions.length ? "진행 중" : "아직 기록 없음";
-};
 const sessionMaxBpm = (session) => Math.max(Number(session.bpm) || 0, ...((session.bpmEntries || []).map((entry) => Number(entry.bpm) || 0)));
 const techniquePlanCompactText = (plan) => {
   const type = TECHNIQUE_TYPES[plan.type] || plan.title || "테크닉";
@@ -1270,225 +1340,6 @@ function PianoHomeTechniques(p) {
     </Section>
   );
 }
-function PianoDashboard({
-  mode,
-  title,
-  totalMinutes,
-  pieceSessions,
-  simpleTechniqueSessions,
-  techniquePractices,
-  techniquePlanSessions,
-  goalMinutes,
-  pieces,
-  focusPieces = [],
-  focusTechniques = [],
-  techniquePlans,
-  pianoItemName,
-  setScreen,
-  monthControls,
-  onEditFocus,
-  showPracticeStart = true,
-  compact = false,
-}) {
-  const pieceMinutes = sum(pieceSessions, (session) => session.duration);
-  const techniqueMinutes = sum(simpleTechniqueSessions, (session) => session.duration) + sum(techniquePractices, (session) => session.duration);
-  const activeDays = new Set([...pieceSessions, ...simpleTechniqueSessions, ...techniquePractices].map((session) => session.date).filter(Boolean)).size;
-  const goal = Number(goalMinutes) || 0;
-  const progress = goal ? Math.round(totalMinutes / goal * 100) : 0;
-  const practicedPieceStats = pieces.map((piece) => {
-    const sessions = pieceSessions.filter((session) => session.targetId === piece.id);
-    const latest = latestByDate(sessions);
-    return {
-      piece,
-      sessions,
-      minutes: sum(sessions, (session) => session.duration),
-      repetitions: sum(sessions, (session) => session.repetitions),
-      latest,
-      lastDate: latest && latest.date,
-    };
-  }).filter((item) => item.minutes > 0);
-  const focusStats = focusPieces.map((piece) => {
-    const sessions = pieceSessions.filter((session) => session.targetId === piece.id);
-    const latest = latestByDate(sessions);
-    return {
-      piece,
-      sessions,
-      minutes: sum(sessions, (session) => session.duration),
-      repetitions: sum(sessions, (session) => session.repetitions),
-      latest,
-      lastDate: latest && latest.date,
-    };
-  });
-  const pieceStats = (mode === "month" && focusStats.length ? focusStats : practicedPieceStats)
-    .slice()
-    .sort((a, b) => b.minutes - a.minutes || (b.lastDate || "").localeCompare(a.lastDate || ""));
-  const activePlans = techniquePlans.filter((plan) => plan.status === "active");
-    const recentRows = [
-    ...pieceSessions.map((session) => ({
-      id: session.id,
-      date: session.date,
-      marker: "♪",
-      title: pianoItemName(session) || "곡 연습",
-      subtitle: `${shortDate(session.date)} · ${pieceSessionText(session)}`,
-    })),
-    ...simpleTechniqueSessions.map((session) => ({
-      id: session.id,
-      date: session.date,
-      marker: "♪",
-      title: "보조 테크닉",
-      subtitle: `${shortDate(session.date)} · ${pianoItemName(session) || "테크닉"} · ${minText(session.duration)}`,
-    })),
-    ...techniquePractices.map((session) => ({
-      id: session.id,
-      date: session.date,
-      marker: "✓",
-      title: "테크닉 연습",
-      subtitle: [shortDate(session.date), minText(session.duration), metronomeSessionText(session), practiceItemsText(session.items)].filter(Boolean).join(" · "),
-      })),
-    ].sort(byDateDesc).slice(0, 5);
-    if (compact) {
-      const leadPiece = pieceStats[0];
-      const leadFocusTechnique = mode === "month" && focusTechniques[0];
-      const leadPlan = activePlans[0];
-      return (
-        <>
-          {monthControls}
-          <div className="stat-grid">
-            <div className="stat"><div className="stat-value">{minText(totalMinutes)}</div><div className="stat-label">총 시간</div></div>
-            <div className="stat"><div className="stat-value">{minText(pieceMinutes)}</div><div className="stat-label">곡</div></div>
-            <div className="stat"><div className="stat-value">{minText(techniqueMinutes)}</div><div className="stat-label">테크닉</div></div>
-          </div>
-          <Section title="대시보드">
-            <Row
-              marker="%"
-              title={mode === "week" ? "주간 목표" : "월간 목표"}
-              subtitle={goal ? `${minText(totalMinutes)} / ${minText(goal)} · ${activeDays}일 연습` : `${minText(totalMinutes)} · ${activeDays}일 연습`}
-              right={<Pill tone={progress >= 100 ? "green" : "blue"}>{goal ? `${Math.min(progress, 999)}%` : "기록"}</Pill>}
-            >
-              <Progress value={goal ? progress : 0} />
-            </Row>
-            {leadPiece ? (
-              <Row
-                marker="♪"
-                title={pieceDisplayName(leadPiece.piece)}
-                subtitle={pieceProgressText(leadPiece.piece, leadPiece.sessions)}
-                right={<span className="mono">{minText(leadPiece.minutes)}{leadPiece.repetitions ? ` · ${leadPiece.repetitions}회` : ""}</span>}
-                onClick={() => setScreen({ type: "piece-practice", data: { pieceId: leadPiece.piece.id } })}
-              />
-            ) : <Row marker="♪" title="곡 연습" subtitle="아직 기록 없음" right={<Pill>대기</Pill>} onClick={() => setScreen({ type: "piece-practice" })} />}
-            {leadFocusTechnique ? (() => {
-              const sessions = simpleTechniqueSessions.filter((session) => session.targetId === leadFocusTechnique.id);
-              const current = Number(leadFocusTechnique.currentBPM) || Math.max(0, ...sessions.map((session) => Number(session.bpm) || 0));
-              const minutes = sum(sessions, (session) => session.duration);
-              return (
-                <Row
-                  marker="♪"
-                  title={leadFocusTechnique.title}
-                  subtitle={`${leadFocusTechnique.category} ${current || 0}BPM까지 진행`}
-                  right={minutes ? <span className="mono">{minText(minutes)}</span> : <Pill>대기</Pill>}
-                  onClick={() => setScreen({ type: "piano-session", data: { type: "technique", targetId: leadFocusTechnique.id } })}
-                />
-              );
-            })() : leadPlan ? (
-              <Row
-                marker={leadPlan.completed ? "✓" : "♪"}
-                title={techniquePlanCompactText(leadPlan)}
-                subtitle={techniqueNextText(leadPlan)}
-                right={<Pill tone={leadPlan.completed ? "green" : statusClass(leadPlan.status)}>{leadPlan.completed ? "완료" : "진행"}</Pill>}
-                onClick={() => setScreen({ type: "technique-plan-detail", item: leadPlan })}
-              />
-            ) : <Row marker="♪" title="테크닉" subtitle="진행 중인 항목 없음" right={<Pill>대기</Pill>} onClick={() => setScreen({ type: "technique-practice" })} />}
-          </Section>
-        </>
-      );
-    }
-    return (
-    <>
-      {monthControls}
-      <div className="stat-grid">
-        <div className="stat"><div className="stat-value">{minText(totalMinutes)}</div><div className="stat-label">총 시간</div></div>
-        <div className="stat"><div className="stat-value">{minText(pieceMinutes)}</div><div className="stat-label">곡</div></div>
-        <div className="stat"><div className="stat-value">{minText(techniqueMinutes)}</div><div className="stat-label">테크닉</div></div>
-      </div>
-      <Section title={mode === "week" ? "주간 목표" : "월간 목표"}>
-        <Row
-          marker="%"
-          title={`${title} 피아노 진행`}
-          subtitle={goal ? `${minText(totalMinutes)} / ${minText(goal)} · ${activeDays}일 연습` : `${minText(totalMinutes)} · ${activeDays}일 연습`}
-          right={<Pill tone={progress >= 100 ? "green" : "blue"}>{goal ? `${Math.min(progress, 999)}%` : "기록"}</Pill>}
-        >
-          <Progress value={goal ? progress : 0} />
-        </Row>
-        <Row marker="♪" title="곡 / 테크닉 비중" subtitle={`곡 ${minText(pieceMinutes)} · 테크닉 ${minText(techniqueMinutes)}`} />
-      </Section>
-      {showPracticeStart && (
-        <Section title="연습 시작">
-          <Row marker="▶" title="곡 연습 시작" subtitle="타이머와 구간 반복 카운트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "piece-practice" })} />
-          <Row marker="▶" title="테크닉 연습 시작" subtitle="BPM별 반복과 체크리스트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "technique-practice" })} />
-        </Section>
-      )}
-      <Section title={mode === "week" ? "이번 주 곡 연습" : "월간 집중 곡"} action={mode === "month" && onEditFocus ? <button className="section-action" onClick={onEditFocus}>편집</button> : null}>
-        {pieceStats.map(({ piece, minutes, repetitions, lastDate, sessions }) => (
-          <Row
-            key={piece.id}
-            marker="♪"
-            title={pieceDisplayName(piece)}
-            subtitle={pieceProgressText(piece, sessions)}
-            right={minutes ? <span className="mono">{minText(minutes)}{repetitions ? ` · ${repetitions}회` : ""}</span> : <Pill>대기</Pill>}
-            onClick={() => setScreen({ type: "piece-practice", data: { pieceId: piece.id } })}
-          />
-        ))}
-        {!pieceStats.length && <Empty text={mode === "week" ? "이번 주 곡 연습 없음" : "집중 곡 없음"} />}
-      </Section>
-      <Section title={mode === "week" ? "테크닉 진행" : "월간 테크닉"}>
-        {mode === "month" && focusTechniques.map((technique) => {
-          const sessions = simpleTechniqueSessions.filter((session) => session.targetId === technique.id);
-          const current = Number(technique.currentBPM) || Math.max(0, ...sessions.map((session) => Number(session.bpm) || 0));
-          const minutes = sum(sessions, (session) => session.duration);
-          return (
-            <Row
-              key={technique.id}
-              marker="♪"
-              title={technique.title}
-              subtitle={`${technique.category} ${current || 0}BPM까지 진행`}
-              right={minutes ? <span className="mono">{minText(minutes)}</span> : <Pill>대기</Pill>}
-              onClick={() => setScreen({ type: "piano-session", data: { type: "technique", targetId: technique.id } })}
-            />
-          );
-        })}
-        {activePlans.map((plan) => (
-          <Row
-            key={plan.id}
-            marker={plan.completed ? "✓" : "♪"}
-            title={techniquePlanCompactText(plan)}
-            subtitle={techniqueNextText(plan)}
-            right={<Pill tone={plan.completed ? "green" : statusClass(plan.status)}>{plan.completed ? "완료" : "진행"}</Pill>}
-            onClick={() => setScreen({ type: "technique-plan-detail", item: plan })}
-          />
-        ))}
-        {mode === "month" && !focusTechniques.length && !activePlans.length && <Empty text="월간 테크닉 없음" />}
-        {mode === "week" && !activePlans.length && <Empty text="진행 중인 테크닉 없음" />}
-      </Section>
-      <Section title="최근 피아노 기록">
-        {recentRows.map((row) => <Row key={`${row.marker}-${row.id}`} marker={row.marker} title={row.title} subtitle={row.subtitle} />)}
-        {!recentRows.length && <Empty text="최근 기록 없음" />}
-      </Section>
-    </>
-  );
-}
-function PianoPieceRow({ piece, sessions, onRecord }) {
-  const minutes = sum(sessions, (session) => session.duration);
-  return <Row marker="♪" title={piece.title} subtitle={`${piece.composer || "작곡가 미정"} · ${piece.currentSection || "구간 없음"}`} right={<span className="mono">{minText(minutes)}</span>} onClick={onRecord} />;
-}
-function TechniqueRow({ technique, sessions, onRecord }) {
-  const current = Number(technique.currentBPM) || Math.max(0, ...sessions.map((s) => Number(s.bpm) || 0));
-  const target = Number(technique.targetBPM) || 0;
-  return (
-    <Row marker="♪" title={technique.title} subtitle={`${technique.category} · ${current}/${target} BPM`} right={<Pill tone={statusClass(technique.status)}>{PIANO_STATUS[technique.status] || "테크닉"}</Pill>} onClick={onRecord}>
-      <Progress value={target ? Math.round(current / target * 100) : 0} />
-    </Row>
-  );
-}
 function TechniquePlanRow({ plan, sessions, onOpen }) {
   const allSessions = sessions || [];
   const assessment = assessTechniquePlan(plan, allSessions);
@@ -1583,7 +1434,6 @@ function RecordView(p) {
   const periodPianoSessions = p.pianoSessions.filter((session) => session.date >= periodStart && session.date < periodEnd);
   const periodTechniquePractices = p.techniquePractices.filter((session) => session.date >= periodStart && session.date < periodEnd);
   const periodTechniquePlanSessions = p.techniquePlanSessions.filter((session) => session.date >= periodStart && session.date < periodEnd);
-  const periodPieceSessions = periodPianoSessions.filter((session) => session.type === "piece");
   const periodSimpleTechniqueSessions = periodPianoSessions.filter((session) => session.type === "technique");
   const periodTotalMinutes = sum(periodPianoSessions, (session) => session.duration) + sum(periodTechniquePractices, (session) => session.duration);
   const reviewWeekStart = p.calendarMode === "week" ? periodStart : p.ws;
@@ -1595,8 +1445,19 @@ function RecordView(p) {
   const avgDenominator = p.calendarMode === "week" ? 7 : parseDate(shiftDate(periodEnd, -1)).getDate();
   const avgMinutes = Math.round(periodTotalMinutes / Math.max(1, avgDenominator));
   const dayMinutes = (date) => sum(p.pianoSessions.filter((session) => session.date === date), (session) => session.duration) + sum(p.techniquePractices.filter((session) => session.date === date), (session) => session.duration);
-  const chartDates = p.calendarMode === "week" ? dates : dates.filter((date) => date.startsWith(ym)).slice(0, 7);
-  const chartRows = chartDates.map((date) => ({ date, label: DAYS[parseDate(date).getDay()], minutes: dayMinutes(date) }));
+  const monthChartDates = dates.filter((date) => date.startsWith(ym));
+  const monthChartRows = [];
+  for (let index = 0; index < monthChartDates.length; index += 7) {
+    const bucket = monthChartDates.slice(index, index + 7);
+    monthChartRows.push({
+      date: `${ym}-week-${monthChartRows.length + 1}`,
+      label: `${monthChartRows.length + 1}주`,
+      minutes: sum(bucket, (date) => dayMinutes(date)),
+    });
+  }
+  const chartRows = p.calendarMode === "week"
+    ? dates.map((date) => ({ date, label: DAYS[parseDate(date).getDay()], minutes: dayMinutes(date) }))
+    : monthChartRows;
   const maxChartMinutes = Math.max(1, ...chartRows.map((row) => row.minutes));
   const techniqueRows = Object.entries(TECHNIQUE_TYPES).map(([type, label]) => {
     const planMinutes = sum(periodTechniquePlanSessions.filter((session) => session.planType === type), (session) => session.practiceDuration || session.duration);
@@ -2224,6 +2085,7 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
     const practiceId = uid();
     const endedAt = new Date().toISOString();
     const duration = Math.max(1, Math.round(elapsedMs / 60000));
+    const planDuration = duration / Math.max(1, selectedPlans.length);
     const items = selectedPlans.map((plan) => {
       const bpmEntries = normalizedBpmEntries(plan);
       return {
@@ -2276,7 +2138,8 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
           keyName: (plan.mode || techniqueModeForType(plan.type)) === "key-number" ? plan.currentKey || "C" : "",
           numbers: groupText(techniqueGroup(plan)),
           duration: 0,
-          practiceDuration: duration,
+          practiceDuration: planDuration,
+          sessionDuration: duration,
           bpmEntries: item.bpmEntries,
           bpm: item.bpm,
           repetitions: item.repetitions,
