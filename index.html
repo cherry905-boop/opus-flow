@@ -8,7 +8,13 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Opus Flow">
+<meta name="application-name" content="Opus Flow">
+<meta name="description" content="피아노 연습 기록과 체크를 위한 Opus Flow">
+<meta name="format-detection" content="telephone=no">
 <meta name="theme-color" content="#FFFFFF">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>">
 <style>
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css');
@@ -2615,6 +2621,11 @@ function RoutineCommon({ form, setForm }) {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+if ("serviceWorker" in navigator && ["https:", "http:"].includes(location.protocol)) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
