@@ -156,6 +156,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .count-stepper{display:grid;grid-template-columns:34px 1fr 44px;align-items:center;border:1px solid var(--border);border-radius:6px;overflow:hidden;min-height:36px;background:var(--bg)}
 .count-button{border:0;background:var(--bg-soft);color:var(--text);font-size:13px;font-weight:650;height:100%;cursor:pointer}
 .count-value{font-family:ui-monospace,'SF Mono',Menlo,monospace;text-align:center;font-size:14px;font-weight:650}
+.practice-sticky{position:sticky;bottom:0;z-index:4;margin:18px -20px -34px;padding:12px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border-soft);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.practice-step-note{font-size:13px;color:var(--muted);line-height:1.5;margin:-10px 0 20px}
+.review-back{border:0;background:transparent;color:var(--muted);font-size:13px;padding:0 0 16px;cursor:pointer}
 @media (hover:none){.row:hover{background:transparent}.row:active{background:var(--bg-soft)}}
 @media (min-width:900px){
   .layout{display:grid;grid-template-columns:220px 1fr;max-width:1120px}
@@ -971,6 +974,7 @@ function PianoDashboard({
   setScreen,
   monthControls,
   onEditFocus,
+  showPracticeStart = true,
 }) {
   const pieceMinutes = sum(pieceSessions, (session) => session.duration);
   const techniqueMinutes = sum(simpleTechniqueSessions, (session) => session.duration) + sum(techniquePractices, (session) => session.duration);
@@ -1047,10 +1051,12 @@ function PianoDashboard({
         </Row>
         <Row marker="♪" title="곡 / 테크닉 비중" subtitle={`곡 ${minText(pieceMinutes)} · 테크닉 ${minText(techniqueMinutes)}`} />
       </Section>
-      <Section title="연습 시작">
-        <Row marker="▶" title="곡 연습 시작" subtitle="타이머와 구간 반복 카운트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "piece-practice" })} />
-        <Row marker="▶" title="테크닉 연습 시작" subtitle="BPM별 반복과 체크리스트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "technique-practice" })} />
-      </Section>
+      {showPracticeStart && (
+        <Section title="연습 시작">
+          <Row marker="▶" title="곡 연습 시작" subtitle="타이머와 구간 반복 카운트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "piece-practice" })} />
+          <Row marker="▶" title="테크닉 연습 시작" subtitle="BPM별 반복과 체크리스트" right={<Pill tone="blue">시작</Pill>} onClick={() => setScreen({ type: "technique-practice" })} />
+        </Section>
+      )}
       <Section title={mode === "week" ? "이번 주 곡 연습" : "월간 집중 곡"} action={mode === "month" && onEditFocus ? <button className="section-action" onClick={onEditFocus}>편집</button> : null}>
         {pieceStats.map(({ piece, minutes, repetitions, lastDate, sessions }) => (
           <Row
@@ -1242,6 +1248,7 @@ function RecordView(p) {
         techniquePlans={p.techniquePlans}
         pianoItemName={p.pianoItemName}
         setScreen={p.setScreen}
+        showPracticeStart={false}
         monthControls={p.calendarMode === "month" ? (
           <div className="properties">
             <div className="property-label">의도</div>
@@ -1701,6 +1708,7 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
     metronomeSignature: data && data.metronomeSignature || "4/4",
     note: "",
   });
+  const [step, setStep] = useState("practice");
   const [now, setNow] = useState(Date.now());
   const activeTimer = timer && timer.kind === "technique" ? timer : null;
   useEffect(() => {
@@ -1757,6 +1765,18 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
   };
   const pauseTimer = () => setTimer(activeTimer ? { ...activeTimer, running: false, startedAt: null, accumulatedMs: Math.round(elapsedMs) } : null);
   const resetTimer = () => setTimer(null);
+  const goToCheck = () => {
+    if (!selectedPlans.length) {
+      alert("먼저 체크할 테크닉 항목을 선택해주세요.");
+      return;
+    }
+    if (elapsedMs < 1000) {
+      alert("먼저 연습 시작을 눌러 실제 시간을 기록해주세요.");
+      return;
+    }
+    if (activeTimer && activeTimer.running) pauseTimer();
+    setStep("check");
+  };
   const markStable = () => setForm((prev) => ({
     ...prev,
     completedAll: true,
@@ -1861,114 +1881,148 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
       </>
     );
   }
-  return (
-    <>
-      <PageHeader icon="🎹" title="테크닉 연습" subtitle="시간을 재고, 끝나면 한 번에 체크" />
-      <div className="timer-card">
-        <div className="timer-time">{clockText(elapsedMs)}</div>
-        <div className="button-row" style={{ marginTop: 0 }}>
-          {!activeTimer || !activeTimer.running ? <button className="button" onClick={startTimer}>{elapsedMs ? "이어하기" : "시작"}</button> : <button className="button secondary" onClick={pauseTimer}>일시정지</button>}
-          <button className="button ghost" onClick={resetTimer}>초기화</button>
-        </div>
-      </div>
-      <Metronome
-        value={form.metronomeBPM}
-        signature={form.metronomeSignature}
-        onChange={(value) => setForm({ ...form, metronomeBPM: value })}
-        onSignatureChange={(value) => setForm({ ...form, metronomeSignature: value })}
-      />
-      <Section title="오늘 한 테크닉">
-        {availablePlans.map((plan) => (
-          <Row
-            key={plan.id}
-            marker={<span className="check-marker"><input type="checkbox" checked={Boolean(checked[plan.id] || totalRepetitionsForPlan(plan.id) > 0)} readOnly /></span>}
-            title={techniqueTaskTitle(plan)}
-            subtitle={techniqueTaskMeta(plan)}
-            onClick={() => togglePlan(plan)}
-          >
-            <div onClick={(e) => e.stopPropagation()}>
-              {entriesForPlan(plan).map((entry, index) => (
-                <div className="bpm-entry" key={entry.id || index}>
-                  <div>
-                    <div className="practice-mini-label">BPM</div>
-                    <input className="input practice-mini-input" type="number" value={entry.bpm} onChange={(e) => updateBpmEntry(plan, index, { bpm: e.target.value })} />
-                  </div>
-                  <div>
-                    <div className="practice-mini-label">반복</div>
-                    <div className="count-stepper">
-                      <button className="count-button" type="button" onClick={() => decrementReps(plan, index)}>-</button>
-                      <div className="count-value">{Number(entry.repetitions) || 0}</div>
-                      <button className="count-button" type="button" onClick={() => incrementReps(plan, index)}>+1</button>
-                    </div>
-                  </div>
-                  <button className="bpm-entry-remove" type="button" onClick={() => removeBpmEntry(plan, index)}>×</button>
-                </div>
-              ))}
-              <button className="bpm-add" type="button" onClick={() => addBpmEntry(plan)}>+ BPM 추가</button>
+    if (step === "check") {
+      return (
+        <>
+          <PageHeader icon="🎹" title="연습 후 체크" subtitle={`${selectedPlans.length}개 항목 · ${minText(Math.max(1, Math.round(elapsedMs / 60000)))}`} />
+          <button className="review-back" type="button" onClick={() => setStep("practice")}>← 연습으로 돌아가기</button>
+          <Section title="오늘 한 테크닉">
+            {selectedPlans.map((plan) => {
+              const repetitions = totalRepetitionsForPlan(plan.id);
+              const bpmText = bpmEntriesText(normalizedBpmEntries(plan));
+              return (
+                <Row
+                  key={plan.id}
+                  marker="✓"
+                  title={techniqueTaskTitle(plan)}
+                  subtitle={[techniqueTaskMeta(plan), bpmText, repetitions ? `${repetitions}회` : ""].filter(Boolean).join(" · ")}
+                />
+              );
+            })}
+          </Section>
+          <Section title="연습 후 상태">
+            <div className="quick-checks">
+              <button className="button secondary" type="button" onClick={markStable}>오늘 안정적</button>
+              <button className="button ghost" type="button" onClick={markCaution}>무리감 표시</button>
             </div>
-          </Row>
-        ))}
-      </Section>
-      <Section title="연습 후 상태">
-        <div className="quick-checks">
-          <button className="button secondary" type="button" onClick={markStable}>오늘 안정적</button>
-          <button className="button ghost" type="button" onClick={markCaution}>무리감 표시</button>
+            <ChoiceGroup
+              label="완료"
+              value={Boolean(form.completedAll)}
+              onChange={(value) => setForm({ ...form, completedAll: value })}
+              options={[{ value: true, label: "끝까지 함" }, { value: false, label: "중간에 멈춤" }]}
+              warningValues={[false]}
+            />
+            <div className="score-grid">
+              <ScoreSelect label="소리 고름" value={form.evenness} onChange={(value) => setForm({ ...form, evenness: value })} />
+              <ScoreSelect label="음색 일정" value={form.soundConsistency} onChange={(value) => setForm({ ...form, soundConsistency: value })} />
+              <ScoreSelect label="손가락 균형" value={form.fingerIndependence} onChange={(value) => setForm({ ...form, fingerIndependence: value })} />
+            </div>
+            <ChoiceGroup
+              label="약해진 손가락"
+              value={form.weakFingerDrop}
+              onChange={(value) => setForm({ ...form, weakFingerDrop: value })}
+              options={Object.entries(DROP_LABELS).map(([value, label]) => ({ value, label }))}
+              warningValues={["mild", "clear"]}
+            />
+            <ChoiceGroup
+              label="무너짐"
+              value={form.collapse}
+              onChange={(value) => setForm({ ...form, collapse: value })}
+              options={Object.entries(COLLAPSE_LABELS).map(([value, label]) => ({ value, label }))}
+              warningValues={["mild", "clear"]}
+            />
+            <ChoiceGroup
+              label="몸 긴장"
+              value={form.tension}
+              onChange={(value) => setForm({ ...form, tension: Number(value) })}
+              options={[0,1,2,3,4,5].map((value) => ({ value, label: String(value) }))}
+              compact
+              warningValues={[3,4,5]}
+            />
+            <ChoiceGroup
+              label="통증/저림"
+              value={form.pain}
+              onChange={(value) => setForm({ ...form, pain: value })}
+              options={Object.entries(PAIN_LABELS).map(([value, label]) => ({ value, label }))}
+              warningValues={["discomfort", "pain"]}
+            />
+            <ChoiceGroup
+              label="난이도"
+              value={form.difficulty}
+              onChange={(value) => setForm({ ...form, difficulty: value })}
+              options={Object.entries(DIFFICULTY_LABELS).map(([value, label]) => ({ value, label }))}
+              warningValues={["hard", "tooHard"]}
+            />
+            <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
+            <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
+          </Section>
+          <button className="button full" style={{ marginTop: 18 }} onClick={save}>연습 저장</button>
+          <div className="rule-note">저장하면 연습 시간은 한 번만 기록되고, 체크한 항목들은 각자의 다음 단계 판정에 반영됩니다.</div>
+        </>
+      );
+    }
+    return (
+      <>
+        <PageHeader icon="🎹" title="테크닉 연습" subtitle="먼저 연습하고, 끝나면 체크합니다" />
+        <div className="practice-step-note">지금 화면은 연습용입니다. 체크리스트는 마지막 단계에서 한 번만 보이게 정리했습니다.</div>
+        <div className="timer-card">
+          <div className="timer-time">{clockText(elapsedMs)}</div>
+          <div className="button-row" style={{ marginTop: 0 }}>
+            {!activeTimer || !activeTimer.running ? <button className="button" onClick={startTimer}>{elapsedMs ? "이어하기" : "시작"}</button> : <button className="button secondary" onClick={pauseTimer}>일시정지</button>}
+            <button className="button ghost" onClick={resetTimer}>초기화</button>
+          </div>
         </div>
-        <ChoiceGroup
-          label="완료"
-          value={Boolean(form.completedAll)}
-          onChange={(value) => setForm({ ...form, completedAll: value })}
-          options={[{ value: true, label: "끝까지 함" }, { value: false, label: "중간에 멈춤" }]}
-          warningValues={[false]}
+        <Metronome
+          value={form.metronomeBPM}
+          signature={form.metronomeSignature}
+          onChange={(value) => setForm({ ...form, metronomeBPM: value })}
+          onSignatureChange={(value) => setForm({ ...form, metronomeSignature: value })}
         />
-        <div className="score-grid">
-          <ScoreSelect label="소리 고름" value={form.evenness} onChange={(value) => setForm({ ...form, evenness: value })} />
-          <ScoreSelect label="음색 일정" value={form.soundConsistency} onChange={(value) => setForm({ ...form, soundConsistency: value })} />
-          <ScoreSelect label="손가락 균형" value={form.fingerIndependence} onChange={(value) => setForm({ ...form, fingerIndependence: value })} />
+        <Section title="오늘 한 테크닉">
+          {availablePlans.map((plan) => {
+            const active = Boolean(checked[plan.id] || totalRepetitionsForPlan(plan.id) > 0);
+            const repetitions = totalRepetitionsForPlan(plan.id);
+            return (
+              <Row
+                key={plan.id}
+                marker={<span className="check-marker"><input type="checkbox" checked={active} readOnly /></span>}
+                title={techniqueTaskTitle(plan)}
+                subtitle={techniqueTaskMeta(plan)}
+                right={active ? <span className="mono">{repetitions}회</span> : <Pill>탭해서 추가</Pill>}
+                onClick={() => togglePlan(plan)}
+              >
+                {active && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    {entriesForPlan(plan).map((entry, index) => (
+                      <div className="bpm-entry" key={entry.id || index}>
+                        <div>
+                          <div className="practice-mini-label">BPM</div>
+                          <input className="input practice-mini-input" type="number" value={entry.bpm} onChange={(e) => updateBpmEntry(plan, index, { bpm: e.target.value })} />
+                        </div>
+                        <div>
+                          <div className="practice-mini-label">반복</div>
+                          <div className="count-stepper">
+                            <button className="count-button" type="button" onClick={() => decrementReps(plan, index)}>-</button>
+                            <div className="count-value">{Number(entry.repetitions) || 0}</div>
+                            <button className="count-button" type="button" onClick={() => incrementReps(plan, index)}>+1</button>
+                          </div>
+                        </div>
+                        <button className="bpm-entry-remove" type="button" onClick={() => removeBpmEntry(plan, index)}>×</button>
+                      </div>
+                    ))}
+                    <button className="bpm-add" type="button" onClick={() => addBpmEntry(plan)}>+ BPM 추가</button>
+                  </div>
+                )}
+              </Row>
+            );
+          })}
+        </Section>
+        <div className="practice-sticky">
+          <button className="button full" type="button" onClick={goToCheck}>연습 후 체크</button>
+          <div className="rule-note">{selectedPlans.length ? `${selectedPlans.length}개 항목 선택됨 · ${minText(Math.max(1, Math.round(elapsedMs / 60000)))}` : "체크할 항목을 누르고 반복 횟수를 올려주세요."}</div>
         </div>
-        <ChoiceGroup
-          label="약해진 손가락"
-          value={form.weakFingerDrop}
-          onChange={(value) => setForm({ ...form, weakFingerDrop: value })}
-          options={Object.entries(DROP_LABELS).map(([value, label]) => ({ value, label }))}
-          warningValues={["mild", "clear"]}
-        />
-        <ChoiceGroup
-          label="무너짐"
-          value={form.collapse}
-          onChange={(value) => setForm({ ...form, collapse: value })}
-          options={Object.entries(COLLAPSE_LABELS).map(([value, label]) => ({ value, label }))}
-          warningValues={["mild", "clear"]}
-        />
-        <ChoiceGroup
-          label="몸 긴장"
-          value={form.tension}
-          onChange={(value) => setForm({ ...form, tension: Number(value) })}
-          options={[0,1,2,3,4,5].map((value) => ({ value, label: String(value) }))}
-          compact
-          warningValues={[3,4,5]}
-        />
-        <ChoiceGroup
-          label="통증/저림"
-          value={form.pain}
-          onChange={(value) => setForm({ ...form, pain: value })}
-          options={Object.entries(PAIN_LABELS).map(([value, label]) => ({ value, label }))}
-          warningValues={["discomfort", "pain"]}
-        />
-        <ChoiceGroup
-          label="난이도"
-          value={form.difficulty}
-          onChange={(value) => setForm({ ...form, difficulty: value })}
-          options={Object.entries(DIFFICULTY_LABELS).map(([value, label]) => ({ value, label }))}
-          warningValues={["hard", "tooHard"]}
-        />
-        <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
-        <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
-      </Section>
-      <button className="button full" style={{ marginTop: 18 }} onClick={save}>연습 저장</button>
-      <div className="rule-note">저장하면 연습 시간은 한 번만 기록되고, 체크한 항목들은 각자의 다음 단계 판정에 반영됩니다.</div>
-    </>
-  );
+      </>
+    );
 }
 function TechniquePlanSessionForm({ data, techniquePlans, setTechniquePlanSessions, onClose }) {
   const activePlans = techniquePlans.filter((plan) => plan.status === "active" && !plan.completed);
