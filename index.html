@@ -1217,14 +1217,15 @@ function RecordView(p) {
   const reviewWeekStart = p.calendarMode === "week" ? periodStart : p.ws;
   const weekReview = p.reviews.find((review) => review.weekStart === reviewWeekStart);
   const countForDate = (date) => p.pianoSessions.filter((s) => s.date === date).length + p.techniquePractices.filter((s) => s.date === date).length;
+  const moveCalendar = (amount) => p.setCalendarAnchor(p.calendarMode === "week" ? shiftDate(p.calendarAnchor, amount * 7) : `${shiftMonth(ym, amount)}-01`);
   return (
     <>
       <PageHeader icon="📅" title="기록" subtitle={`${p.calendarMode === "week" ? `${shortDate(periodStart)} - ${shortDate(shiftDate(periodEnd, -1))}` : monthTitle(ym)} · ${minText(periodTotalMinutes)}`} />
       <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 0 12px" }}>
-        <button className="button ghost" onClick={() => p.setCalendarAnchor(shiftDate(p.calendarAnchor, p.calendarMode === "week" ? -7 : -30))}>←</button>
+        <button className="button ghost" onClick={() => moveCalendar(-1)}>←</button>
         <div style={{ fontSize: 14, fontWeight: 650 }}>{p.calendarMode === "week" ? `${shortDate(dates[0])} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
-        <button className="button ghost" onClick={() => p.setCalendarAnchor(shiftDate(p.calendarAnchor, p.calendarMode === "week" ? 7 : 30))}>→</button>
+        <button className="button ghost" onClick={() => moveCalendar(1)}>→</button>
       </div>
       <PianoDashboard
         mode={p.calendarMode === "week" ? "week" : "month"}
