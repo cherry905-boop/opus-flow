@@ -217,7 +217,7 @@ function App(){
 
     {tab==="works"&&<WorksTab works={works} horizons={horizons} wt={wt} wc={wc} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} pl={pl} cd={cd} C={C}/>}
     {tab==="record"&&<RecordTab sessions={sessions} reviews={reviews} cats={cats} td={td} ws={ws} gp={gp} gc={gc} nav={nav} tg={tg} btnS={btnS} btnG={btnG} H1={H1} H3={H3} rb={rb} pl={pl} pr={pr} pf={pf} cd={cd} C={C}/>}
-    {tab==="settings"&&<SetTab cats={cats} routine={routine} goals={goals} horizons={horizons} works={works} gc={gc} gp={gp} setGoals={setGoals} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} cd={cd} C={C}/>}
+    {tab==="settings"&&<SetTab cats={cats} routine={routine} goals={goals} horizons={horizons} works={works} sessions={sessions} reviews={reviews} gc={gc} gp={gp} setGoals={setGoals} nav={nav} tg={tg} btnS={btnS} inp={inp} H1={H1} H3={H3} rb={rb} cd={cd} C={C}/>}
   </div>
   <nav style={NV}>{[["home","작업실"],["works","곡"],["record","기록"],["settings","설정"]].map(x=>(
     <button key={x[0]} style={nb(tab===x[0])} onClick={()=>{setTab(x[0]);setScr(null);}}>{x[1]}</button>
@@ -254,10 +254,34 @@ function RecordTab(p){const{sessions,reviews,cats,td,ws,gp,gc,nav,tg,btnS,btnG,H
 }
 
 // === SETTINGS TAB ===
-function SetTab(p){const{cats,routine,goals,horizons,works,gc,gp,setGoals,nav,tg,btnS,inp,H1,H3,rb,cd,C}=p;
+function SetTab(p){const{cats,routine,goals,horizons,works,sessions,reviews,gc,gp,setGoals,nav,tg,btnS,inp,H1,H3,rb,cd,C}=p;
   const[stab,setStab]=useState("horizon");
+  const KS_ALL=["of3-works","of3-sessions","of3-reviews","of3-cats","of3-routine","of3-goals","of3-horizons","of3-timer"];
+  const expData=()=>{
+    const data={};KS_ALL.forEach(k=>{const v=localStorage.getItem(k);data[k]=v?JSON.parse(v):null;});
+    const obj={schemaVersion:1,exportedAt:new Date().toISOString(),appVersion:"v3",data};
+    const dt=new Date(),pad=n=>String(n).padStart(2,"0");
+    const fn=`opus-flow-backup-${dt.getFullYear()}${pad(dt.getMonth()+1)}${pad(dt.getDate())}-${pad(dt.getHours())}${pad(dt.getMinutes())}.json`;
+    const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=fn;a.click();
+    URL.revokeObjectURL(url);
+  };
+  const impData=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      let obj;try{obj=JSON.parse(ev.target.result);}catch(err){alert("파일을 읽을 수 없습니다");return;}
+      if(!obj||obj.schemaVersion!==1||!obj.data||typeof obj.data!=="object"){alert("지원하지 않는 백업 파일입니다");return;}
+      if(!confirm("현재 데이터가 모두 교체됩니다. 계속하시겠어요?"))return;
+      Object.entries(obj.data).forEach(([k,v])=>{if(v===null||v===undefined)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));});
+      location.reload();
+    };
+    r.readAsText(f);e.target.value="";
+  };
+  const lastSes=sessions.length?sessions.map(x=>x.date).sort().slice(-1)[0]:null;
   return(<div className="fi"><div style={{...H1,marginBottom:20}}>설정</div>
-    <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>{[["horizon","장기 목표"],["category","카테고리"],["routine","루틴"],["goals","주간 목표"]].map(x=><button key={x[0]} style={tg(stab===x[0])} onClick={()=>setStab(x[0])}>{x[1]}</button>)}</div>
+    <div style={{display:"flex",gap:6,marginBottom:20,flexWrap:"wrap"}}>{[["horizon","장기 목표"],["category","카테고리"],["routine","루틴"],["goals","주간 목표"],["data","데이터"]].map(x=><button key={x[0]} style={tg(stab===x[0])} onClick={()=>setStab(x[0])}>{x[1]}</button>)}</div>
     {stab==="horizon"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>장기 목표</span><button style={btnS} onClick={()=>nav("eH",{title:"",icon:"🎯",target:10})}>+ 추가</button></div>
       {horizons.map(h=>{const linked=works.filter(w=>(w.horizonIds||[]).indexOf(h.id)>=0&&["complete","repertoire","concert"].indexOf(w.status)>=0).length;return(<div key={h.id} style={{...cd,cursor:"pointer"}} onClick={()=>nav("eH",{...h})}><div style={rb}><span style={{fontWeight:700}}>{h.icon} {h.title}</span><span style={{color:C.ac,fontWeight:700}}>{linked}/{h.target}</span></div></div>);})}</div>}
     {stab==="category"&&<div><div style={{...rb,marginBottom:14}}><span style={{color:C.txM,fontSize:13,fontWeight:600}}>카테고리</span><button style={btnS} onClick={()=>nav("eC",{label:"",icon:"🎵"})}>+ 추가</button></div>
@@ -269,7 +293,13 @@ function SetTab(p){const{cats,routine,goals,horizons,works,gc,gp,setGoals,nav,tg
     {stab==="goals"&&<div><div style={{color:C.txM,fontSize:13,marginBottom:14,fontWeight:600}}>카테고리별 주간 목표</div>
       {cats.map(c=>{const g=goals.find(x=>x.categoryId===c.id);return(<div key={c.id} style={{...cd,display:"flex",alignItems:"center",gap:12}}><span style={{flex:1,fontSize:15,fontWeight:600}}>{c.icon} {c.label}</span>
         <input type="number" style={{...inp,width:64,marginBottom:0,textAlign:"center",padding:8}} value={g?g.target:0} onChange={e=>{const v=parseInt(e.target.value)||0;const ex=goals.find(x=>x.categoryId===c.id);if(ex)setGoals(goals.map(x=>x.categoryId===c.id?{...x,target:v}:x));else setGoals([...goals,{categoryId:c.id,target:v}]);}}/>
-        <span style={{color:C.txD,fontSize:13}}>회</span></div>);})}</div>}</div>);
+        <span style={{color:C.txD,fontSize:13}}>회</span></div>);})}</div>}
+    {stab==="data"&&<div>
+      <div style={cd}><div style={H3}>현재 저장된 데이터</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>{[["곡",works.length],["세션",sessions.length],["리뷰",reviews.length],["카테고리",cats.length]].map(x=>(<div key={x[0]} style={{textAlign:"center"}}><div style={{fontSize:20,fontWeight:800}}>{x[1]}</div><div style={{color:C.txM,fontSize:11,marginTop:4,fontWeight:600}}>{x[0]}</div></div>))}</div>
+        <div style={{color:C.txM,fontSize:13,fontWeight:500}}>마지막 활동 <span style={{color:C.tx,fontWeight:600,marginLeft:6}}>{lastSes?fmtFull(lastSes):"없음"}</span></div></div>
+      <div style={cd}><div style={H3}>백업 내보내기</div><button style={btnS} onClick={expData}>JSON 파일로 저장</button></div>
+      <div style={cd}><div style={H3}>백업 불러오기</div><label style={{...btnS,display:"inline-block"}}>JSON 파일 선택<input type="file" accept="application/json,.json" style={{display:"none"}} onChange={impData}/></label></div></div>}</div>);
 }
 
 // === SESSION FORM ===
