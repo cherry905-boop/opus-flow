@@ -180,6 +180,157 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   .overlay{background:var(--bg);backdrop-filter:none}
   .overlay-inner{min-height:100%;margin:0 auto;background:var(--bg);border:0;border-radius:0;box-shadow:none}
 }
+
+/* Photo reference pass: iOS-like piano practice app */
+html,body,#root{background:#f3f1ed}
+body{color:#1f1f1d}
+.app{background:#fff;min-height:100vh}
+.layout{max-width:390px;background:#fff}
+.main{max-width:390px;margin:0 auto;padding:0 24px 116px;background:#fff;overflow-x:hidden}
+.status-bar{height:42px;display:flex;align-items:center;justify-content:space-between;padding:8px 8px 2px;color:#111;font-size:15px;font-weight:720}
+.status-icons{display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:1}
+.battery{width:22px;height:11px;border:1.8px solid #111;border-radius:3px;display:inline-block;position:relative}
+.battery:after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;border-radius:2px;background:#111}
+.battery:before{content:"";position:absolute;left:2px;top:2px;bottom:2px;width:14px;border-radius:1px;background:#111}
+.page-header{margin:12px 0 16px}
+.page-head-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.page-head-left{display:flex;align-items:center;min-width:0;gap:12px}
+.page-icon{width:34px;height:34px;display:grid;place-items:center;margin:0;font-size:28px;line-height:1;color:#111}
+.page-icon:empty{display:none}
+.page-title{font-size:28px;font-weight:800;letter-spacing:0;line-height:1.12;color:#151512;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.page-subtitle{margin-top:7px;font-size:12px;line-height:1.35;color:#83807a}
+.page-action{flex:0 0 auto}
+.icon-button{width:34px;height:34px;border:0;background:transparent;border-radius:99px;color:#191916;font-size:22px;display:grid;place-items:center;cursor:pointer}
+.action-stack{display:grid;gap:12px;margin:16px 0 14px}
+.action-card{width:100%;max-width:100%;overflow:hidden;min-height:56px;border:1px solid #e7e2dc;background:#fff;border-radius:10px;display:grid;grid-template-columns:34px minmax(0,1fr) 18px;align-items:center;gap:10px;padding:12px 14px;text-align:left;color:#161613;box-shadow:0 1px 0 rgba(20,18,15,.02);cursor:pointer}
+.action-card:active{background:#f7f5f1}
+.action-icon{font-size:25px;line-height:1;text-align:center}
+.action-copy{display:grid;gap:2px;min-width:0}
+.action-title{font-size:16px;font-weight:760;line-height:1.25}
+.action-subtitle{font-size:11px;color:#8b8781;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chevron{font-size:24px;line-height:1;color:#111}
+.tabs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;margin:12px 0 20px;padding:3px;border:1px solid #e7e2dc;border-radius:999px;background:#f5f3ef;overflow:hidden}
+.tab{border:0;border-radius:999px;background:transparent;color:#5f5b55;font-size:13px;font-weight:500;padding:7px 10px;line-height:1.15}
+.tab.active{background:#fff;color:#111;font-weight:800;border-bottom:0;box-shadow:0 1px 8px rgba(26,24,20,.08)}
+.section{margin-top:24px}
+.section-head{margin-bottom:9px}
+.section-title{font-size:13px;font-weight:800;color:#1d1c19}
+.section-action.plus{font-size:24px;line-height:1;color:#1a1916}
+.row{width:100%;max-width:100%;overflow:hidden;min-height:58px;padding:11px 12px;margin-bottom:8px;border:1px solid #e8e3dc;border-radius:9px;background:#fff;gap:10px;box-shadow:0 1px 0 rgba(20,18,15,.02)}
+.row:first-child{border-top:1px solid #e8e3dc}
+.row:hover{background:#fff}
+.row:active{background:#f7f5f1}
+.marker{width:24px;flex-basis:24px;color:#111;font-size:20px}
+.row-title{font-size:13px;font-weight:760;color:#1f1f1d;letter-spacing:0}
+.row-sub{font-size:11px;color:#85817b;margin-top:3px}
+.row-right{gap:6px;font-size:11px;color:#635f59;flex:0 0 auto;max-width:96px;min-width:0;justify-content:flex-end;overflow:hidden}
+.row-stack{display:grid;gap:3px;text-align:right;color:#77736d}
+.row-stack .mono{color:#222;font-size:12px}
+.pill{border-radius:7px;padding:4px 8px;min-height:22px;font-size:11px;font-weight:700}
+.button{background:#1f211e;border-radius:12px;min-height:44px}
+.button.secondary{background:#f2f0ec;color:#222}
+.button.ghost{background:#f6f4f0;color:#555}
+.button.danger{background:#fbe4e4;color:#5c1f1f}
+.mobile-nav{border-top:1px solid #e7e2dc;background:rgba(255,255,255,.94);padding:6px 0 calc(7px + env(safe-area-inset-bottom));box-shadow:0 -10px 30px rgba(35,31,25,.06)}
+.mobile-nav-inner{max-width:390px;grid-template-columns:repeat(5,1fr);align-items:end}
+.nav-button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-height:58px;padding:4px 2px 5px;color:#7b7771;font-size:11px}
+.nav-button.active{color:#171715;font-weight:800}
+.nav-icon{height:22px;display:grid;place-items:center;font-size:20px;line-height:1}
+.nav-button.center{transform:translateY(-16px);color:#8a857f}
+.nav-button.center .nav-icon{width:54px;height:54px;border-radius:999px;background:linear-gradient(#b6b1a9,#979188);color:#fff;font-size:28px;box-shadow:0 8px 18px rgba(57,53,48,.24);border:3px solid rgba(255,255,255,.9)}
+.nav-button.center span:last-child{margin-top:-2px}
+.overlay{background:#fff}
+.overlay-inner{max-width:390px;padding:0 24px 128px;background:#fff}
+.back{padding:10px 0 12px;color:#111;font-size:24px;line-height:1;width:44px;text-align:left}
+.back{font-size:0}
+.back:before{content:"←";font-size:24px}
+.properties{border:1px solid #e8e3dc;border-radius:12px;padding:13px 14px;margin-bottom:18px;background:#fff}
+.field{margin-bottom:13px}
+.input,.select,.textarea{border:1px solid #e8e3dc;border-radius:9px;background:#fff;padding:11px 12px}
+.textarea{min-height:90px}
+.week-card,.bar-card,.distribution-card{border:1px solid #e8e3dc;border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 1px 0 rgba(20,18,15,.02)}
+.period-nav{display:grid;grid-template-columns:32px 1fr 32px;align-items:center;margin:0;padding:8px 4px 6px}
+.period-title{font-size:14px;font-weight:760;color:#1d1c19;text-align:center}
+.period-arrow{border:0;background:transparent;font-size:28px;line-height:1;color:#151512;cursor:pointer}
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);padding:7px 8px 12px;gap:2px}
+.week-day{border:0;background:transparent;display:grid;place-items:center;gap:6px;min-height:58px;border-radius:999px;color:#5f5b55;cursor:pointer}
+.week-day span{font-size:11px;color:#8a857f}
+.week-day strong{width:30px;height:30px;border-radius:99px;display:grid;place-items:center;font-size:14px;font-weight:650}
+.week-day.today strong{background:#1d1d1a;color:#fff}
+.week-day i{width:5px;height:5px;border-radius:99px;background:#48a064}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 22px}
+.metric-card{border:1px solid #e8e3dc;border-radius:9px;background:#fff;padding:13px 12px;min-height:88px}
+.metric-value{font-size:18px;font-weight:820;color:#1b1b18;line-height:1.15}
+.metric-label{font-size:12px;font-weight:760;color:#2a2926;margin-top:10px}
+.metric-caption{font-size:11px;color:#8a857f;margin-top:4px}
+.bar-card{height:176px;padding:18px 14px 10px}
+.bar-chart{height:100%;display:grid;grid-template-columns:repeat(7,1fr);align-items:end;gap:11px}
+.bar-column{height:100%;display:grid;grid-template-rows:1fr 18px;align-items:end;text-align:center;gap:8px}
+.bar-track{height:100%;display:flex;align-items:end;justify-content:center;border-top:1px solid #f0ece6}
+.bar-fill{width:14px;border-radius:8px 8px 2px 2px;background:#35332f;min-height:4px}
+.bar-column span{font-size:11px;color:#817c75}
+.distribution-card{padding:14px 13px}
+.dist-row{display:grid;grid-template-columns:54px 1fr 52px;align-items:center;gap:12px;min-height:28px;font-size:12px;color:#262522}
+.dist-row div{height:4px;border-radius:99px;background:#eeeae4;overflow:hidden}
+.dist-row i{display:block;height:100%;border-radius:99px;background:#9b9993}
+.dist-row em{font-style:normal;text-align:right;color:#6f6b65}
+.practice-timer-card{border:1px solid #e8e3dc;border-radius:12px;padding:14px 16px;margin:4px 0 18px;display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:center;background:#fff}
+.timer-label{font-size:11px;color:#6f6b65;margin-bottom:4px}
+.timer-time{font-size:36px;color:#050505;letter-spacing:0;margin:0}
+.timer-goal{border-left:1px solid #e8e3dc;padding-left:18px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 8px}
+.timer-goal .timer-label{grid-column:1 / 3}
+.timer-goal strong{font-size:18px}
+.timer-goal span{font-size:26px;color:#111}
+.timer-buttons{grid-column:1 / 3;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.metronome-card{border:1px solid #1f1f1d;border-radius:13px;background:#fff;padding:14px 16px 16px;margin:0 0 20px;box-shadow:0 12px 22px rgba(22,20,17,.16)}
+.metronome-top{margin:0 0 18px}
+.metronome-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:760}
+.metronome-icons{display:flex;gap:14px;font-size:20px;color:#191916}
+.metronome-dot{background:#4ca260}
+.metronome-display{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;font-size:40px;font-weight:820;color:#050505}
+.metronome-display input{width:92px;border:0;background:transparent;text-align:left;font:inherit;color:#050505;line-height:1}
+.metronome-beats{justify-content:center;margin:0 0 14px}
+.metronome-settings-row{display:grid;grid-template-columns:74px 82px 1fr;border-top:1px solid #ebe6df;border-bottom:1px solid #ebe6df;margin:0 -16px 15px}
+.metronome-settings-row label{min-height:58px;padding:9px 10px;border-right:1px solid #ebe6df;display:grid;align-content:center;gap:4px;font-size:11px;color:#6e6a64}
+.metronome-settings-row label:last-child{border-right:0;grid-template-columns:1fr 38px;align-items:center}
+.metronome-settings-row label:last-child span{grid-column:1 / 3}
+.metronome-settings-row select{border:0;background:transparent;color:#111;font-size:13px;min-width:0}
+.metronome-settings-row input[type=range]{width:100%;accent-color:#111}
+.metronome-settings-row em{font-style:normal;color:#111;text-align:right}
+.metronome-control-row{display:grid;grid-template-columns:58px 78px 72px;justify-content:center;align-items:center;gap:26px}
+.metro-stop,.metro-tap{border:0;background:#f1efeb;color:#111;border-radius:12px;min-height:44px;font-weight:800;cursor:pointer}
+.metro-play{border:0;width:78px;height:78px;border-radius:999px;background:#1f1f1d;color:#fff;font-size:32px;display:grid;place-items:center;box-shadow:0 8px 15px rgba(20,18,15,.2);cursor:pointer}
+.metro-tap{border-radius:999px}
+.metronome-state{margin-top:10px;justify-content:center;font-size:11px;color:#7c7771}
+.quick-checks{grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 18px}
+.quick-card{border:1px solid #e8e3dc;border-radius:10px;min-height:102px;background:#fff;display:grid;place-items:center;text-align:center;padding:12px;color:#171714;cursor:pointer}
+.quick-card strong{font-size:28px;line-height:1}
+.quick-card span{font-size:15px;font-weight:820;margin-top:4px}
+.quick-card em{font-style:normal;font-size:11px;color:#77736d}
+.quick-card.stable{background:#f4faf5;border-color:#dceadf}
+.quick-card.caution{background:#fff3f1;border-color:#f1d9d4;color:#8c1d13}
+.eval-list{display:grid;gap:8px}
+.eval-row{border:1px solid #e8e3dc;border-radius:10px;background:#fff;display:grid;grid-template-columns:40px 1fr;gap:10px;padding:10px}
+.eval-icon{width:34px;height:34px;border-radius:8px;background:#f2f0ec;display:grid;place-items:center;font-size:20px;color:#222}
+.eval-row.warning .eval-icon{background:#fff0ee;color:#9d2a1d}
+.eval-copy{min-width:0}
+.eval-title{font-size:13px;font-weight:820;color:#1c1b18}
+.eval-subtitle{font-size:10px;color:#8a857f;margin-top:2px;line-height:1.25}
+.eval-options{grid-column:1 / 3;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.eval-button{border:1px solid #ebe6df;background:#faf9f7;border-radius:7px;min-height:35px;font-size:12px;color:#4f4b45;cursor:pointer}
+.eval-button.active{background:#1f1f1d;color:#fff;border-color:#1f1f1d;font-weight:800}
+.practice-sticky{width:min(390px,100vw);padding:0 0 env(safe-area-inset-bottom);border:0;background:transparent;backdrop-filter:none}
+.dark-cta{border-radius:16px 16px 0 0;background:linear-gradient(135deg,#2d2f2b,#171914);min-height:90px;font-size:16px;box-shadow:0 -10px 24px rgba(24,22,18,.18)}
+.dark-cta span{display:inline-grid;place-items:center;margin-left:14px;width:24px;height:24px;border-radius:99px;background:#efede8;color:#222;font-size:12px}
+.calendar{border:0;margin:0}
+.calendar-head{border:0;color:#8a857f}
+.calendar-day{border:0;border-radius:9px}
+@media (min-width:900px){
+  .layout{max-width:390px;background:#fff;box-shadow:0 12px 36px rgba(33,30,24,.10)}
+  .main{max-width:390px;padding:0 24px 116px}
+  .mobile-nav{display:block}
+  .mobile-nav-inner{grid-template-columns:repeat(5,1fr)}
+}
 </style>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -576,13 +727,38 @@ const parseGroups = (value) => String(value || "")
   .map((part) => part.split(",").map((number) => Number(number.trim())).filter(Boolean))
   .filter((group) => group.length);
 
-function PageHeader({ icon, title, subtitle }) {
+function StatusBar() {
+  return (
+    <div className="status-bar" aria-hidden="true">
+      <span>9:41</span>
+      <span className="status-icons"><span>▮▮▮</span><span>⌁</span><span className="battery" /></span>
+    </div>
+  );
+}
+function PageHeader({ icon, title, subtitle, action }) {
   return (
     <header className="page-header">
-      <div className="page-icon">{icon}</div>
-      <h1 className="page-title">{title}</h1>
+      <div className="page-head-row">
+        <div className="page-head-left">
+          <div className="page-icon">{icon}</div>
+          <h1 className="page-title">{title}</h1>
+        </div>
+        {action && <div className="page-action">{action}</div>}
+      </div>
       {subtitle && <div className="page-subtitle">{subtitle}</div>}
     </header>
+  );
+}
+function ActionCard({ icon, title, subtitle, onClick }) {
+  return (
+    <button className="action-card" type="button" onClick={onClick}>
+      <span className="action-icon">{icon}</span>
+      <span className="action-copy">
+        <span className="action-title">{title}</span>
+        {subtitle && <span className="action-subtitle">{subtitle}</span>}
+      </span>
+      <span className="chevron">›</span>
+    </button>
   );
 }
 function Properties({ rows }) {
@@ -659,6 +835,43 @@ function ChoiceGroup({ label, value, onChange, options, compact = false, warning
             </button>
           );
         })}
+      </div>
+    </div>
+  );
+}
+function MetricCard({ label, value, caption }) {
+  return (
+    <div className="metric-card">
+      <div className="metric-value">{value}</div>
+      <div className="metric-label">{label}</div>
+      {caption && <div className="metric-caption">{caption}</div>}
+    </div>
+  );
+}
+function EvalRow({ icon, title, subtitle, value, onChange, warning = false }) {
+  const options = [
+    { value: "good", label: "좋음" },
+    { value: "normal", label: "보통" },
+    { value: "hard", label: "어려움" },
+  ];
+  return (
+    <div className={`eval-row ${warning ? "warning" : ""}`}>
+      <div className="eval-icon">{icon}</div>
+      <div className="eval-copy">
+        <div className="eval-title">{title}</div>
+        <div className="eval-subtitle">{subtitle}</div>
+      </div>
+      <div className="eval-options">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            className={`eval-button ${value === option.value ? "active" : ""}`}
+            onClick={() => onChange(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -782,57 +995,46 @@ function Metronome({ value = 80, signature = "4/4", onChange, onSignatureChange 
   return (
     <div className="metronome-card">
       <div className="metronome-top">
-        <div className="metronome-title">메트로놈</div>
-        <div className="metronome-state">
-          <span className={`metronome-dot ${running && beat ? "on" : ""}`} />
-          {running ? `${beat || 1}/${beatsPerMeasure}` : "대기"}
-          <div className="metronome-beats">
-            {Array.from({ length: beatsPerMeasure }).map((_, index) => (
-              <span key={index} className={`metronome-beat ${index === 0 ? "accent" : ""} ${running && beat === index + 1 ? "active" : ""}`} />
-            ))}
-          </div>
-        </div>
+        <div className="metronome-title"><span className={`metronome-dot ${running && beat ? "on" : ""}`} />메트로놈</div>
+        <div className="metronome-icons"><span>♩</span><span>⋮</span></div>
       </div>
-      <div className="metronome-controls">
-        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm - 5)}>-</button>
-        <div className="metronome-bpm">
-          <input
-            type="number"
-            min="30"
-            max="240"
-            value={bpmInput}
-            onChange={(e) => setBpmInput(e.target.value)}
-            onBlur={(e) => commitBpm(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                commitBpm(e.currentTarget.value);
-                e.currentTarget.blur();
-              }
-            }}
-          />
-          <span>BPM</span>
-        </div>
-        <button className="button ghost" type="button" onClick={() => setBpmValue(bpm + 5)}>+</button>
-        {running ? <button className="button secondary" type="button" onClick={stop}>정지</button> : <button className="button" type="button" onClick={start}>켜기</button>}
+      <div className="metronome-display">
+        <span>♩ =</span>
+        <input
+          type="number"
+          min="30"
+          max="240"
+          value={bpmInput}
+          onChange={(e) => setBpmInput(e.target.value)}
+          onBlur={(e) => commitBpm(e.currentTarget.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              commitBpm(e.currentTarget.value);
+              e.currentTarget.blur();
+            }
+          }}
+        />
       </div>
-      <details className="metronome-advanced">
-        <summary>박자·볼륨</summary>
-        <div className="metronome-options">
-          <div className="metronome-mini">
-            <span>박자</span>
-            <select value={timeSignature} onChange={(e) => setSignatureValue(e.target.value)}>
-              {METRONOME_SIGNATURES.map((item) => <option key={item} value={item}>{item}</option>)}
-            </select>
-          </div>
-          <div className="metronome-mini">
-            <span>강세</span>
-            <select value={timeSignature === "6/8" ? "1·4" : "1"} disabled>
-              <option value="1">1박</option>
-              <option value="1·4">1·4박</option>
-            </select>
-          </div>
-        </div>
-        <label className="metronome-volume">
+      <div className="metronome-beats">
+        {Array.from({ length: beatsPerMeasure }).map((_, index) => (
+          <span key={index} className={`metronome-beat ${index === 0 ? "accent" : ""} ${running && beat === index + 1 ? "active" : ""}`} />
+        ))}
+      </div>
+      <div className="metronome-settings-row">
+        <label>
+          <span>박자</span>
+          <select value={timeSignature} onChange={(e) => setSignatureValue(e.target.value)}>
+            {METRONOME_SIGNATURES.map((item) => <option key={item} value={item}>{item}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>음색</span>
+          <select defaultValue="click">
+            <option value="click">클릭</option>
+            <option value="soft">소프트</option>
+          </select>
+        </label>
+        <label>
           <span>볼륨</span>
           <input
             type="range"
@@ -843,9 +1045,17 @@ function Metronome({ value = 80, signature = "4/4", onChange, onSignatureChange 
             onInput={(e) => setVolumeValue(e.currentTarget.value)}
             onChange={(e) => setVolumeValue(e.currentTarget.value)}
           />
-          <span className="metronome-volume-value">{volume}%</span>
+          <em>{volume}</em>
         </label>
-      </details>
+      </div>
+      <div className="metronome-control-row">
+        <button className="metro-stop" type="button" onClick={stop}>■</button>
+        {running ? <button className="metro-play" type="button" onClick={stop}>Ⅱ</button> : <button className="metro-play" type="button" onClick={start}>▶</button>}
+        <button className="metro-tap" type="button" onClick={() => setBpmValue(bpm)}>TAP</button>
+      </div>
+      <div className="metronome-state">
+        {running ? `${beat || 1}/${beatsPerMeasure}` : "대기"} · {timeSignature}
+      </div>
     </div>
   );
 }
@@ -902,10 +1112,19 @@ function App() {
   };
 
   const navItems = [
-    { id: "piano", label: "피아노" },
-    { id: "record", label: "기록" },
-    { id: "settings", label: "설정" },
+    { id: "piano", label: "홈", icon: "⌂" },
+    { id: "record", label: "기록", icon: "◴" },
+    { id: "practice", label: "연습", icon: "◷", center: true },
+    { id: "library", label: "라이브러리", icon: "▦" },
+    { id: "settings", label: "설정", icon: "⚙" },
   ];
+  const handleNav = (item) => {
+    if (item.center) {
+      setScreen({ type: "technique-practice" });
+      return;
+    }
+    openTab(item.id);
+  };
   return (
     <div className="app">
       <div className="layout">
@@ -916,13 +1135,24 @@ function App() {
           </nav>
         </aside>
         <main className="main">
+          <StatusBar />
           {tab === "piano" && <PianoView {...common} />}
           {tab === "record" && <RecordView {...common} />}
+          {tab === "library" && <LibraryView {...common} />}
           {tab === "settings" && <SettingsView {...common} />}
         </main>
       </div>
       <nav className="mobile-nav"><div className="mobile-nav-inner">
-        {navItems.map((item) => <button key={item.id} className={`nav-button ${tab === item.id ? "active" : ""}`} onClick={() => openTab(item.id)}>{item.label}</button>)}
+        {navItems.map((item) => (
+          <button
+            key={item.id}
+            className={`nav-button ${tab === item.id ? "active" : ""} ${item.center ? "center" : ""}`}
+            onClick={() => handleNav(item)}
+          >
+            <span className="nav-icon">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
+        ))}
       </div></nav>
       {screen && <Overlay screen={screen} onClose={() => setScreen(null)} {...common} />}
     </div>
@@ -947,24 +1177,97 @@ function lastText(date) {
   return `${diff}일 전`;
 }
 function PianoView(p) {
-  const activePieces = p.pieces.filter((piece) => piece.status === "active").length;
-  const activePlans = p.techniquePlans.filter((plan) => plan.status === "active" && !plan.completed).length;
   return (
     <>
-      <PageHeader icon="🎹" title="피아노" subtitle={`곡 ${activePieces}개 · 테크닉 ${activePlans}개 · 마지막 ${lastText(p.lastActivity)}`} />
-      <Section title="연습 시작">
-        <Row marker="▶" title="곡 연습 시작" subtitle="타이머, 메트로놈, 구간 반복 카운트" right={<Pill tone="blue">시작</Pill>} onClick={() => p.setScreen({ type: "piece-practice" })} />
-        <Row marker="▶" title="테크닉 연습 시작" subtitle="메트로놈, BPM별 반복, 연습 후 체크" right={<Pill tone="blue">시작</Pill>} onClick={() => p.setScreen({ type: "technique-practice" })} />
-      </Section>
+      <PageHeader
+        icon="🎹"
+        title="피아노"
+        subtitle="오늘도 꾸준한 연습, 내일의 나를 만듭니다."
+        action={<button className="icon-button" type="button" aria-label="알림">♧</button>}
+      />
+      <div className="action-stack">
+        <ActionCard icon="♫" title="곡 연습 시작" subtitle="타이머와 구간 반복 카운트" onClick={() => p.setScreen({ type: "piece-practice" })} />
+        <ActionCard icon="♬" title="테크닉 연습 시작" subtitle="메트로놈, BPM별 반복, 연습 후 체크" onClick={() => p.setScreen({ type: "technique-practice" })} />
+      </div>
       <Tabs value={p.pianoView} onChange={p.setPianoView} items={[
         { value: "pieces", label: "곡" },
         { value: "techniques", label: "테크닉" },
         { value: "sessions", label: "세션" },
       ]} />
-      {p.pianoView === "pieces" && <PianoPieceLibrary {...p} />}
-      {p.pianoView === "techniques" && <TechniqueLibrary {...p} />}
+      {p.pianoView === "pieces" && <PianoHomePieces {...p} />}
+      {p.pianoView === "techniques" && <PianoHomeTechniques {...p} />}
       {p.pianoView === "sessions" && <PianoSessionList {...p} />}
     </>
+  );
+}
+function PianoHomePieces(p) {
+  const activePieces = p.pieces.filter((piece) => piece.status === "active").slice(0, 4);
+  const recentTechniqueRows = [
+    ...p.techniquePlanSessions.map((session) => ({
+      id: session.id,
+      date: session.date,
+      title: session.stageLabel || "테크닉 연습",
+      subtitle: [bpmEntriesText(session.bpmEntries) || (session.bpm ? `BPM ${session.bpm}` : ""), session.planType ? TECHNIQUE_TYPES[session.planType] : ""].filter(Boolean).join(" · "),
+      duration: session.practiceDuration || session.duration || 0,
+    })),
+    ...p.pianoSessions.filter((session) => session.type === "technique").map((session) => ({
+      id: session.id,
+      date: session.date,
+      title: p.pianoItemName(session) || "보조 테크닉",
+      subtitle: session.bpm ? `BPM ${session.bpm}` : "기록",
+      duration: session.duration || 0,
+    })),
+  ].sort(byDateDesc).slice(0, 3);
+  return (
+    <>
+      <Section title="집중 곡" action={<button className="section-action plus" type="button" onClick={() => p.setScreen({ type: "piece-form" })}>+</button>}>
+        {activePieces.map((piece) => {
+          const sessions = p.pianoSessions.filter((session) => session.type === "piece" && session.targetId === piece.id && session.date >= p.ws && session.date < p.we);
+          const minutes = sum(sessions, (session) => session.duration);
+          return (
+            <Row
+              key={piece.id}
+              marker="♪"
+              title={piece.title}
+              subtitle={piece.currentSection || piece.composer || "진행 구간 없음"}
+              right={<span className="row-stack"><span className="mono">{minutes ? minText(minutes) : "-"}</span><span>이번 주</span></span>}
+              onClick={() => p.setScreen({ type: "piece-practice", data: { pieceId: piece.id } })}
+            />
+          );
+        })}
+        {!activePieces.length && <Empty text="집중 곡 없음" />}
+      </Section>
+      <Section title="최근 테크닉 기록">
+        {recentTechniqueRows.map((row) => (
+          <Row
+            key={row.id}
+            marker="♪"
+            title={row.title}
+            subtitle={row.subtitle || "테크닉"}
+            right={<span className="row-stack"><span className="mono">{minText(row.duration)}</span><span>{lastText(row.date)}</span></span>}
+          />
+        ))}
+        {!recentTechniqueRows.length && <Empty text="최근 테크닉 기록 없음" />}
+      </Section>
+    </>
+  );
+}
+function PianoHomeTechniques(p) {
+  const activePlans = p.techniquePlans.filter((plan) => plan.status === "active" && !plan.completed);
+  return (
+    <Section title="현재 테크닉" action={<button className="section-action plus" type="button" onClick={() => p.setScreen({ type: "technique-plan-form" })}>+</button>}>
+      {activePlans.map((plan) => (
+        <Row
+          key={plan.id}
+          marker="●"
+          title={techniquePlanCompactText(plan)}
+          subtitle={techniqueNextText(plan)}
+          right={<Pill tone="blue">진행 중</Pill>}
+          onClick={() => p.setScreen({ type: "technique-plan-detail", item: plan })}
+        />
+      ))}
+      {!activePlans.length && <Empty text="진행 중인 테크닉 없음" />}
+    </Section>
   );
 }
 function PianoDashboard({
@@ -1283,63 +1586,82 @@ function RecordView(p) {
   const periodPieceSessions = periodPianoSessions.filter((session) => session.type === "piece");
   const periodSimpleTechniqueSessions = periodPianoSessions.filter((session) => session.type === "technique");
   const periodTotalMinutes = sum(periodPianoSessions, (session) => session.duration) + sum(periodTechniquePractices, (session) => session.duration);
-  const visibleMonthFocus = p.settings.monthlyFocus[ym] || { intent: "", pieceIds: [], techniqueIds: [] };
-  const focusPieces = (visibleMonthFocus.pieceIds || []).map((id) => p.pieceMap[id]).filter(Boolean);
-  const focusTechniques = (visibleMonthFocus.techniqueIds || []).map((id) => p.techniqueMap[id]).filter(Boolean);
-  const updateVisibleMonthFocus = (patch) => p.updateSettings({ monthlyFocus: { ...p.settings.monthlyFocus, [ym]: { ...visibleMonthFocus, ...patch } } });
   const reviewWeekStart = p.calendarMode === "week" ? periodStart : p.ws;
   const weekReview = p.reviews.find((review) => review.weekStart === reviewWeekStart);
   const countForDate = (date) => p.pianoSessions.filter((s) => s.date === date).length + p.techniquePractices.filter((s) => s.date === date).length;
   const moveCalendar = (amount) => p.setCalendarAnchor(p.calendarMode === "week" ? shiftDate(p.calendarAnchor, amount * 7) : `${shiftMonth(ym, amount)}-01`);
+  const cumulativeMinutes = sum(p.pianoSessions, (session) => session.duration) + sum(p.techniquePractices, (session) => session.duration);
+  const sessionCount = periodPianoSessions.length + periodTechniquePractices.length;
+  const avgDenominator = p.calendarMode === "week" ? 7 : parseDate(shiftDate(periodEnd, -1)).getDate();
+  const avgMinutes = Math.round(periodTotalMinutes / Math.max(1, avgDenominator));
+  const dayMinutes = (date) => sum(p.pianoSessions.filter((session) => session.date === date), (session) => session.duration) + sum(p.techniquePractices.filter((session) => session.date === date), (session) => session.duration);
+  const chartDates = p.calendarMode === "week" ? dates : dates.filter((date) => date.startsWith(ym)).slice(0, 7);
+  const chartRows = chartDates.map((date) => ({ date, label: DAYS[parseDate(date).getDay()], minutes: dayMinutes(date) }));
+  const maxChartMinutes = Math.max(1, ...chartRows.map((row) => row.minutes));
+  const techniqueRows = Object.entries(TECHNIQUE_TYPES).map(([type, label]) => {
+    const planMinutes = sum(periodTechniquePlanSessions.filter((session) => session.planType === type), (session) => session.practiceDuration || session.duration);
+    const simpleMinutes = sum(periodSimpleTechniqueSessions.filter((session) => {
+      const target = p.techniqueMap[session.targetId];
+      return target && target.category === label;
+    }), (session) => session.duration);
+    return { type, label, minutes: planMinutes + simpleMinutes };
+  }).filter((row) => row.minutes > 0 || p.calendarMode === "week").slice(0, 4);
+  const maxTechniqueMinutes = Math.max(1, ...techniqueRows.map((row) => row.minutes));
   return (
     <>
-      <PageHeader icon="📅" title="기록" subtitle={`${p.calendarMode === "week" ? `${shortDate(periodStart)} - ${shortDate(shiftDate(periodEnd, -1))}` : monthTitle(ym)} · ${minText(periodTotalMinutes)}`} />
-      <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
-      <div className="period-nav">
-        <button className="button ghost" onClick={() => moveCalendar(-1)}>←</button>
-        <div className="period-title">{p.calendarMode === "week" ? `${shortDate(dates[0])} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
-        <button className="button ghost" onClick={() => moveCalendar(1)}>→</button>
-      </div>
-      <PianoDashboard
-        mode={p.calendarMode === "week" ? "week" : "month"}
-        title={p.calendarMode === "week" ? `${shortDate(periodStart)} - ${shortDate(shiftDate(periodEnd, -1))}` : monthTitle(ym)}
-        totalMinutes={periodTotalMinutes}
-        pieceSessions={periodPieceSessions}
-        simpleTechniqueSessions={periodSimpleTechniqueSessions}
-        techniquePractices={periodTechniquePractices}
-        techniquePlanSessions={periodTechniquePlanSessions}
-        goalMinutes={p.calendarMode === "week" ? p.settings.goals.weeklyPianoMinutes : (Number(p.settings.goals.weeklyPianoMinutes) || 0) * 4}
-        pieces={p.pieces}
-        focusPieces={focusPieces}
-        focusTechniques={focusTechniques}
-        techniquePlans={p.techniquePlans}
-        pianoItemName={p.pianoItemName}
-        setScreen={p.setScreen}
-        showPracticeStart={false}
-        compact
-        monthControls={p.calendarMode === "month" ? (
-          <div className="properties">
-            <div className="property-label">의도</div>
-            <div className="property-value">
-              <textarea className="textarea" style={{ minHeight: 64 }} value={visibleMonthFocus.intent || ""} placeholder="이번 달 피아노 의도" onChange={(e) => updateVisibleMonthFocus({ intent: e.target.value })} />
-            </div>
-          </div>
-        ) : null}
-        onEditFocus={p.calendarMode === "month" ? () => { p.setSelectedMonth(ym); p.setScreen({ type: "focus-picker" }); } : null}
+      <PageHeader
+        icon="▣"
+        title="기록"
+        subtitle={`누적 ${minText(cumulativeMinutes)} · ${p.calendarMode === "week" ? "이번 주" : "이번 달"} ${minText(periodTotalMinutes)}`}
+        action={<button className="icon-button" type="button" aria-label="필터">≡</button>}
       />
-      <Section title="캘린더">
-        <div className="calendar">
-          {DAYS.map((day) => <div key={day} className="calendar-head">{day}</div>)}
-          {dates.map((date) => {
+      <Tabs value={p.calendarMode} onChange={p.setCalendarMode} items={[{ value: "week", label: "주간" }, { value: "month", label: "월간" }]} />
+      <div className="week-card">
+        <div className="period-nav">
+          <button className="period-arrow" onClick={() => moveCalendar(-1)}>‹</button>
+          <div className="period-title">{p.calendarMode === "week" ? `${fullDate(dates[0]).replace(` ${DAYS_FULL[parseDate(dates[0]).getDay()]}`, "")} - ${shortDate(dates[6])}` : monthTitle(ym)}</div>
+          <button className="period-arrow" onClick={() => moveCalendar(1)}>›</button>
+        </div>
+        <div className="week-strip">
+          {(p.calendarMode === "week" ? dates : dates.filter((date) => date.startsWith(ym)).slice(0, 7)).map((date) => {
             const count = countForDate(date);
             const isToday = date === p.td;
             return (
-              <button key={date} className={`calendar-day ${date.startsWith(ym) ? "" : "muted"} ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
-                <div>{parseDate(date).getDate()}</div>
-                {count > 0 && <div className="dot" />}
+              <button key={date} className={`week-day ${isToday ? "today" : ""}`} onClick={() => p.setScreen({ type: "day-detail", date })}>
+                <span>{DAYS[parseDate(date).getDay()]}</span>
+                <strong>{parseDate(date).getDate()}</strong>
+                {count > 0 && <i />}
               </button>
             );
           })}
+        </div>
+      </div>
+      <div className="metric-grid">
+        <MetricCard label="세션" value={`${sessionCount}회`} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+        <MetricCard label="연습 시간" value={minText(periodTotalMinutes)} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+        <MetricCard label="일 평균" value={minText(avgMinutes)} caption={p.calendarMode === "week" ? "이번 주" : "이번 달"} />
+      </div>
+      <Section title={`${p.calendarMode === "week" ? "주간" : "월간"} 시간 분포`}>
+        <div className="bar-card">
+          <div className="bar-chart">
+            {chartRows.map((row) => (
+              <div className="bar-column" key={row.date}>
+                <div className="bar-track"><div className="bar-fill" style={{ height: `${Math.max(4, row.minutes / maxChartMinutes * 100)}%` }} /></div>
+                <span>{row.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+      <Section title="테크닉별 시간">
+        <div className="distribution-card">
+          {techniqueRows.map((row) => (
+            <div className="dist-row" key={row.type}>
+              <span>{row.label}</span>
+              <div><i style={{ width: `${Math.max(6, row.minutes / maxTechniqueMinutes * 100)}%` }} /></div>
+              <em>{minText(row.minutes)}</em>
+            </div>
+          ))}
         </div>
       </Section>
       <Section title="주간 리뷰">
@@ -1349,6 +1671,21 @@ function RecordView(p) {
         {p.reviews.slice().sort((a, b) => (b.weekStart || "").localeCompare(a.weekStart || "")).slice(0, 5).map((review) => <Row key={review.id} marker="□" title={review.weekStart ? fullDate(review.weekStart) : "날짜 없음"} subtitle={(review.win || review.text || review.focus || review.memo || "").slice(0, 70) || "내용 없음"} onClick={() => p.setScreen({ type: "review-form", item: { ...review, win: review.win || review.text || "" } })} />)}
         {!p.reviews.length && <Empty text="지난 리뷰 없음" />}
       </Section>
+    </>
+  );
+}
+
+function LibraryView(p) {
+  const [view, setView] = useState("pieces");
+  return (
+    <>
+      <PageHeader icon="▦" title="라이브러리" subtitle={`곡 ${p.pieces.length}개 · 테크닉 ${p.techniquePlans.length}개`} />
+      <Tabs value={view} onChange={setView} items={[
+        { value: "pieces", label: "곡" },
+        { value: "techniques", label: "테크닉" },
+      ]} />
+      {view === "pieces" && <PianoPieceLibrary {...p} />}
+      {view === "techniques" && <TechniqueLibrary {...p} />}
     </>
   );
 }
@@ -1479,6 +1816,7 @@ function Overlay({ screen, onClose, ...p }) {
   return (
     <div className="overlay">
       <div className="overlay-inner">
+        <StatusBar />
         <button className="back" onClick={onClose}>← 닫기</button>
         {screen.type === "piece-form" && <PieceForm item={screen.item} onClose={onClose} {...p} />}
         {screen.type === "technique-form" && <TechniqueForm item={screen.item} onClose={onClose} {...p} />}
@@ -1868,6 +2206,12 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
     pain: prev.pain === "none" ? "discomfort" : prev.pain,
     difficulty: ["easy", "good"].includes(prev.difficulty) ? "hard" : prev.difficulty,
   }));
+  const evalFromScore = (score) => Number(score) >= 4 ? "good" : Number(score) >= 3 ? "normal" : "hard";
+  const scoreFromEval = (value) => value === "good" ? 5 : value === "normal" ? 3 : 1;
+  const evalFromPain = (value) => value === "none" ? "good" : value === "discomfort" ? "normal" : "hard";
+  const painFromEval = (value) => value === "good" ? "none" : value === "normal" ? "discomfort" : "pain";
+  const evalFromDifficulty = (value) => ["easy", "good"].includes(value) ? "good" : value === "hard" ? "normal" : "hard";
+  const difficultyFromEval = (value) => value === "good" ? "good" : value === "normal" ? "hard" : "tooHard";
   const save = () => {
     if (!selectedPlans.length) {
       alert("체크한 테크닉 항목이 없습니다.");
@@ -1970,74 +2314,51 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
               );
             })}
           </Section>
-          <Section title="연습 후 상태">
+          <Section title="연습 상태 평가">
             <div className="quick-checks">
-              <button className="button secondary" type="button" onClick={markStable}>오늘 안정적</button>
-              <button className="button ghost" type="button" onClick={markCaution}>무리감 표시</button>
+              <button className="quick-card stable" type="button" onClick={markStable}>
+                <strong>☺</strong>
+                <span>오늘 안정적</span>
+                <em>모든 항목 양호</em>
+              </button>
+              <button className="quick-card caution" type="button" onClick={markCaution}>
+                <strong>☹</strong>
+                <span>무리감 표시</span>
+                <em>어려움 있음</em>
+              </button>
             </div>
-            <ChoiceGroup
-              label="완료"
-              value={Boolean(form.completedAll)}
-              onChange={(value) => setForm({ ...form, completedAll: value })}
-              options={[{ value: true, label: "끝까지 함" }, { value: false, label: "중간에 멈춤" }]}
-              warningValues={[false]}
-            />
-            <div className="score-grid">
-              <ScoreSelect label="소리 고름" value={form.evenness} onChange={(value) => setForm({ ...form, evenness: value })} />
-              <ScoreSelect label="음색 일정" value={form.soundConsistency} onChange={(value) => setForm({ ...form, soundConsistency: value })} />
-              <ScoreSelect label="손가락 균형" value={form.fingerIndependence} onChange={(value) => setForm({ ...form, fingerIndependence: value })} />
+            <div className="eval-list">
+              <EvalRow icon="⌁" title="소리의 고름" subtitle="음색과 음량이 균일하게 유지되었나요?" value={evalFromScore(form.evenness)} onChange={(value) => setForm({ ...form, evenness: scoreFromEval(value), soundConsistency: scoreFromEval(value) })} />
+              <EvalRow icon="♖" title="손가락 밸런스" subtitle="특정 손가락이 약해지지 않았나요?" value={form.weakFingerDrop === "none" && evalFromScore(form.fingerIndependence) === "good" ? "good" : form.weakFingerDrop === "mild" ? "normal" : "hard"} onChange={(value) => setForm({ ...form, fingerIndependence: scoreFromEval(value), weakFingerDrop: value === "good" ? "none" : value === "normal" ? "mild" : "clear" })} />
+              <EvalRow icon="♧" title="긴장도" subtitle="불필요한 긴장 없이 편안했나요?" value={Number(form.tension) <= 2 ? "good" : Number(form.tension) === 3 ? "normal" : "hard"} onChange={(value) => setForm({ ...form, tension: value === "good" ? 1 : value === "normal" ? 3 : 5 })} />
+              <EvalRow icon="♡" title="통증 / 불편감" subtitle="통증이나 불편감이 없었나요?" value={evalFromPain(form.pain)} onChange={(value) => setForm({ ...form, pain: painFromEval(value) })} warning />
+              <EvalRow icon="▥" title="난이도 체감" subtitle="현재 BPM이 적절한 난이도였나요?" value={evalFromDifficulty(form.difficulty)} onChange={(value) => setForm({ ...form, difficulty: difficultyFromEval(value) })} />
+              <EvalRow icon="♖" title="한 손 연습" subtitle="필요한 경우 한 손 연습이 수월하게 되었나요?" value={Boolean(form.completedAll) ? "good" : "normal"} onChange={(value) => setForm({ ...form, completedAll: value !== "hard" })} />
             </div>
-            <ChoiceGroup
-              label="약해진 손가락"
-              value={form.weakFingerDrop}
-              onChange={(value) => setForm({ ...form, weakFingerDrop: value })}
-              options={Object.entries(DROP_LABELS).map(([value, label]) => ({ value, label }))}
-              warningValues={["mild", "clear"]}
-            />
-            <ChoiceGroup
-              label="무너짐"
-              value={form.collapse}
-              onChange={(value) => setForm({ ...form, collapse: value })}
-              options={Object.entries(COLLAPSE_LABELS).map(([value, label]) => ({ value, label }))}
-              warningValues={["mild", "clear"]}
-            />
-            <ChoiceGroup
-              label="몸 긴장"
-              value={form.tension}
-              onChange={(value) => setForm({ ...form, tension: Number(value) })}
-              options={[0,1,2,3,4,5].map((value) => ({ value, label: String(value) }))}
-              compact
-              warningValues={[3,4,5]}
-            />
-            <ChoiceGroup
-              label="통증/저림"
-              value={form.pain}
-              onChange={(value) => setForm({ ...form, pain: value })}
-              options={Object.entries(PAIN_LABELS).map(([value, label]) => ({ value, label }))}
-              warningValues={["discomfort", "pain"]}
-            />
-            <ChoiceGroup
-              label="난이도"
-              value={form.difficulty}
-              onChange={(value) => setForm({ ...form, difficulty: value })}
-              options={Object.entries(DIFFICULTY_LABELS).map(([value, label]) => ({ value, label }))}
-              warningValues={["hard", "tooHard"]}
-            />
             <Field label="녹음/파일"><input className="input" value={form.recordingId} placeholder="선택 사항: 파일명이나 링크" onChange={(e) => setForm({ ...form, recordingId: e.target.value })} /></Field>
             <Field label="메모"><textarea className="textarea" value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} /></Field>
           </Section>
-          <button className="button full" style={{ marginTop: 18 }} onClick={save}>연습 저장</button>
+          <div className="practice-sticky">
+            <button className="button full dark-cta" type="button" onClick={save}>◎ 기록 저장하기</button>
+          </div>
           <div className="rule-note">저장하면 연습 시간은 한 번만 기록되고, 체크한 항목들은 각자의 다음 단계 판정에 반영됩니다.</div>
         </>
       );
     }
     return (
       <>
-        <PageHeader icon="🎹" title="테크닉 연습" subtitle="먼저 연습하고, 끝나면 체크합니다" />
-        <div className="practice-step-note">지금 화면은 연습용입니다. 체크리스트는 마지막 단계에서 한 번만 보이게 정리했습니다.</div>
-        <div className="timer-card">
-          <div className="timer-time">{clockText(elapsedMs)}</div>
-          <div className="button-row" style={{ marginTop: 0 }}>
+        <PageHeader icon="" title="테크닉 연습" action={<button className="icon-button" type="button" onClick={resetTimer}>◷</button>} />
+        <div className="timer-card practice-timer-card">
+          <div>
+            <div className="timer-label">연습 시간</div>
+            <div className="timer-time">{clockText(elapsedMs)}</div>
+          </div>
+          <div className="timer-goal">
+            <div className="timer-label">세션 목표</div>
+            <strong>30:00</strong>
+            <span>›</span>
+          </div>
+          <div className="timer-buttons">
             {!activeTimer || !activeTimer.running ? <button className="button" onClick={startTimer}>{elapsedMs ? "이어하기" : "시작"}</button> : <button className="button secondary" onClick={pauseTimer}>일시정지</button>}
             <button className="button ghost" onClick={resetTimer}>초기화</button>
           </div>
@@ -2048,7 +2369,7 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
           onChange={(value) => setForm({ ...form, metronomeBPM: value })}
           onSignatureChange={(value) => setForm({ ...form, metronomeSignature: value })}
         />
-        <Section title="오늘 한 테크닉">
+        <Section title="현재 테크닉">
           {availablePlans.map((plan) => {
             const active = Boolean(checked[plan.id] || totalRepetitionsForPlan(plan.id) > 0);
             const repetitions = totalRepetitionsForPlan(plan.id);
@@ -2088,8 +2409,7 @@ function TechniquePracticeForm({ data, techniquePlans, setTechniquePractices, se
           })}
         </Section>
         <div className="practice-sticky">
-          <button className="button full" type="button" onClick={goToCheck}>연습 후 체크</button>
-          <div className="rule-note">{selectedPlans.length ? `${selectedPlans.length}개 항목 선택됨 · ${minText(Math.max(1, Math.round(elapsedMs / 60000)))}` : "체크할 항목을 누르고 반복 횟수를 올려주세요."}</div>
+          <button className="button full dark-cta" type="button" onClick={goToCheck}>◎ 연습 후 체크하기 <span>{selectedPlans.length || 0}</span></button>
         </div>
       </>
     );
