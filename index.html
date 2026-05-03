@@ -193,11 +193,6 @@ body{color:#1f1f1d}
 .app{background:#fff;min-height:100vh}
 .layout{max-width:390px;background:#fff}
 .main{max-width:390px;margin:0 auto;padding:0 24px 116px;background:#fff;overflow-x:hidden}
-.status-bar{height:42px;display:flex;align-items:center;justify-content:space-between;padding:8px 8px 2px;color:#111;font-size:15px;font-weight:720}
-.status-icons{display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:1}
-.battery{width:22px;height:11px;border:1.8px solid #111;border-radius:3px;display:inline-block;position:relative}
-.battery:after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;border-radius:2px;background:#111}
-.battery:before{content:"";position:absolute;left:2px;top:2px;bottom:2px;width:14px;border-radius:1px;background:#111}
 .page-header{margin:12px 0 16px}
 .page-head-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .page-head-left{display:flex;align-items:center;min-width:0;gap:12px}
@@ -813,14 +808,6 @@ const parseGroups = (value) => String(value || "")
   .map((part) => part.split(",").map((number) => Number(number.trim())).filter(Boolean))
   .filter((group) => group.length);
 
-function StatusBar() {
-  return (
-    <div className="status-bar" aria-hidden="true">
-      <span>9:41</span>
-      <span className="status-icons"><span>▮▮▮</span><span>⌁</span><span className="battery" /></span>
-    </div>
-  );
-}
 function PageHeader({ icon, title, subtitle, action }) {
   return (
     <header className="page-header">
@@ -1221,7 +1208,6 @@ function App() {
           </nav>
         </aside>
         <main className="main">
-          <StatusBar />
           {tab === "piano" && <PianoView {...common} />}
           {tab === "record" && <RecordView {...common} />}
           {tab === "library" && <LibraryView {...common} />}
@@ -1704,7 +1690,6 @@ function Overlay({ screen, onClose, ...p }) {
   return (
     <div className="overlay">
       <div className="overlay-inner">
-        <StatusBar />
         <button className="back" onClick={onClose}>← 닫기</button>
         {screen.type === "piece-form" && <PieceForm item={screen.item} onClose={onClose} {...p} />}
         {screen.type === "technique-form" && <TechniqueForm item={screen.item} onClose={onClose} {...p} />}
